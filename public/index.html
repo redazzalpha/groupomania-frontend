@@ -1,19 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="<%= BASE_URL %>favicon.svg">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
+
+    <!-- font-awesome CSS -->
+    <link rel="stylesheet" href="./fonts/css/font-awesome.min.css" defer>
+
+    <!--TODO add href link-->
+    <link rel="canonical" href="example_site_url_main_page">
+
+    <meta name="title" content="Groupomania - Réseau social d'entreprise" >
+    <!--TODO write better description-->
+    <meta name="description" content="Groupomania est un réseau social d'entreprise" >
+
+    <meta name="robots" content="index, follow" >   
+    <meta name="googlebot" content="index, follow" >
+
+    <meta name="twitter-card" content="summary">
+    <meta name="twitter-title" content="Groupomania - Réseau social d'entreprise">
+    <!--TODO write better description-->
+    <meta name="twitter-description" content="Groupomania est un réseau social d'entreprise">
+    
+    <!--TODO add url-->
+    <meta name="twitter-url" content="example_site_url">
+    <meta name="twitter-image" content="example_image_url">
+
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Groupomania - Réseau social d'entreprise">
+    <meta property="og:title" content="Groupomania - Réseau social d'entreprise" >
+
+    <!--TODO write better description-->
+    <meta property="og:description" content="Groupomania est un réseau social d'entreprise" >
+
+    <!--TODO add url-->
+    <meta property="og:url" content="example_site_url" >
+    <meta property="og:image" content="example_image_url" >
+
+    <title>Groupomania - Réseau social d'entreprise</title>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    
   </body>
 </html>

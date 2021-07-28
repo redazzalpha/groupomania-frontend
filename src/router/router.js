@@ -1,57 +1,58 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import defines from '../defines/define';
 import register from '../views/register.vue';
 import home from '../views/home.vue';
-import signup from '../views/signup.vue';
 import profil from '../views/profil.vue';
 import team from '../views/team.vue';
 import notification from '../views/notification.vue';
 import logout from '../views/logout.vue';
-import insertimg from '../views/insertimg.vue';
+import notfound from '../views/notfound.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
     {
-        path: '/',
+        name: "root",
+        path: defines.ROOT_URL,
+        redirect: defines.REGISTER_URL,
+        component: register,
+    },
+    {
         name: 'register',
+        path: defines.REGISTER_URL,
         component: register
     },
     {
-        path: '/home',
         name: 'home',
+        path: `${defines.HOME_URL}/:id`,
         component: home
     },
     {
-        path: '/signup',
-        name: 'signup',
-        component: signup
-    },
-    {
-        path: '/profil',
         name: 'profil',
+        path: defines.PROFIL_URL,
         component: profil
     },
     {
-        path: '/team',
         name: 'team',
+        path: defines.TEAM_URL,
         component: team
     },
     {
-        path: '/notification',
         name: 'notification',
+        path: defines.NOTIFICATION_URL,
         component: notification
     },
     {
-        path: '/logout',
         name: 'logout',
+        path: defines.LOGOUT_URL,
         component: logout
     },
     {
-        path: '/insert/img',
-        name: 'insertimg',
-        component: insertimg
-    },
+        name: "notFound",
+        path: "/*",
+        component: notfound
+    }
 ];
 
 const router = new VueRouter({
