@@ -16,13 +16,18 @@ const storeServices = {
         context.commit("TOGGLE_DRAWER");
     },
     post: async (context, payload) => {
-        let answer = await fetch(payload.url, { method: "post", headers: { "Accept": "application/json", "Content-type": "application/json", }, body: JSON.stringify(payload.data) });
+        const headers = new Headers({
+            "Accept": "application/json",
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${payload.data.token}`,
+        });
+        let answer = await fetch(payload.url, { method: "post", headers, body: JSON.stringify(payload.data) });
         let data = await answer.text();
         context.commit("SET_POST_ANSWER", data);
     },
     get: async (context, payload) => {
-
         const headers = new Headers({
+            "Accept": "application/json",
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${payload.data.token}`,
         });

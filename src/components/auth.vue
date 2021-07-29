@@ -47,11 +47,14 @@ export default {
     },
     async created() {        
         if(localStorage.data != null && localStorage.data != undefined) {
+            const data = JSON.parse(localStorage.data);
             const payload = {
                 url: `${process.env.VUE_APP_SERVER_URL}${defines.HOME_URL}`,
-                data: JSON.parse(localStorage.data).response,
+                data: {
+                    token: data.response.token,
+                },
             };
-            await this.get(payload);    
+            await this.get(payload);
             if(JSON.parse(this.getAnswer).error == undefined)
                 this.ready = true;
             else this.ready = false;

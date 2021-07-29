@@ -81,13 +81,16 @@ export default {
     methods: {
         ...mapActions(["post", "get"]),
         async publish() {
+            //post publication
             // check if publication if empty   
             if(this.publication && services.checkPublication(this.publication)) {
                 // check local storage
                 if(localStorage.data != null && localStorage.data != undefined) {
                     // get data from localstorage
-                    const id = JSON.parse(localStorage.data).response.id;
-                    const author = JSON.parse(localStorage.data).response.email;
+                    const data =  JSON.parse(localStorage.data);
+                    const id = data.response.id;
+                    const author = data.response.email;
+                    const token = data.response.token;
                     // create payload
                     const payload = {
                     url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
@@ -96,7 +99,8 @@ export default {
                             author: author,
                             publication: this.publication,
                             postLike: 0,
-                            postDislike: 0
+                            postDislike: 0,
+                            token: token,
                         }
                     };
                     // post publication
@@ -150,6 +154,19 @@ export default {
         close() {
             this.errordial = !this.errordial;
         },
+    },
+    async beforeMount() {
+        // get publications
+        if(localStorage.data != null && localStorage.data != undefined) {
+            const data = JSON.parse(localStorage.data);
+            const payload = {
+                url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
+                data: {
+                    token: data.response.token,
+                }
+            };
+            await this.get(payload);    
+        }
     },
 }
 </script>

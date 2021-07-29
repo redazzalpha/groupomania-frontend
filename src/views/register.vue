@@ -182,6 +182,7 @@ export default {
                         pseudo: this.pseudo,
                         email: this.email,
                         password: this.password,
+                        token: "",
                     },
                 };
                 // post data
@@ -207,7 +208,8 @@ export default {
                         url: `${process.env.VUE_APP_SERVER_URL}/login`,
                         data: {
                             email: this.email,
-                            password: this.password
+                            password: this.password,
+                            token: "",
                         }
                     };
                     // post data
@@ -231,11 +233,10 @@ export default {
     },
     async created() {
         // auto loggin
-        const data = localStorage.data;
-        if(data != undefined && data != null) {
-            const answer = JSON.parse(localStorage.data);
+        if(localStorage.data != null && localStorage.data != undefined) {
+            const data = JSON.parse(localStorage.data);
             this.dialog = false;
-            this.$router.push(`${defines.HOME_URL}/${answer.response.id}`);
+            this.$router.push(`${defines.HOME_URL}/${data.response.id}`);
         }
     },
     
