@@ -1,7 +1,7 @@
 <template>
     <div>
         <!--dialog-login-register-window-->
-        <v-dialog v-model="dialog" persistent max-width="600px" min-width="360px">
+        <v-dialog v-model="dialog" persistent max-width="600px" min-width="360px" :retain-focus="false">
             <div class="main-block">
                 <!--main-tab-container-->
                 <v-tabs v-model="tab" show-arrows background-color="primary" icons-and-text dark grow>
@@ -79,6 +79,7 @@
         </template >
         </errordial>
     </div>
+
 </template>
 
 <script>
@@ -228,6 +229,16 @@ export default {
             this.dialog2 = !this.dialog2;
         },
     },
+    async created() {
+        // auto loggin
+        const data = localStorage.data;
+        if(data != undefined && data != null) {
+            const answer = JSON.parse(localStorage.data);
+            this.dialog = false;
+            this.$router.push(`${defines.HOME_URL}/${answer.response.id}`);
+        }
+    },
+    
 }
 </script>
 
