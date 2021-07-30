@@ -1,11 +1,6 @@
 <template>
     <auth tab="home" :auth_url="auth_url"  @onReady="trigger">
         <slot v-if="ready">
-
-
-            ++ {{getAnswer}}
-            ++ {{obj}}
-
             <h2 class="pa-5">Dernières publiations</h2>
             <!--express your-self-card-->
             <v-card elevation="15" color="grey lighten-3" max-width=550 class="ma-auto mb-8">
@@ -41,7 +36,7 @@
             </v-card>
             <!--publication-card-->
             <pubcard 
-                authorPub="hi guys !" 
+                :authorPub="pub" 
                 authorName="MalcomZ"
                 authorImgUrl="../assets/malcomZ.jpg"
                 userImgUrl="../assets/user_wolf.jpg"
@@ -87,7 +82,8 @@ export default {
             errordial: false,
             titleDial: "",
             textDial: "",
-            obj: "",
+            pub: null,
+
             buttons: [
                 {label: "Ajouter une image", class: "col-8",action: this.post},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish },
@@ -115,6 +111,7 @@ export default {
                     url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
                         data: {
                             id: id,
+                            pseudo: "mook",
                             author: author,
                             publication: this.publication,
                             postLike: 0,
@@ -124,6 +121,7 @@ export default {
                     };
                     // post publication
                     await this.post(payload);
+
                     const answer = JSON.parse(this.postAnswer);
                     // check if error from server 
                     if(answer.error != undefined && answer.error.code != undefined) {
@@ -185,6 +183,12 @@ export default {
                 }
             };
             await this.get(payload);
+            const answer = JSON.parse(this.getAnswer);
+            if(answer.results.length >= 1)
+                this.pub = answer.results[0].text;
+
+
+            
         }
     },
 }
