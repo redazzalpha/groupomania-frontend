@@ -1,8 +1,14 @@
 <template>
-    <auth tab="home" @onReady="trigger">
+    <auth tab="home" :auth_url="auth_url"  @onReady="trigger">
         <slot v-if="ready">
+
+
+            ++ {{getAnswer}}
+            ++ {{obj}}
+
             <h2 class="pa-5">Dernières publiations</h2>
-            <v-card elevation="15" color="grey lighten-3" max-width=550 class="ma-auto">
+            <!--express your-self-card-->
+            <v-card elevation="15" color="grey lighten-3" max-width=550 class="ma-auto mb-8">
                 <v-container>
                     <v-row>
                         <v-col>
@@ -10,7 +16,7 @@
                             <v-card-subtitle class="d-none d-sm-block">Publiez ce que vous aimez !</v-card-subtitle>
                         </v-col>
                         <v-col class="d-flex flex-row-reverse">
-                            <v-avatar color="primary"  right size="60" class="white--text"><img src="../assets/user_wolf.jpg" alt="user image"></v-avatar>
+                            <v-avatar color="primary"  right size="60" class="white--text"><v-img src="../assets/user_wolf.jpg" alt="user image" /></v-avatar>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -33,6 +39,15 @@
                     </v-container>
                 </v-card-actions>
             </v-card>
+            <!--publication-card-->
+            <pubcard 
+                authorPub="hi guys !" 
+                authorName="MalcomZ"
+                authorImgUrl="../assets/malcomZ.jpg"
+                userImgUrl="../assets/user_wolf.jpg"
+                likeCount=0
+                dislikeCount=0
+            ></pubcard>
             <!--error-dial-->
             <errordial
             title="Erreur système"
@@ -55,20 +70,24 @@ import defines from "../defines/define";
 import auth from "../components/auth.vue";
 import errordial from "../components/errordial.vue";
 import btnClose from "../components/btnClose.vue";
+import pubcard from "../components/pubcard.vue";
 export default {
     name: "home",
     components: {
         auth,
         errordial,
         btnClose,
+        pubcard,
     },
     data(){
         return {
+            auth_url: `${process.env.VUE_APP_SERVER_URL}${defines.HOME_URL}`, 
             ready: true,
             publication: "",
             errordial: false,
             titleDial: "",
             textDial: "",
+            obj: "",
             buttons: [
                 {label: "Ajouter une image", class: "col-8",action: this.post},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish },
@@ -155,7 +174,7 @@ export default {
             this.errordial = !this.errordial;
         },
     },
-    async beforeMount() {
+    async mounted() {
         // get publications
         if(localStorage.data != null && localStorage.data != undefined) {
             const data = JSON.parse(localStorage.data);
@@ -165,7 +184,7 @@ export default {
                     token: data.response.token,
                 }
             };
-            await this.get(payload);    
+            await this.get(payload);
         }
     },
 }

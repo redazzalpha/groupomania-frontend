@@ -24,7 +24,6 @@
 <script>
 import { mapActions, mapState } from "vuex";
 import errordial from "../components/errordial.vue"
-import defines from "../defines/define";
 
 export default {
     name: "auth",
@@ -33,6 +32,10 @@ export default {
     },
     props: {
         tag: String,
+        auth_url: {
+            type: String,
+            required: true,
+        }
     },
     data() {
         return {
@@ -49,7 +52,7 @@ export default {
         if(localStorage.data != null && localStorage.data != undefined) {
             const data = JSON.parse(localStorage.data);
             const payload = {
-                url: `${process.env.VUE_APP_SERVER_URL}${defines.HOME_URL}`,
+                url: `${this.auth_url}`,
                 data: {
                     token: data.response.token,
                 },
