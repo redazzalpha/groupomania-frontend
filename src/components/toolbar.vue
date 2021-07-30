@@ -5,7 +5,7 @@
             <v-col cols="2" class="d-flex justify-center">
                 <v-app-bar-nav-icon @click.stop="toggleDrawer" title="Menu"></v-app-bar-nav-icon>
             </v-col>
-            <!--toolbar icons-->
+            <!--toolbar-icons-->
             <v-col cols="2" class="d-flex justify-center" v-for="item in icons" :key="item.label">
                 <v-btn icon dark :to="item.url" :title="item.title"><v-icon>{{ item.icon }}</v-icon></v-btn>
             </v-col>
@@ -33,5 +33,3 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>

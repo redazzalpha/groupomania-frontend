@@ -6,6 +6,7 @@ import home from '../views/home.vue';
 import profil from '../views/profil.vue';
 import team from '../views/team.vue';
 import notification from '../views/notification.vue';
+import logout from '../views/logout.vue';
 import notfound from '../views/notfound.vue';
 
 Vue.use(VueRouter);
@@ -24,7 +25,7 @@ const routes = [
     },
     {
         name: 'home',
-        path: `${defines.HOME_URL}/:id`,
+        path: defines.HOME_URL,
         component: home
     },
     {
@@ -43,8 +44,13 @@ const routes = [
         component: notification
     },
     {
+        name: 'logout',
+        path: defines.LOGOUT_URL,
+        component: logout
+    },
+    {
         name: "notFound",
-        path: "/*",
+        path: defines.UNKNOWN_URL,
         component: notfound
     }
 ];

@@ -23,13 +23,13 @@
             :key="item.title"
             :to="item.url"
             >
-            <v-list-item-icon>
-                <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-icon>
+                <v-list-item-icon>
+                    <v-icon>{{ item.icon }}</v-icon>
+                </v-list-item-icon>
 
-            <v-list-item-content>
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-            </v-list-item-content>
+                <v-list-item-content>
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item-content>
             </v-list-item>
         </v-list>
     </v-navigation-drawer>
@@ -44,7 +44,7 @@ export default {
         return {
             id: "test",
             items: [
-                { title: 'Accueil', url: `${defines.HOME_URL}/test`, icon: 'mdi-home' },
+                { title: 'Accueil', url: defines.HOME_URL, icon: 'mdi-home' },
                 { title: 'Mon profil', url: defines.PROFIL_URL, icon: 'mdi-account' },
                 { title: 'Se déconnecter', url: defines.LOGOUT_URL, icon: 'mdi-logout' },
             ],
@@ -52,8 +52,4 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>
 

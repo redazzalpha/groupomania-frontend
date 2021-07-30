@@ -49,15 +49,19 @@ export default {
         ...mapActions(["get"]),
     },
     async mounted() {        
-        if(localStorage.data != null && localStorage.data != undefined) {
-            const data = JSON.parse(localStorage.data);
+        if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
+            const grpm_store = JSON.parse(localStorage.grpm_store);
             const payload = {
                 url: `${this.auth_url}`,
                 data: {
-                    token: data.response.token,
+                    token: grpm_store.data.token,
+                    tokenRefresh: grpm_store.data.tokenRefresh,
                 },
-            };            
+            };
+            // get request            
             await this.get(payload);
+            // check if error on response
+            // and set ready state used for child 
             if(JSON.parse(this.getAnswer).error == undefined)
                 this.ready = true;
             else this.ready = false;

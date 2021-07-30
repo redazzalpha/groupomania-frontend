@@ -137,14 +137,17 @@ export default {
         ...mapActions(["post"]),
         async validateLogin() {
             if (this.$refs.loginForm.validate()) {
-                // create payload
+                // create payload 
+                // this is done straight casue
+                // user inputs have already been checked
                 let payload = {
-                    url: `${process.env.VUE_APP_SERVER_URL}/login`,
+                    url: `${process.env.VUE_APP_SERVER_URL}${defines.LOGIN_URL}`,
                     data: {
                         email: this.loginEmail,
                         password: this.loginPassword
                     }
                 };
+
                 // post data
                 await this.post(payload);
 
@@ -166,10 +169,10 @@ export default {
                     }
                 }
                 // if no error on answer store it 
-                // go to home page
+                // and redirect to home page
                 else {
-                    localStorage.data = JSON.stringify(answer);
-                    this.$router.push(`${defines.HOME_URL}/${answer.response.id}`);
+                    localStorage.grpm_store = JSON.stringify(answer);
+                    this.$router.push(defines.HOME_URL);
                 }                
             }
         },
@@ -233,10 +236,9 @@ export default {
     },
     async created() {
         // auto loggin
-        if(localStorage.data != null && localStorage.data != undefined) {
-            const data = JSON.parse(localStorage.data);
+        if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
             this.dialog = false;
-            this.$router.push(`${defines.HOME_URL}/${data.response.id}`);
+            this.$router.push(defines.HOME_URL);
         }
     },
     
