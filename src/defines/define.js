@@ -5,7 +5,6 @@ const defines = {
     HOME_URL: "/app/home",
     PROFIL_URL: "/app/profil",
     NOTIFICATION_URL: "/app/notification",
-    LOGOUT_URL: "/app/logout",
     TEAM_URL: "/app/team",
     PUBLISH_URL: "/app/publish",
 };

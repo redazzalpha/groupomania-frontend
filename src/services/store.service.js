@@ -1,4 +1,3 @@
-require('dotenv').config();
 
 const storeServices = {
     // mutations
@@ -31,7 +30,7 @@ const storeServices = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${payload.data.token}`,
         });
-
+        
         let answer = await fetch(payload.url, {method: "get", headers});
         let data = await answer.text();
         context.commit("SET_GET_ANSWER", data);

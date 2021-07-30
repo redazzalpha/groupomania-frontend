@@ -6,7 +6,6 @@ import home from '../views/home.vue';
 import profil from '../views/profil.vue';
 import team from '../views/team.vue';
 import notification from '../views/notification.vue';
-import logout from '../views/logout.vue';
 import notfound from '../views/notfound.vue';
 
 Vue.use(VueRouter);
@@ -42,11 +41,6 @@ const routes = [
         name: 'notification',
         path: defines.NOTIFICATION_URL,
         component: notification
-    },
-    {
-        name: 'logout',
-        path: defines.LOGOUT_URL,
-        component: logout
     },
     {
         name: "notFound",

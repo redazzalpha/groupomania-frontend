@@ -121,7 +121,6 @@ export default {
                     };
                     // post publication
                     await this.post(payload);
-
                     const answer = JSON.parse(this.postAnswer);
                     // check if error from server 
                     if(answer.error != undefined && answer.error.code != undefined) {
@@ -186,9 +185,6 @@ export default {
             const answer = JSON.parse(this.getAnswer);
             if(answer.results.length >= 1)
                 this.pub = answer.results[0].text;
-
-
-            
         }
     },
 }

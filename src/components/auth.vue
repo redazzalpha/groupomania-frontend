@@ -48,7 +48,7 @@ export default {
     methods: {
         ...mapActions(["get"]),
     },
-    async created() {        
+    async mounted() {        
         if(localStorage.data != null && localStorage.data != undefined) {
             const data = JSON.parse(localStorage.data);
             const payload = {
@@ -56,7 +56,7 @@ export default {
                 data: {
                     token: data.response.token,
                 },
-            };
+            };            
             await this.get(payload);
             if(JSON.parse(this.getAnswer).error == undefined)
                 this.ready = true;
