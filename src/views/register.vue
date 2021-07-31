@@ -180,7 +180,7 @@ export default {
             if (this.$refs.registerForm.validate()) {
                 //create paylod
                 let payload = {
-                    url: `${process.env.VUE_APP_SERVER_URL}${defines.REGISTER_URL}`,
+                    url: `${process.env.VUE_APP_SERVER_URL}${defines.SIGNUP_URL}`,
                     data: {
                         pseudo: this.pseudo,
                         email: this.email,
@@ -218,9 +218,8 @@ export default {
                     // post data
                     await this.post(payload);
                     
-                    answer  = JSON.parse(this.postAnswer);
-                    localStorage.data = JSON.stringify(answer);
-                    this.$router.push(`${defines.HOME_URL}/${answer.response.id}`);
+                    localStorage.grpm_store = JSON.stringify(answer);
+                    this.$router.push(defines.HOME_URL);
                 }
             }
         },

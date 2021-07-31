@@ -35,6 +35,9 @@ const storeServices = {
         let data = await answer.text();
         context.commit("SET_GET_ANSWER", data);
     },
+    npost: () => {
+        this.$http.post("http://localhost:8080/");
+    },
 };
 
 export default storeServices;

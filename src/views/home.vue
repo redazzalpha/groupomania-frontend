@@ -1,6 +1,8 @@
 <template>
     <auth tab="home" :auth_url="auth_url"  @onReady="trigger">
         <slot v-if="ready">
+
+
             <h2 class="pa-5">Dernières publiations</h2>
             <!--express your-self-card-->
             <v-card elevation="15" color="grey lighten-3" max-width=550 class="ma-auto mb-8">
@@ -173,12 +175,12 @@ export default {
     },
     async mounted() {
         // get publications
-        if(localStorage.data != null && localStorage.data != undefined) {
-            const data = JSON.parse(localStorage.data);
+        if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
+            const grpm_store = JSON.parse(localStorage.grpm_store);
             const payload = {
                 url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
                 data: {
-                    token: data.response.token,
+                    token: grpm_store.data.token,
                 }
             };
             await this.get(payload);
