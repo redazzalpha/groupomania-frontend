@@ -1,8 +1,6 @@
 <template>
     <auth tab="home" :auth_url="auth_url"  @onReady="trigger">
         <slot v-if="ready">
-
-
             <h2 class="pa-5">Dernières publiations</h2>
             <!--express your-self-card-->
             <v-card elevation="15" color="grey lighten-3" max-width=550 class="ma-auto mb-8">
@@ -45,6 +43,7 @@
                 likeCount=0
                 dislikeCount=0
             ></pubcard>
+
             <!--error-dial-->
             <errordial
             title="Erreur système"
@@ -54,7 +53,6 @@
                 <template v-slot:bottom>
                     <btnClose text="Ok" :eventAtClick="close"></btnClose>
                 </template >
-
             </errordial>
         </slot>
     </auth>
@@ -79,9 +77,9 @@ export default {
     data(){
         return {
             auth_url: `${process.env.VUE_APP_SERVER_URL}${defines.HOME_URL}`, 
-            ready: true,
-            publication: "",
+            ready: false,
             errordial: false,
+            publication: "",
             titleDial: "",
             textDial: "",
             pub: null,
@@ -97,59 +95,51 @@ export default {
     },
     methods: {
         ...mapActions(["post", "get"]),
-        async publish() {
+        publish() {
             //post publication
             // check if publication if empty   
             if(this.publication && services.checkPublication(this.publication)) {
+
                 // check local storage
-                if(localStorage.data != null && localStorage.data != undefined) {
+                if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
+
+
                     // get data from localstorage
-                    const data =  JSON.parse(localStorage.data);
-                    const id = data.response.id;
-                    const author = data.response.email;
-                    const token = data.response.token;
+                    const grpm_store =  JSON.parse(localStorage.grpm_store);
+
                     // create payload
-                    const payload = {
-                    url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
+                    let payload = {
+                        url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
                         data: {
-                            id: id,
-                            pseudo: "mook",
-                            author: author,
+                            token: grpm_store.data.token,
+                            tokenRefresh: grpm_store.data.tokenRefresh,
                             publication: this.publication,
-                            postLike: 0,
-                            postDislike: 0,
-                            token: token,
-                        }
+                        },
                     };
-                    // post publication
-                    await this.post(payload);
-                    const answer = JSON.parse(this.postAnswer);
-                    // check if error from server 
-                    if(answer.error != undefined && answer.error.code != undefined) {
-                        switch(answer.error.code) {
 
-                            /*** 
-                             * This following code won't be used 
-                             * cause no error to catch
-                             * if create new error from server update this part
-                             * and uncomment the code just below to add new
-                             * case to the switch.
-                             * 
-                             * case "ER_UNK_USER":
-                             *   this.textDial = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
-                             *   this.dialog2 = true;
-                             *   break;
-                             * 
-                            */
+                    // create headers
+                    const head = {
+                        "Accept": "application/json",
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${payload.data.token}`,
+                    };
 
-                            default:
-                                throw new Error("Unknown error");    
+                    // post request
+                    this.$http.post(payload.url, payload.data, { headers: head })
+                    .then(
+                        (/*success*/) => {
+                            this.publication = "";
+                        },
+                        failed => {
+                            failed.json()
+                            .then(json => {
+                                switch(json.error.code) {
+                                    default:
+                                        throw new Error("Unknown error");    
+                                }
+                            })
                         }
-                    }
-                    // if no error from server 
-                    else {
-                        this.publication = "";
-                    }
+                    );
                 }
                 // if localstorage data is empty or undefined
                 else {
@@ -159,7 +149,6 @@ export default {
             }
             // if publication is empty set error dialog
             else {
-
                 this.textDial = "Vous ne pouvez pas créer de publication vide"
                 this.errordial = true;
             }  
@@ -173,20 +162,39 @@ export default {
             this.errordial = !this.errordial;
         },
     },
-    async mounted() {
+    mounted() {
+
         // get publications
         if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
             const grpm_store = JSON.parse(localStorage.grpm_store);
+
+            // create payload
             const payload = {
                 url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
                 data: {
                     token: grpm_store.data.token,
                 }
             };
-            await this.get(payload);
-            const answer = JSON.parse(this.getAnswer);
-            if(answer.results.length >= 1)
-                this.pub = answer.results[0].text;
+
+            // create headers
+            const head = {
+                "Accept": "application/json",
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${payload.data.token}`,
+            };
+    
+            // post request
+            this.$http.get(payload.url,  { headers: head })
+            .then(
+                (success) => {
+                    success.json()
+                    .then(json => {
+                        if(json.results.length >= 1)
+                            this.pub = json.results[0].text;
+                    });
+                },
+                (/*failed*/) => {}
+            );
         }
     },
 }

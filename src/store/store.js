@@ -17,8 +17,6 @@ export default new Vuex.Store({
     },
     actions: {
         toggleDrawer: services.toggleDrawer,
-        post: services.post,
-        get: services.get,
     },
     modules: {
     }

@@ -107,6 +107,7 @@ export default {
             email: "",
             password: "",
             verify: "",
+            fromRgstr: null,
             tab: 0,
 
             tabs: [
@@ -135,49 +136,58 @@ export default {
     },
     methods: {
         ...mapActions(["post"]),
-        async validateLogin() {
-            if (this.$refs.loginForm.validate()) {
-                // create payload 
-                // this is done straight casue
-                // user inputs have already been checked
+        validateLogin() {
+            if (this.fromRgstr || this.$refs.loginForm.validate()) {
+
+                // create payload
                 let payload = {
                     url: `${process.env.VUE_APP_SERVER_URL}${defines.LOGIN_URL}`,
                     data: {
-                        email: this.loginEmail,
-                        password: this.loginPassword
+                        email: this.fromRgstr? this.fromRgstr.email : this.loginEmail,
+                        password: this.fromRgstr? this.fromRgstr.password : this.loginPassword, 
                     }
                 };
 
-                // post data
-                await this.post(payload);
+                // create headers
+                const head = {
+                    "Accept": "application/json",
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${payload.data.token}`,
+                };
 
-                // check post answer looking for error
-                // and update dialog2 for dialog error 
-                const answer  = JSON.parse(this.postAnswer);
-                if(answer.error != undefined && answer.error.code != undefined) {
-                    switch(answer.error.code) {
-                        case "ER_UNK_USER":
-                            this.textDialog = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
-                            this.dialog2 = true;
-                            break;
-                        case "ER_INV_PASS":
-                            this.textDialog = "Le mot de passe que vous avez saisi est invalide";
-                            this.dialog2 = true;
-                            break;
-                        default:
-                            throw new Error("Unknown error");    
+                // post request
+                this.$http.post(payload.url, payload.data, { headers: head })
+                .then(
+                    success => {
+                        success.text()
+                        .then(text => {
+                            localStorage.grpm_store = text;
+                            this.$router.push(defines.HOME_URL);
+                        });
+                    },
+                    failed => {
+                        failed.json()
+                        .then(json => {
+                            switch(json.error.code) {
+                                case "ER_UNK_USER":
+                                    this.textDialog = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
+                                    this.dialog2 = true;
+                                    break;
+                                case "ER_INV_PASS":
+                                    this.textDialog = "Le mot de passe que vous avez saisi est invalide";
+                                    this.dialog2 = true;
+                                    break;
+                                default:
+                                    throw new Error("Unknown error");    
+                            }
+                        });
                     }
-                }
-                // if no error on answer store it 
-                // and redirect to home page
-                else {
-                    localStorage.grpm_store = JSON.stringify(answer);
-                    this.$router.push(defines.HOME_URL);
-                }                
+                );
             }
         },
-        async validateRegister() {
+        validateRegister() {
             if (this.$refs.registerForm.validate()) {
+
                 //create paylod
                 let payload = {
                     url: `${process.env.VUE_APP_SERVER_URL}${defines.SIGNUP_URL}`,
@@ -188,39 +198,35 @@ export default {
                         token: "",
                     },
                 };
-                // post data
-                await this.post(payload);
 
-                // check post answer looking for error
-                // and update dialog2 for dialog error 
-                let answer  = JSON.parse(this.postAnswer);
-                if(answer.error != undefined && answer.error.code != undefined) {
-                    switch(answer.error.code) {
-                        case "ER_DUP_ENTRY":
-                            this.dialog2 = true;
-                            this.textDialog = "L'utilisateur que vous essayez de créer existe déjà.";
-                            break;
-                        default:
-                            throw new Error("Unknown error");    
+                // create headers
+                const head = {
+                    "Accept": "application/json",
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${payload.data.token}`,
+                };
+
+                // post request
+                this.$http.post(payload.url, payload.data, { headers: head })
+                .then(
+                    (/*success*/) => {
+                        this.fromRgstr = {email: this.email, password: this.password};
+                        this.validateLogin();
+                    },
+                    failed => {
+                        failed.json()
+                        .then(json => {
+                            switch(json.error.code) {
+                                case "ER_DUP_ENTRY":
+                                    this.dialog2 = true;
+                                    this.textDialog = "L'utilisateur que vous essayez de créer existe déjà.";
+                                    break;
+                                default:
+                                    throw new Error("Unknown error");    
+                            }
+                        });
                     }
-                }
-                // if no error get token and go to home page
-                else {
-                    // create payload
-                    payload = {
-                        url: `${process.env.VUE_APP_SERVER_URL}/login`,
-                        data: {
-                            email: this.email,
-                            password: this.password,
-                            token: "",
-                        }
-                    };
-                    // post data
-                    await this.post(payload);
-                    
-                    localStorage.grpm_store = JSON.stringify(answer);
-                    this.$router.push(defines.HOME_URL);
-                }
+                );
             }
         },
         reset() {
@@ -233,7 +239,7 @@ export default {
             this.dialog2 = !this.dialog2;
         },
     },
-    async created() {
+    created() {
         // auto loggin
         if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
             this.dialog = false;
