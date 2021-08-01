@@ -48,6 +48,7 @@
                 :authorPub="item.text" 
                 :likeCount="item.postLike"
                 :dislikeCount="item.postDislike"
+                :pubId="item.pubId"
             @comment="postComment"
             ></pubcard>
             <!--error-dial-->
@@ -167,8 +168,23 @@ export default {
         close() {
             this.dialogErr = !this.dialogErr;
         },
-        postComment() {
-            alert("post comment");
+        postComment(comData) {
+            const payload = {
+                url: `${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`,
+                data: {
+                    pubId: comData.pubId,
+                    text: comData.comText,
+                }
+            };
+            this.$http.post(payload.url, payload.data)
+            .then(
+                (/*success*/) => {
+
+                },
+                (/*failed*/) => {
+
+                }
+            );
         },
     },
     mounted() {

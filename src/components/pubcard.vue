@@ -44,10 +44,10 @@
             <!--comments-row-->
             <v-row></v-row>
             <!--add-comment-row-->
-                <v-row>
+            <v-row>
                 <v-card-text>   
                     <v-row>
-                        <v-textarea background-color="white" placeholder="Votre commentaire" solo rounded rows="1" full-width outlined no-resize>
+                        <v-textarea v-model="comText" background-color="white" placeholder="Votre commentaire" solo rounded rows="1" full-width outlined no-resize>
                             <template v-slot:prepend>
                                 <v-avatar size=40>
                                     <v-img v-if="userImgName" :src="userImgName"  />
@@ -75,6 +75,12 @@ export default {
         authorPub: String,
         likeCount: Number,
         dislikeCount: Number,
+        pubId: Number,
+    },
+    data() {
+        return {
+            comText: "",
+        };
     },
     computed: {
         authorImg: function () {
@@ -88,7 +94,9 @@ export default {
     },
     methods: {
         comment() {
-            this.$emit("comment", true);
+
+            this.$emit("comment", {pubId: this.pubId, comText: this.comText});
+            this.comText = "";
         }
     }
 }

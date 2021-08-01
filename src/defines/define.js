@@ -10,6 +10,7 @@ const defines = {
     NOTIFICATION_URL: "/app/notification",
     LOGOUT_URL: "/app/logout",
     PUBLISH_URL: "/app/publish",
+    COMMENT_URL: "/app/publish/comment",
     UNKNOWN_URL: "/*",
 };
 
