@@ -48,12 +48,13 @@
                 :authorPub="item.text" 
                 :likeCount="item.postLike"
                 :dislikeCount="item.postDislike"
+            @comment="postComment"
             ></pubcard>
             <!--error-dial-->
             <errordial
             title="Erreur système"
-            :text="dialogErrText"
             :model= "dialogErr"
+            :text="dialogErrText"
             >
                 <template v-slot:bottom>
                     <btnClose text="Ok" :eventAtClick="close"></btnClose>
@@ -108,52 +109,29 @@ export default {
             // check if publication if empty   
             if(this.pubTextArea && services.checkPublication(this.pubTextArea)) {
 
-                // check local storage
-                if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
+                // create payload
+                let payload = {
+                    url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
+                    data: { publication: this.pubTextArea }
+                };
 
-
-                    // get data from localstorage
-                    const grpm_store =  JSON.parse(localStorage.grpm_store);
-
-                    // create payload
-                    let payload = {
-                        url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
-                        data: {
-                            token: grpm_store.data.token,
-                            tokenRefresh: grpm_store.data.tokenRefresh,
-                            publication: this.pubTextArea,
-                        },
-                    };
-
-                    // create headers
-                    const head = {
-                        "Accept": "application/json",
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${payload.data.token}`,
-                    };
-
-                    // post request
-                    this.$http.post(payload.url, payload.data, { headers: head })
-                    .then(
-                        (/*success*/) => {
-                            this.pubTextArea = "";
-                        },
-                        failed => {
-                            failed.json()
-                            .then(json => {
-                                switch(json.error.code) {
-                                    default:
-                                        throw new Error("Unknown error");    
-                                }
-                            })
-                        }
-                    );
-                }
-                // if localstorage data is empty or undefined
-                else {
-                    this.dialogErrText = "Une erreur s'est produite reconnectez-vous et réessayez"
-                    this.dialogErr = true;
-                }
+                // post request
+                this.$http.post(payload.url, payload.data)
+                .then(
+                    (/*success*/) => {
+                        this.pubTextArea = "";
+                        this.getPubs();
+                    },
+                    failed => {
+                        failed.json()
+                        .then(json => {
+                            switch(json.error.code) {
+                                default:
+                                    throw new Error("Unknown error");    
+                            }
+                        })
+                    }
+                );
             }
             // if publication is empty set error dialog
             else {
@@ -162,38 +140,18 @@ export default {
             }  
         },
         getPubs() {
-        // get publications
-        if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
-                const grpm_store = JSON.parse(localStorage.grpm_store);
-
-                // create payload
-                const payload = {
-                    url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
-                    data: {
-                        token: grpm_store.data.token,
-                    }
-                };
-
-                // create headers
-                const head = {
-                    "Accept": "application/json",
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${payload.data.token}`,
-                };
-        
-                // post request
-                this.$http.get(payload.url,  { headers: head })
-                .then(
-                    (success) => {
-                        success.json()
-                        .then(json => {
-                            if(json.results.length >= 1)
-                                this.publications = json.results;
-                        });
-                    },
-                    (/*failed*/) => {}
-                );
-            }
+            // get request
+            this.$http.get(`${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`)
+            .then(
+                (success) => {
+                    success.json()
+                    .then(json => {
+                        if(json.results.length >= 1)
+                            this.publications = json.results;
+                    });
+                },
+                (/*failed*/) => {}
+            );
         },
         insertImg() {
 
@@ -208,6 +166,9 @@ export default {
         // function used to close error dialog
         close() {
             this.dialogErr = !this.dialogErr;
+        },
+        postComment() {
+            alert("post comment");
         },
     },
     mounted() {

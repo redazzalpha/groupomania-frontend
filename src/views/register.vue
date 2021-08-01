@@ -144,21 +144,13 @@ export default {
                         password: this.fromRgstr? this.fromRgstr.password : this.paasswordLogin, 
                     }
                 };
-
-                // create headers
-                const head = {
-                    "Accept": "application/json",
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${payload.data.token}`,
-                };
-
                 // post request
-                this.$http.post(payload.url, payload.data, { headers: head })
+                this.$http.post(payload.url, payload.data)
                 .then(
                     success => {
                         success.text()
-                        .then(text => {
-                            localStorage.grpm_store = text;
+                        .then(token => {
+                            localStorage.grpm_store = token;
                             this.$router.push(defines.HOME_URL);
                         });
                     },
@@ -192,19 +184,11 @@ export default {
                         pseudo: this.pseudoRgstr,
                         email: this.emailRgstr,
                         password: this.passwordRgstr,
-                        token: "",
                     },
                 };
 
-                // create headers
-                const head = {
-                    "Accept": "application/json",
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${payload.data.token}`,
-                };
-
                 // post request
-                this.$http.post(payload.url, payload.data, { headers: head })
+                this.$http.post(payload.url, payload.data)
                 .then(
                     (/*success*/) => {
                         this.fromRgstr = {email: this.emailRgstr, password: this.passwordRgstr};

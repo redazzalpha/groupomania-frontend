@@ -9,7 +9,7 @@
                         <v-col  cols=4 >
                             <v-avatar size=60>
                                 <v-img v-if="authorImgName != 'null'" :src="authorImg"/>
-                                <v-icon v-else size=65 color="primary">mdi-account-circle</v-icon>
+                                <v-icon v-else size=65 color="gey">mdi-account-circle</v-icon>
                             </v-avatar>
                         </v-col>
                         <v-col >
@@ -55,7 +55,7 @@
                                 </v-avatar>
                             </template>
                             <template v-slot:append>
-                                <v-btn title="Envoyer" icon size=40 color="primary" ><v-icon>mdi-send</v-icon></v-btn>
+                                <v-btn title="Envoyer" icon size=40 color="primary" @click="comment"><v-icon>mdi-send</v-icon></v-btn>
                             </template>
                         </v-textarea>
                     </v-row>
@@ -85,6 +85,11 @@ export default {
             return null;
         },
         
+    },
+    methods: {
+        comment() {
+            this.$emit("comment", true);
+        }
     }
 }
 </script>

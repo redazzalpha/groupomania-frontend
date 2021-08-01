@@ -45,37 +45,21 @@ export default {
     },
     beforeMount() {
     
-        if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
-
-            const grpm_store = JSON.parse(localStorage.grpm_store);
-
-            // create headers
-            const head = {
-                "Accept": "application/json",
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${grpm_store.data.token}`,
-            };
-
-            // post request
-            this.$http.get(this.auth_url,  { headers: head })
-            .then(
-                (success) => {
-                    success.json()
-                    .then(json => {
-                        this.ready = true;
-                        this.$emit("onReady", {ready: this.ready, json });
-                    });
-                },
-                (/*failed*/) =>{
-                    this.ready = false;
-                    this.$emit("onReady", {ready: this.ready, json: null });
-                } 
-            );
-        }
-        else {
-            this.ready = false;
-            this.$emit("onReady", {ready: this.ready, json: null });
-        }
+        // post request
+        this.$http.get(this.auth_url)
+        .then(
+            (success) => {
+                success.json()
+                .then(json => {
+                    this.ready = true;
+                    this.$emit("onReady", {ready: this.ready, json });
+                });
+            },
+            (/*failed*/) =>{
+                this.ready = false;
+                this.$emit("onReady", {ready: this.ready, json: null });
+            } 
+        );
     },
 }
 </script>
