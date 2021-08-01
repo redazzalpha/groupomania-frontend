@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
-import defines from "../defines/define";
 import errordial from "../components/errordial.vue"
 
 export default {
@@ -43,50 +41,40 @@ export default {
             ready: true,
         };
     },
-    computed: {
-        ...mapState(["getAnswer"]),
-    },
     methods: {
-        ...mapActions(["get"]),
     },
-    beforeMount() {       
+    beforeMount() {
     
         if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
 
             const grpm_store = JSON.parse(localStorage.grpm_store);
-            
-            // create payload
-            let payload = {
-                url: `${this.auth_url}`,
-                data: {
-                    token: grpm_store.data.token,
-                    tokenRefresh: grpm_store.data.tokenRefresh,
-                },
-            };
 
             // create headers
             const head = {
                 "Accept": "application/json",
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${payload.data.token}`,
+                'Authorization': `Bearer ${grpm_store.data.token}`,
             };
 
             // post request
-            this.$http.get(`${process.env.VUE_APP_SERVER_URL}${defines.HOME_URL}`,  { headers: head })
+            this.$http.get(this.auth_url,  { headers: head })
             .then(
-                (/*success*/) => {
-                    this.ready = true;
-                    this.$emit("onReady", true);
+                (success) => {
+                    success.json()
+                    .then(json => {
+                        this.ready = true;
+                        this.$emit("onReady", {ready: this.ready, json });
+                    });
                 },
-                (/*failed*/) => {
+                (/*failed*/) =>{
                     this.ready = false;
-                    this.$emit("onReady", false);
-                }
+                    this.$emit("onReady", {ready: this.ready, json: null });
+                } 
             );
         }
         else {
-                this.ready = false;
-                this.$emit("onReady", false);
+            this.ready = false;
+            this.$emit("onReady", {ready: this.ready, json: null });
         }
     },
 }

@@ -15,19 +15,6 @@ const storeServices = {
         context.commit("TOGGLE_DRAWER");
     },
     post: async function (/*context, payload*/) {
-
-
-/****
- * 
- * 
- let answer = await fetch(payload.url, { method: "post", headers, body: JSON.stringify(payload.data) });
- let data = await answer.text();
- context.commit("SET_POST_ANSWER", data);
- * 
- * 
- * 
- */
-
     },
     get: async (context, payload) => {
         const headers = new Headers({
@@ -39,9 +26,6 @@ const storeServices = {
         let answer = await fetch(payload.url, {method: "get", headers});
         let data = await answer.text();
         context.commit("SET_GET_ANSWER", data);
-    },
-    npost: () => {
-        this.$http.post("http://localhost:8080/");
     },
 };
 

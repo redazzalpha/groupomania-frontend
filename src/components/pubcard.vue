@@ -1,13 +1,16 @@
 <template>
     <!--Publications-cards-->
-    <v-card max-width=550 class="ma-auto mt-8" elevation="15" outlined  color="grey lighten-3">
+    <v-card max-width=550 class="ma-auto mt-8" elevation="15" outlined  color="grey lighten-1" shaped>
         <v-container>
             <!--title-row-->
             <v-row>
                 <v-card-title>
                     <v-row class="d-flex">
-                        <v-col  cols=3 >
-                            <v-avatar size=60><v-img src="../assets/malcomZ.jpg"  /></v-avatar>
+                        <v-col  cols=4 >
+                            <v-avatar size=60>
+                                <v-img v-if="authorImgName != 'null'" :src="authorImg"/>
+                                <v-icon v-else size=65 color="primary">mdi-account-circle</v-icon>
+                            </v-avatar>
                         </v-col>
                         <v-col >
                             <v-card-text>{{ authorName }}</v-card-text>
@@ -46,7 +49,10 @@
                     <v-row>
                         <v-textarea background-color="white" placeholder="Votre commentaire" solo rounded rows="1" full-width outlined no-resize>
                             <template v-slot:prepend>
-                                <v-avatar size=40><img src="../assets/user_wolf.jpg" /></v-avatar>
+                                <v-avatar size=40>
+                                    <v-img v-if="userImgName" :src="userImgName"  />
+                                    <v-icon v-else size=40 color="primary">mdi-account-circle</v-icon>
+                                </v-avatar>
                             </template>
                             <template v-slot:append>
                                 <v-btn title="Envoyer" icon size=40 color="primary" ><v-icon>mdi-send</v-icon></v-btn>
@@ -63,13 +69,22 @@
 export default {
     name: "pubcard",
     props: {
-        authorImgUrl: String,
+        userImgName: String,
+        authorImgName: String,
         authorName: String,
         authorPub: String,
-        userImgUrl: String,
-        likeCount: String,
-        dislikeCount: String,
+        likeCount: Number,
+        dislikeCount: Number,
+    },
+    computed: {
+        authorImg: function () {
+            if(this.authorImgName != "null") {
+                let images = require.context('../assets', false, /\.png$|\.jpg$|\.jpeg$/)
+                return images(`./${this.authorImgName}`);
+            }
+            return null;
+        },
+        
     }
-
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <!--dialog-login-register-window-->
-        <v-dialog v-model="dialog" persistent max-width="600px" min-width="360px" :retain-focus="false">
+        <v-dialog v-model="dialogSign" persistent max-width="600px" min-width="360px" :retain-focus="false">
             <div class="main-block">
                 <!--main-tab-container-->
                 <v-tabs v-model="tab" show-arrows background-color="primary" icons-and-text dark grow>
@@ -18,10 +18,10 @@
                                 <v-form ref="loginForm" v-model="loginValid" lazy-validation>
                                     <v-row>
                                         <v-col cols="12">
-                                            <v-text-field v-model="loginEmail" :rules="emailRules" label="E-mail" ></v-text-field>
+                                            <v-text-field v-model="emailLogin" :rules="emailRules" label="E-mail" ></v-text-field>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-text-field v-model="loginPassword" :append-icon="show1?'mdi-eye':'mdi-eye-off'" :rules="[passwdRules.required, passwdRules.validate]" :type="show1 ? 'text' : 'password'" name="input-10-1" label="Password" hint="8 caractères minimum" counter @click:append="show1 = !show1"></v-text-field>
+                                            <v-text-field v-model="paasswordLogin" :append-icon="showLoginfield?'mdi-eye':'mdi-eye-off'" :rules="[passwdRules.required, passwdRules.validate]" :type="showLoginfield ? 'text' : 'password'" name="input-10-1" label="Password" hint="8 caractères minimum" counter @click:append="showLoginfield = !showLoginfield"></v-text-field>
                                         </v-col>
                                         <v-col class="d-flex" cols="12" sm="6" xsm="12">
                                         </v-col>
@@ -41,16 +41,16 @@
                                 <v-form ref="registerForm" v-model="registerValid" lazy-validation>
                                     <v-row>
                                         <v-col cols="12">
-                                            <v-text-field v-model="pseudo" :rules="fieldRules" label="Pseudo" maxlength="20"></v-text-field>
+                                            <v-text-field v-model="pseudoRgstr" :rules="fieldRules" label="Pseudo" maxlength="20"></v-text-field>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-text-field v-model="email" :rules="emailRules" label="E-mail"></v-text-field>
+                                            <v-text-field v-model="emailRgstr" :rules="emailRules" label="E-mail"></v-text-field>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-text-field v-model="password" :rules="[passwdRules.required, passwdRules.validate]" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :type="show2 ? 'text' : 'password'" name="input-10-1" label="Mot de passe" hint="8 caractères minimum" counter @click:append="show2 = !show2"></v-text-field>
+                                            <v-text-field v-model="passwordRgstr" :rules="[passwdRules.required, passwdRules.validate]" :append-icon="showRgstrField ? 'mdi-eye' : 'mdi-eye-off'" :type="showRgstrField ? 'text' : 'password'" name="input-10-1" label="Mot de passe" hint="8 caractères minimum" counter @click:append="showRgstrField = !showRgstrField"></v-text-field>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-text-field block v-model="verify" :rules="[passwdRules.required, passwdRules.validate, passwdMatch]" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :type="show2 ? 'text' : 'password'" name="input-10-1" label="Confirmez mot de passe" counter @click:append="show2 = !show2"></v-text-field>
+                                            <v-text-field block v-model="verifyPasswds" :rules="[passwdRules.required, passwdRules.validate, passwdMatch]" :append-icon="showRgstrField ? 'mdi-eye' : 'mdi-eye-off'" :type="showRgstrField ? 'text' : 'password'" name="input-10-1" label="Confirmez mot de passe" counter @click:append="showRgstrField = !showRgstrField"></v-text-field>
                                         </v-col>
                                         <v-spacer></v-spacer>
                                         <v-col class="d-flex ml-auto" cols="12" sm="3" xsm="12">
@@ -67,8 +67,8 @@
         <!--dialog-error-window-->
         <errordial 
         title="Erreur système"
-        :text="textDialog"
-        :model="dialog2"
+        :text="dialogErrText"
+        :model="dialogErr"
         >
         <template v-slot:bottom>
             <v-row>
@@ -83,7 +83,6 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
 import services from "../services/register.service";
 import defines from "../defines/define";
 import errordial from "../components/errordial.vue";
@@ -94,19 +93,19 @@ export default {
     },
     data() {
         return {
-            dialog: true,
-            dialog2 : false,
-            textDialog: "",
             loginValid: false,
             registerValid: false,
-            show1: false,
-            show2: false,
-            loginEmail: "",
-            loginPassword: "",
-            pseudo: "",
-            email: "",
-            password: "",
-            verify: "",
+            showLoginfield: false,
+            showRgstrField: false,
+            dialogSign: true,
+            dialogErr : false,
+            dialogErrText: "",
+            emailLogin: "",
+            paasswordLogin: "",
+            pseudoRgstr: "",
+            emailRgstr: "",
+            passwordRgstr: "",
+            verifyPasswds: "",
             fromRgstr: null,
             tab: 0,
 
@@ -129,13 +128,11 @@ export default {
         };
     },
     computed: {
-        ...mapState(["postAnswer"]),
         passwdMatch() {
-            return () => this.password === this.verify || "Les mots de passes ne sont pas identiques";
+            return () => this.passwordRgstr === this.verifyPasswds || "Les mots de passes ne sont pas identiques";
         },
     },
     methods: {
-        ...mapActions(["post"]),
         validateLogin() {
             if (this.fromRgstr || this.$refs.loginForm.validate()) {
 
@@ -143,8 +140,8 @@ export default {
                 let payload = {
                     url: `${process.env.VUE_APP_SERVER_URL}${defines.LOGIN_URL}`,
                     data: {
-                        email: this.fromRgstr? this.fromRgstr.email : this.loginEmail,
-                        password: this.fromRgstr? this.fromRgstr.password : this.loginPassword, 
+                        email: this.fromRgstr? this.fromRgstr.email : this.emailLogin,
+                        password: this.fromRgstr? this.fromRgstr.password : this.paasswordLogin, 
                     }
                 };
 
@@ -170,12 +167,12 @@ export default {
                         .then(json => {
                             switch(json.error.code) {
                                 case "ER_UNK_USER":
-                                    this.textDialog = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
-                                    this.dialog2 = true;
+                                    this.dialogErrText = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
+                                    this.dialogErr = true;
                                     break;
                                 case "ER_INV_PASS":
-                                    this.textDialog = "Le mot de passe que vous avez saisi est invalide";
-                                    this.dialog2 = true;
+                                    this.dialogErrText = "Le mot de passe que vous avez saisi est invalide";
+                                    this.dialogErr = true;
                                     break;
                                 default:
                                     throw new Error("Unknown error");    
@@ -192,9 +189,9 @@ export default {
                 let payload = {
                     url: `${process.env.VUE_APP_SERVER_URL}${defines.SIGNUP_URL}`,
                     data: {
-                        pseudo: this.pseudo,
-                        email: this.email,
-                        password: this.password,
+                        pseudo: this.pseudoRgstr,
+                        email: this.emailRgstr,
+                        password: this.passwordRgstr,
                         token: "",
                     },
                 };
@@ -210,7 +207,7 @@ export default {
                 this.$http.post(payload.url, payload.data, { headers: head })
                 .then(
                     (/*success*/) => {
-                        this.fromRgstr = {email: this.email, password: this.password};
+                        this.fromRgstr = {email: this.emailRgstr, password: this.passwordRgstr};
                         this.validateLogin();
                     },
                     failed => {
@@ -218,8 +215,8 @@ export default {
                         .then(json => {
                             switch(json.error.code) {
                                 case "ER_DUP_ENTRY":
-                                    this.dialog2 = true;
-                                    this.textDialog = "L'utilisateur que vous essayez de créer existe déjà.";
+                                    this.dialogErr = true;
+                                    this.dialogErrText = "L'utilisateur que vous essayez de créer existe déjà.";
                                     break;
                                 default:
                                     throw new Error("Unknown error");    
@@ -236,13 +233,13 @@ export default {
             this.$refs.form.resetValidation();
         },
         close() {
-            this.dialog2 = !this.dialog2;
+            this.dialogErr = !this.dialogErr;
         },
     },
     created() {
         // auto loggin
         if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
-            this.dialog = false;
+            this.dialogSign = false;
             this.$router.push(defines.HOME_URL);
         }
     },
