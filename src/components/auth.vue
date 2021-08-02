@@ -45,7 +45,7 @@ export default {
     },
     beforeMount() {
     
-        // post request
+        // get request
         this.$http.get(this.auth_url)
         .then(
             (success) => {

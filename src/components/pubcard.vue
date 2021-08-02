@@ -1,6 +1,7 @@
 <template>
     <!--Publications-cards-->
     <v-card max-width=550 class="ma-auto mt-8" elevation="15" outlined  color="grey lighten-1" shaped>
+
         <v-container>
             <!--title-row-->
             <v-row>
@@ -42,7 +43,11 @@
                 </v-col>
             </v-row>
             <!--comments-row-->
-            <v-row></v-row>
+            <v-row v-for="item in comments" :key="item.comId">
+                <v-col v-if="item.pubId == pubId">
+                    <p>--{{ item.text}} </p>
+                </v-col>
+            </v-row>
             <!--add-comment-row-->
             <v-row>
                 <v-card-text>   
@@ -76,6 +81,7 @@ export default {
         likeCount: Number,
         dislikeCount: Number,
         pubId: Number,
+        comments: Array,
     },
     data() {
         return {

@@ -41,7 +41,7 @@
             <!--publication-card-->
             <pubcard
                 v-for="item in publications"
-                :key="item.id" 
+                :key="item.pubId" 
                 :userImgName="userImg"
                 :authorImgName="item.img"
                 :authorName="item.pseudo"
@@ -49,7 +49,8 @@
                 :likeCount="item.postLike"
                 :dislikeCount="item.postDislike"
                 :pubId="item.pubId"
-            @comment="postComment"
+                :comments="comments"
+                @comment="postComment"
             ></pubcard>
             <!--error-dial-->
             <errordial
@@ -89,6 +90,7 @@ export default {
             dialogErr: false,
             dialogErrText: "",
             publications: [],
+            comments: [],
             buttons: [
                 {label: "Ajouter une image", class: "col-8",action: this.insertImg},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish },
@@ -121,7 +123,7 @@ export default {
                 .then(
                     (/*success*/) => {
                         this.pubTextArea = "";
-                        this.getPubs();
+                        this.updatePost();
                     },
                     failed => {
                         failed.json()
@@ -140,6 +142,20 @@ export default {
                 this.dialogErr = true;
             }  
         },
+        postComment(comData) {
+            const payload = {
+                url: `${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`,
+                data: {
+                    pubId: comData.pubId,
+                    text: comData.comText,
+                }
+            };
+            this.$http.post(payload.url, payload.data)
+            .then(
+                (/*success*/) => {this.updatePost();},
+                (/*failed*/) => {}
+            );
+        },
         getPubs() {
             // get request
             this.$http.get(`${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`)
@@ -153,6 +169,24 @@ export default {
                 },
                 (/*failed*/) => {}
             );
+        },
+        getComs() {
+            // get request
+            this.$http.get(`${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`)
+            .then(
+                (success) => {
+                    success.json()
+                    .then(json => {
+                        if(json.results.length >= 1)
+                            this.comments = json.results;
+                    });
+                },
+                (/*failed*/) => {}
+            );
+        },
+        updatePost() {
+            this.getPubs();
+            this.getComs();
         },
         insertImg() {
 
@@ -168,27 +202,9 @@ export default {
         close() {
             this.dialogErr = !this.dialogErr;
         },
-        postComment(comData) {
-            const payload = {
-                url: `${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`,
-                data: {
-                    pubId: comData.pubId,
-                    text: comData.comText,
-                }
-            };
-            this.$http.post(payload.url, payload.data)
-            .then(
-                (/*success*/) => {
-
-                },
-                (/*failed*/) => {
-
-                }
-            );
-        },
     },
     mounted() {
-        this.getPubs();
+        this.updatePost();
     },
 }
 </script>
