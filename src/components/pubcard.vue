@@ -1,7 +1,6 @@
 <template>
     <!--Publications-cards-->
     <v-card max-width=550 class="ma-auto mt-8" elevation="15" outlined  color="grey lighten-1" shaped>
-
         <v-container>
             <!--title-row-->
             <v-row>
@@ -10,7 +9,7 @@
                         <v-col  cols=4 >
                             <v-avatar size=60>
                                 <v-img v-if="authorImgName != 'null'" :src="authorImg"/>
-                                <v-icon v-else size=65 color="gey">mdi-account-circle</v-icon>
+                                <v-icon v-else size=65 >mdi-account-circle</v-icon>
                             </v-avatar>
                         </v-col>
                         <v-col >
@@ -44,8 +43,12 @@
             </v-row>
             <!--comments-row-->
             <v-row v-for="item in comments" :key="item.comId">
-                <v-col v-if="item.pubId == pubId">
-                    <p>--{{ item.text}} </p>
+                <v-col v-if="item.pubId == pubId" class="d-flex align-center">
+                                <v-avatar size=40>
+                                    <v-img v-if="userImgName" :src="userImgName"  />
+                                    <v-icon v-else size=40>mdi-account-circle</v-icon>
+                                </v-avatar>
+                    <v-card-text>{{ item.text}} </v-card-text>
                 </v-col>
             </v-row>
             <!--add-comment-row-->
@@ -96,7 +99,6 @@ export default {
             }
             return null;
         },
-        
     },
     methods: {
         comment() {
