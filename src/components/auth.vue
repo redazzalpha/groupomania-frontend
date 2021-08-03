@@ -7,7 +7,7 @@
         <errordial 
         title="Erreur système"
         text="Vous n'êtes pas authentifié."
-        :model="!ready"
+        :model="dialogErr"
         >
             <slot>
                 <v-row  class="d-flex flex-column" >
@@ -38,7 +38,7 @@ export default {
     },
     data() {
         return {
-            ready: true,
+            dialogErr: false,
         };
     },
     methods: {
@@ -51,13 +51,13 @@ export default {
             (success) => {
                 success.json()
                 .then(json => {
-                    this.ready = true;
-                    this.$emit("onReady", {ready: this.ready, json });
+                    this.dialogErr = false;
+                    this.$emit("onReady", {ready: !this.dialogErr, json });
                 });
             },
             (/*failed*/) =>{
-                this.ready = false;
-                this.$emit("onReady", {ready: this.ready, json: null });
+                this.dialogErr = true;
+                this.$emit("onReady", {ready: !this.dialogErr, json: null });
             } 
         );
     },

@@ -3,9 +3,31 @@
         <slot v-if="showPage">
             <h2 class="pa-5">Mon profil</h2>
             <!--main-card-container-->
-            <v-card elevation=10 class="pb-4 pt-8">
+            <v-card elevation=10 class="pb-4 ">
                 <!--main-card-container-title-->
-                <v-card-title class="d-flex justify-center"><v-avatar size=100><img src="../assets/user_wolf.jpg" alt=""></v-avatar></v-card-title>
+                <v-card-title class="d-flex justify-center">
+                    <div style="position: relative">
+                        <v-avatar size=100>
+                            <v-img v-if="userData.img" :src="userImg" />
+                            <v-icon v-else size=100 color="primary">mdi-account-circle</v-icon>
+                        </v-avatar>
+                        <v-btn 
+                            icon 
+                            color="primary" 
+                            style="position: absolute; top: 80px; left: 72px;"
+                            title="Changer ma photo de profil"
+                            @click="onPickFile"
+                        >
+                            <v-icon>mdi-camera</v-icon>
+                        </v-btn> 
+                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="onFilePicked" />
+                    </div>
+
+                    <img id="output" />
+
+                </v-card-title>
+                <v-card-text class="text-center">
+                </v-card-text>
                 <!--tabs-main-block-->
                 <v-tabs-items>
                     <!--tabs-container-->
@@ -15,7 +37,7 @@
                         <v-tab-item class="pa-4">
                             <v-card class="d-flex flex-column align-center justify-center ma-auto pb-4 pt-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
                                 <v-card-title>E-mail</v-card-title>
-                                <v-card-text class="d-flex justify-center">redazzwolf@gmail.com</v-card-text>
+                                <v-card-text class="d-flex justify-center">{{ userData.email }}</v-card-text>
                             </v-card>
                         </v-tab-item>
                         <!--tab-description-->
@@ -23,8 +45,11 @@
                         <v-tab-item class="pa-4">
                             <v-card class="d-flex flex-column align-center justify-center ma-auto pb-4 pt-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
                                 <v-card-title>Description</v-card-title>
-                                <v-card-text class="d-flex justify-center">Yeah that's me!</v-card-text>
-                                <v-textarea background-color="white" outlined  placeholder="Ajouter un texte"></v-textarea>
+                                <v-card-text class="d-flex justify-center">
+                                    <div v-if="userData.description" class="text-center">{{ userData.description }}</div>
+                                    <div v-else class="text-center">Vous n'avez pas encore de description</div>
+                                </v-card-text>
+                                <v-textarea background-color="white" outlined  placeholder="Ajouter un texte" no-resize auto-grow></v-textarea>
                                 <v-btn to="/home">Changer ma description</v-btn>
                             </v-card>
                         </v-tab-item>
@@ -37,29 +62,31 @@
                                     <v-container fluid >
                                         <v-row class="d-flex flex-column">
                                             <v-col>
+                                                <!--password-field-->
                                                 <v-text-field
-                                                    :append-icon="show3 ? 'mdi-eye' : 'mdi-eye-off'"
+                                                    :append-icon="showPasswd ? 'mdi-eye' : 'mdi-eye-off'"
                                                     :rules="[rules.required, rules.min]"
-                                                    :type="show3 ? 'text' : 'password'"
+                                                    :type="showPasswd ? 'text' : 'password'"
                                                     name="input-10-2"
                                                     hint="At least 8 characters"
                                                     value=""
                                                     placeholder="Mot de passe actuel"
                                                     class="input-group--focused"
-                                                    @click:append="show3 = !show3"
+                                                    @click:append="showPasswd = !showPasswd"
                                                 ></v-text-field>
                                             </v-col>
                                             <v-col>
+                                                <!--confirme-password-field-->
                                                 <v-text-field
-                                                    :append-icon="show4 ? 'mdi-eye' : 'mdi-eye-off'"
+                                                    :append-icon="showPasswd ? 'mdi-eye' : 'mdi-eye-off'"
                                                     :rules="[rules.required, rules.emailMatch]"
-                                                    :type="show4 ? 'text' : 'password'"
+                                                    :type="showPasswd ? 'text' : 'password'"
                                                     name="input-10-2"
                                                     hint="At least 8 characters"
                                                     value=""
                                                     placeholder="Nouveau mot de passe"
                                                     error
-                                                    @click:append="show4 = !show4"
+                                                    @click:append="showPasswd = !showPasswd"
                                                 ></v-text-field>
                                             </v-col>
                                         </v-row>
@@ -99,39 +126,47 @@ export default {
         return {
             auth_url: `${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_URL}`,
             showPage: false,
-            show1: false,
-            show2: true,
-            show3: false,
-            show4: false,
+            userData: null,
+            showPasswd: false,
             password: 'Password',
+            defaultButtonText:"Changer mon avatar",
+            selectedFile: null,
+            isSelecting: false,
+            imgUrl: "",
+            img:"",
             rules: {
                 required: value => !!value || 'Required.',
                 min: v => v.length >= 8 || 'Min 8 characters',
                 emailMatch: () => (`The password you entered don't match`),
             },
-            defaultButtonText:"Changer mon avatar",
-            selectedFile: null,
-            isSelecting: false,
         };
     },
     computed: {
+        userImg() {
+            if(this.userData.img) {
+                let images = require.context('../assets', false, /\.png$|\.jpg$|\.jpeg$/)
+                return images(`./${this.userData.img}`);
+            }
+            return null;
+        },
         buttonText() {
         return this.selectedFile ? this.selectedFile.name : this.defaultButtonText
         }
     },
     methods: {
-        onButtonClick() {
-        this.isSelecting = true
-        window.addEventListener('focus', () => {
-            this.isSelecting = false
-        }, { once: true })
-
-        this.$refs.uploader.click()
-        },
-        onFileChanged(e) {
-        this.selectedFile = e.target.files[0]
-        
-        // do something
+        postDesc() {
+            const payload = {
+                url: `${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`,
+                data: {
+                    //pubId: comData.pubId,
+                   //text: comData.comText,
+                }
+            };
+            this.$http.post(payload.url, payload.data)
+            .then(
+                (/*success*/) => {this.updatePost();},
+                (/*failed*/) => {}
+            );
         },
         // function used for show or unshow home view
         trigger(payload) {
@@ -140,10 +175,67 @@ export default {
                 this.userData = payload.json;
             }
         },
-    }
+        onPickFile () { 
+            this.$refs.fileInput.click();
+        }, 
+        onFilePicked (event) { 
+
+            let output = document.getElementById('output');
+            let file = event.target.files[0];
+            let fileReader = new FileReader();
+
+            if(file) {
+                fileReader.readAsDataURL(file);
+                this.img = file;
+            }
+
+            fileReader.addEventListener('load', function (){ 
+                output.width = 300;
+                output.height = 300;
+                output.src = fileReader.result;
+                this.imgUrl = fileReader.result;
+            }, false);
+
+
+            let formData = new FormData();
+            formData.append("image", file, file.name);
+
+            this.$http.post(`${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_IMG_URL}`, formData)
+            .then(
+                success => {
+                    alert(`success: ${success}`)
+                },
+                failed => {
+                    alert(`failed: ${failed}`)
+
+                }
+            );
+
+        },
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 </script>
-
-<style lang="scss" scoped>
-</style>

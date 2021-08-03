@@ -44,10 +44,10 @@
             <!--comments-row-->
             <v-row v-for="item in comments" :key="item.comId">
                 <v-col v-if="item.pubId == pubId" class="d-flex align-center">
-                                <v-avatar size=40>
-                                    <v-img v-if="userImgName" :src="userImgName"  />
-                                    <v-icon v-else size=40>mdi-account-circle</v-icon>
-                                </v-avatar>
+                    <v-avatar size=40>
+                        <v-img v-if="0==0" src="#"  />
+                        <v-icon v-else size=40>mdi-account-circle</v-icon>
+                    </v-avatar>
                     <v-card-text>{{ item.text}} </v-card-text>
                 </v-col>
             </v-row>
@@ -89,6 +89,7 @@ export default {
     data() {
         return {
             comText: "",
+            im: "",
         };
     },
     computed: {
@@ -99,6 +100,16 @@ export default {
             }
             return null;
         },
+        getImg: function (v) {
+            if(v != "null") {
+                let images = require.context('../assets', false, /\.png$|\.jpg$|\.jpeg$/)(`./${v}`);
+                return images(`./${v}`);
+            }
+            return null;
+        },
+        test() {
+            return " zlakiste";
+        }
     },
     methods: {
         comment() {

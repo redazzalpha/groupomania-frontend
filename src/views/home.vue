@@ -26,6 +26,8 @@
                     placeholder="Ajouter un texte"
                     outlined 
                     clearable
+                    no-resize
+                    auto-grow
                     ></v-textarea>
                 </v-card-text>
                 <v-card-actions>
