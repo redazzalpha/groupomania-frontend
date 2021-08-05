@@ -49,15 +49,13 @@ export default {
         this.$http.get(this.auth_url)
         .then(
             (success) => {
-                success.json()
-                .then(json => {
-                    this.dialogErr = false;
-                    this.$emit("onReady", {ready: !this.dialogErr, json });
-                });
+                this.dialogErr = false;
+                this.$emit("onReady", {ready: !this.dialogErr, userData: success.body });
+                
             },
             (/*failed*/) =>{
                 this.dialogErr = true;
-                this.$emit("onReady", {ready: !this.dialogErr, json: null });
+                this.$emit("onReady", {ready: !this.dialogErr, userData: null });
             } 
         );
     },

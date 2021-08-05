@@ -3,7 +3,7 @@
         <slot v-if="showPage">
             <h2 class="pa-5">Dernières publiations</h2>
             <!--express your-self-card-->
-            <v-card elevation="15" color="grey lighten-3" max-width=550 class="ma-auto mb-8">
+            <v-card elevation="15" color="grey lighten-3" max-width=550 class="ma-auto mb-8" style="position: relative">
                 <v-container>
                     <v-row>
                         <v-col>
@@ -11,24 +11,44 @@
                             <v-card-subtitle class="d-none d-sm-block">Publiez ce que vous aimez !</v-card-subtitle>
                         </v-col>
                         <v-col class="d-flex flex-row-reverse">
-                            <v-avatar size=60>
-                                <v-img v-if="userData.img" :src="userImg"  />
-                                <v-icon v-else size=60 color="primary">mdi-account-circle</v-icon>
-                            </v-avatar>
+                            <v-btn to="/app/profil" title="Accéder au profil" icon>
+                                <v-avatar size=60>
+                                    <v-img v-if="userData.img" :src="userData.img"  />
+                                    <v-icon v-else size=60 color="primary">mdi-account-circle</v-icon>
+                                </v-avatar>
+                            </v-btn>
 
                         </v-col>
                     </v-row>
                 </v-container>
                 <v-card-text>
-                    <v-textarea 
-                    v-model="pubTextArea" 
-                    background-color="white" 
-                    placeholder="Ajouter un texte"
-                    outlined 
-                    clearable
-                    no-resize
-                    auto-grow
-                    ></v-textarea>
+
+                <v-textarea 
+                v-model="pubTextArea" 
+                background-color="white" 
+                placeholder="Ajouter un texte"
+                outlined 
+                no-resize
+                auto-grow
+                >
+                </v-textarea>
+
+                <!--
+                <div id="textarea"
+                contentEditable="true" 
+                style="border: solid grey 1px;
+                min-height: 200px; 
+                background-color: white;
+                padding: 10px;
+                outline: none;
+                border-radius: 10px;
+                color: black;
+                caret-color: red;
+                "    
+                >
+                </div>
+                -->
+
                 </v-card-text>
                 <v-card-actions>
                     <v-container>
@@ -36,6 +56,7 @@
                             <v-col v-for="item in buttons" :key="item.label" :class="item.class">
                                 <v-btn small @click="item.action">{{ item.label }}</v-btn>
                             </v-col>
+                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="onFilePicked" />
                         </v-row>
                     </v-container>
                 </v-card-actions>
@@ -44,10 +65,11 @@
             <pubcard
                 v-for="item in publications"
                 :key="item.pubId" 
-                :userImgName="userImg"
-                :authorImgName="item.img"
+                :userImg="userData.img"
+                :authorImg="item.img"
                 :authorName="item.pseudo"
-                :authorPub="item.text" 
+                :text="item.text" 
+                :time="item.time" 
                 :likeCount="item.postLike"
                 :dislikeCount="item.postDislike"
                 :pubId="item.pubId"
@@ -93,23 +115,20 @@ export default {
             dialogErrText: "",
             publications: [],
             comments: [],
+            test: [],
             buttons: [
-                {label: "Ajouter une image", class: "col-8",action: this.insertImg},
+                {label: "Ajouter une image", class: "col-8",action: this.onPickFile},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish },
             ]
         };
     },
-    computed: {
-        userImg() {
-            if(this.userData.img) {
-                let images = require.context('../assets', false, /\.png$|\.jpg$|\.jpeg$/)
-                return images(`./${this.userData.img}`);
-            }
-            return null;
-        },
-    },
     methods: {
         publish() {
+
+            //let textarea = document.getElementById("textarea");
+            //alert(textarea.innerHTML.split(/<img.+\/>/gi));
+            //alert(textarea.innerHTML.match(/<img.*<\/img>/gi));
+
             //post publication
             // check if publication if empty   
             if(this.pubTextArea && services.checkPublication(this.pubTextArea)) {
@@ -128,13 +147,10 @@ export default {
                         this.updatePost();
                     },
                     failed => {
-                        failed.json()
-                        .then(json => {
-                            switch(json.error.code) {
-                                default:
-                                    throw new Error("Unknown error");    
-                            }
-                        })
+                        switch(failed.body.error.code) {
+                            default:
+                                throw new Error("Unknown error");    
+                        }
                     }
                 );
             }
@@ -163,11 +179,11 @@ export default {
             this.$http.get(`${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`)
             .then(
                 (success) => {
-                    success.json()
-                    .then(json => {
-                        if(json.results.length >= 1)
-                            this.publications = json.results;
-                    });
+                    if(success.body.results.length >= 1) {
+                        this.publications = success.body.results;
+                        for(let item of this.publications)
+                            item.time = services.dateTime(item.time);
+                    }
                 },
                 (/*failed*/) => {}
             );
@@ -177,11 +193,11 @@ export default {
             this.$http.get(`${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`)
             .then(
                 (success) => {
-                    success.json()
-                    .then(json => {
-                        if(json.results.length >= 1)
-                            this.comments = json.results;
-                    });
+                    if(success.body.results.length >= 1) {
+                        this.comments = success.body.results;
+                        for(let item of this.comments)
+                            item.time = services.dateTime(item.time);
+                    }
                 },
                 (/*failed*/) => {}
             );
@@ -197,12 +213,46 @@ export default {
         trigger(payload) {
             if(payload.ready) {
                 this.showPage = payload.ready;                                                                                                                         
-                this.userData = payload.json;
+                this.userData = payload.userData;
             }
         },
         // function used to close error dialog
         close() {
             this.dialogErr = !this.dialogErr;
+        },
+        onPickFile () { 
+            this.$refs.fileInput.click();
+        }, 
+        onFilePicked (event) { 
+
+            let textarea = document.getElementById("textarea");                                                   
+            let img = document.createElement("img");
+
+            let file = event.target.files[0];
+            let fileReader = new FileReader();
+
+            if(file) {
+                fileReader.readAsDataURL(file);
+                this.img = file;
+            }
+            fileReader.addEventListener('load', function (){ 
+
+                img.setAttribute("src", fileReader.result);
+                img.setAttribute("width", "100%");
+                textarea.appendChild(img);
+                textarea.focus();   
+            }, false);
+
+            //let formData = new FormData();
+            //formData.append("image", file, file.name);
+
+            //this.$http.post(`${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_IMG_URL}`, formData)
+            //.then(
+               //(/*success*/) => {
+                //},
+               //(/*failed*/) => {
+               //}
+           //);
         },
     },
     mounted() {
@@ -210,3 +260,4 @@ export default {
     },
 }
 </script>
+

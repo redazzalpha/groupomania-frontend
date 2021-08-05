@@ -8,7 +8,7 @@
                 <v-card-title class="d-flex justify-center">
                     <div style="position: relative">
                         <v-avatar size=100>
-                            <v-img v-if="userData.img" :src="userImg" />
+                            <v-img v-if="userData.img" :src="userData.img" />
                             <v-icon v-else size=100 color="primary">mdi-account-circle</v-icon>
                         </v-avatar>
                         <v-btn 
@@ -16,15 +16,12 @@
                             color="primary" 
                             style="position: absolute; top: 80px; left: 72px;"
                             title="Changer ma photo de profil"
-                            @click="onPickFile"
+                            @click="onPickImg"
                         >
                             <v-icon>mdi-camera</v-icon>
                         </v-btn> 
-                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="onFilePicked" />
+                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="postImg" />
                     </div>
-
-                    <img id="output" />
-
                 </v-card-title>
                 <v-card-text class="text-center">
                 </v-card-text>
@@ -49,8 +46,15 @@
                                     <div v-if="userData.description" class="text-center">{{ userData.description }}</div>
                                     <div v-else class="text-center">Vous n'avez pas encore de description</div>
                                 </v-card-text>
-                                <v-textarea background-color="white" outlined  placeholder="Ajouter un texte" no-resize auto-grow></v-textarea>
-                                <v-btn to="/home">Changer ma description</v-btn>
+                                <v-textarea 
+                                v-model="description"
+                                outlined  
+                                no-resize auto-grow
+                                rows=1
+                                background-color="white" 
+                                placeholder="Ajouter un texte"
+                                ></v-textarea>
+                                <v-btn @click="postDesc">Changer ma description</v-btn>
                             </v-card>
                         </v-tab-item>
                         <!--tab-password-->
@@ -128,12 +132,7 @@ export default {
             showPage: false,
             userData: null,
             showPasswd: false,
-            password: 'Password',
-            defaultButtonText:"Changer mon avatar",
-            selectedFile: null,
-            isSelecting: false,
-            imgUrl: "",
-            img:"",
+            description: "",
             rules: {
                 required: value => !!value || 'Required.',
                 min: v => v.length >= 8 || 'Min 8 characters',
@@ -141,101 +140,63 @@ export default {
             },
         };
     },
-    computed: {
-        userImg() {
-            if(this.userData.img) {
-                let images = require.context('../assets', false, /\.png$|\.jpg$|\.jpeg$/)
-                return images(`./${this.userData.img}`);
-            }
-            return null;
-        },
-        buttonText() {
-        return this.selectedFile ? this.selectedFile.name : this.defaultButtonText
-        }
-    },
     methods: {
         postDesc() {
-            const payload = {
-                url: `${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`,
-                data: {
-                    //pubId: comData.pubId,
-                   //text: comData.comText,
-                }
+            const data = {
+                description: this.description,
             };
-            this.$http.post(payload.url, payload.data)
+            this.$http.post(`${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_DESC_URL}`, data)
             .then(
-                (/*success*/) => {this.updatePost();},
-                (/*failed*/) => {}
+                (success) => {
+                    success.text()
+                    .then( token => {
+                        localStorage.grpm_store = token;
+                        this.userData.description = this.description;
+                        this.description = "";
+                    });
+                },
+                (/*failed*/) => {
+                }
             );
         },
         // function used for show or unshow home view
         trigger(payload) {
             if(payload.ready) {
                 this.showPage = payload.ready;                                                                                                                         
-                this.userData = payload.json;
+                this.userData = payload.userData;
             }
         },
-        onPickFile () { 
+        onPickImg () { 
             this.$refs.fileInput.click();
         }, 
-        onFilePicked (event) { 
+        postImg (event) { 
 
-            let output = document.getElementById('output');
             let file = event.target.files[0];
             let fileReader = new FileReader();
 
-            if(file) {
+            if(file) 
                 fileReader.readAsDataURL(file);
-                this.img = file;
-            }
 
             fileReader.addEventListener('load', function (){ 
-                output.width = 300;
-                output.height = 300;
-                output.src = fileReader.result;
-                this.imgUrl = fileReader.result;
             }, false);
-
 
             let formData = new FormData();
             formData.append("image", file, file.name);
 
             this.$http.post(`${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_IMG_URL}`, formData)
             .then(
-                success => {
-                    alert(`success: ${success}`)
+                (success) => {
+                    success.text()
+                        .then(token => {
+                            localStorage.grpm_store = token;
+                            this.userData.img = success.body.data.imgUrl;
+                        });         
                 },
-                failed => {
-                    alert(`failed: ${failed}`)
-
+                (/*failed*/) => {
                 }
             );
 
         },
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 </script>

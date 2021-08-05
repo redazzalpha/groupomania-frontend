@@ -147,29 +147,26 @@ export default {
                 // post request
                 this.$http.post(payload.url, payload.data)
                 .then(
-                    success => {
+                    success => {            
                         success.text()
                         .then(token => {
                             localStorage.grpm_store = token;
                             this.$router.push(defines.HOME_URL);
-                        });
+                        });         
                     },
                     failed => {
-                        failed.json()
-                        .then(json => {
-                            switch(json.error.code) {
-                                case "ER_UNK_USER":
-                                    this.dialogErrText = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
-                                    this.dialogErr = true;
-                                    break;
-                                case "ER_INV_PASS":
-                                    this.dialogErrText = "Le mot de passe que vous avez saisi est invalide";
-                                    this.dialogErr = true;
-                                    break;
-                                default:
-                                    throw new Error("Unknown error");    
-                            }
-                        });
+                        switch(failed.body.error.code) {
+                            case "ER_UNK_USER":
+                                this.dialogErrText = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
+                                this.dialogErr = true;
+                                break;
+                            case "ER_INV_PASS":
+                                this.dialogErrText = "Le mot de passe que vous avez saisi est invalide";
+                                this.dialogErr = true;
+                                break;
+                            default:
+                                throw new Error("Unknown error");    
+                        }
                     }
                 );
             }
@@ -195,17 +192,14 @@ export default {
                         this.validateLogin();
                     },
                     failed => {
-                        failed.json()
-                        .then(json => {
-                            switch(json.error.code) {
-                                case "ER_DUP_ENTRY":
-                                    this.dialogErr = true;
-                                    this.dialogErrText = "L'utilisateur que vous essayez de créer existe déjà.";
-                                    break;
-                                default:
-                                    throw new Error("Unknown error");    
-                            }
-                        });
+                        switch(failed.body.error.code) {
+                            case "ER_DUP_ENTRY":
+                                this.dialogErr = true;
+                                this.dialogErrText = "L'utilisateur que vous essayez de créer existe déjà.";
+                                break;
+                            default:
+                                throw new Error("Unknown error");    
+                        }
                     }
                 );
             }

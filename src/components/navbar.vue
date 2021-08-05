@@ -7,7 +7,8 @@
     >
         <v-list-item>
             <v-list-item-avatar>
-            <v-img src="../assets/user_wolf.jpg"></v-img>
+                <v-img v-if="0==1" :src="userData.img"></v-img>
+                <v-icon v-else color="primary">mdi-account-circle</v-icon>
             </v-list-item-avatar>
 
             <v-list-item-content>
@@ -42,7 +43,7 @@ export default {
     name: "navbar",
     data() {
         return {
-            id: "test",
+            userData: null,
             items: [
                 { title: 'Accueil', url: defines.HOME_URL, icon: 'mdi-home' },
                 { title: 'Mon profil', url: defines.PROFIL_URL, icon: 'mdi-account' },
