@@ -63,22 +63,17 @@
             </v-card>
             <!--publication-card-->
             <pubcard
-                v-for="item in publications"
-                :key="item.pubId" 
                 :userId="userData.userId"
+                :userPseudo="userData.pseudo"
                 :userImg="userData.img"
-                :pubId="item.pubId"
-                :pubUserId="item.userId"
-                :pubPseudo="item.pseudo"
-                :pubImg="item.img"
-                :pubText="item.text" 
-                :pubTime="item.time.substring(0,19)" 
-                :pubLike="item.postLike"
-                :pubDislike="item.postDislike"
+                :publications="publications"
                 :comments="comments"
                 @comment="comment"
                 @delPub="delPub"
-                @refresh="updatePub"
+                @delCom="delCom"
+                @like="like"
+                @refresh="refresh"
+                @dislike="dislike"
             ></pubcard>
             <!--error-dial-->
             <errordial
@@ -99,8 +94,8 @@ import services from "../services/home.service";
 import defines from "../defines/define";
 import auth from "../components/auth.vue";
 import errordial from "../components/errordial.vue";
-import btnClose from "../components/btnClose.vue";
 import pubcard from "../components/pubcard.vue";
+import btnClose from "../components/btnClose.vue";
 export default {
     name: "home",
     components: {
@@ -127,7 +122,6 @@ export default {
     },
     methods: {
         publish() {
-
             //let textarea = document.getElementById("textarea");
             //alert(textarea.innerHTML.split(/<img.+\/>/gi));
             //alert(textarea.innerHTML.match(/<img.*<\/img>/gi));
@@ -142,7 +136,7 @@ export default {
                 .then(
                     (/*success*/) => {
                         this.pubTextArea = "";
-                        this.updatePub();
+                        this.refresh();
                     },
                     (failed) => {
                         switch(failed.body.error.code) {
@@ -158,27 +152,6 @@ export default {
                 this.dialogErr = true;
             }  
         },
-        comment(comData) {
-            // check if publication if empty   
-            if(comData.comText && services.isNotEmpty(comData.comText)) {
-                // create payload
-                const payload = {
-                    pubId: comData.pubId,
-                    comment: comData.comText,
-                };
-                // post request
-                this.$http.post(`${defines.SERVER_URL}${defines.COMMENT_URL}`, payload)
-                .then(
-                    (/*success*/) => {this.updatePub();},
-                    (/*failed*/) => {}
-                );
-            }
-            // if comment is empty set error dialog
-            else {
-                this.dialogErrText = "Vous ne pouvez pas créer de commentaire vide"
-                this.dialogErr = true;
-            }  
-        },
         getPubs() {
             return new Promise((resolve, reject) => {
                 // get request
@@ -188,9 +161,43 @@ export default {
                         this.publications = success.body.results;
                         resolve();
                     },
-                    (failed) => {reject(failed);}
+                    (failed) => {
+                        reject(failed);
+                    }
                 );
             });
+        },
+        delPub(pubId) {
+            const payload = { pubId };
+            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}`, payload)
+            .then(
+                (/*success*/) => { 
+                    this.refresh();
+                },
+                (/*failed*/) => {
+                }
+            );
+        },
+        comment(data) {
+            // check if publication if empty   
+            if(data.comText && services.isNotEmpty(data.comText)) {
+                // create payload
+                const payload = {
+                    pubId: data.pubId,
+                    comment: data.comText,
+                };
+                // post request
+                this.$http.post(`${defines.SERVER_URL}${defines.COMMENT_URL}`, payload)
+                .then(
+                    (/*success*/) => { this.refresh(); },
+                    (/*failed*/) => {}
+                );
+            }
+            // if comment is empty set error dialog
+            else {
+                this.dialogErrText = "Vous ne pouvez pas créer de commentaire vide"
+                this.dialogErr = true;
+            }  
         },
         getComs() {
             return new Promise((resolve, reject) => {
@@ -205,25 +212,19 @@ export default {
                 );
             });
         },
-        delPub(pubId) {
-            const payload = { pubId };
-            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}`, payload)
+        delCom(comId) {
+            const payload = { comId };
+            this.$http.post(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}`, payload)
             .then(
-                (/*success*/) => { 
-                    this.updatePub();
-                },
+                (/*success*/) => { this.refresh(); },
                 (/*failed*/) => {
                 }
             );
         },
-        updatePub() {
+        refresh() {
             this.getPubs()
-                .then(() => {
-                    this.getComs();
-                })
+                .then( () => this.getComs() )
                 .catch();
-
-            //this.getComs();
         },
         insertImg() {
 
@@ -261,7 +262,32 @@ export default {
         },
         onPickFile () { 
             this.$refs.fileInput.click();
-        }, 
+        },
+        like(pubId){
+            const payload = { pubId };            
+            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_LIKE_URL}`, payload)
+            .then(
+                (/*success*/) => {
+                    this.refresh();
+                },
+                (/*failed*/) => {
+
+                },
+            );
+        },
+        dislike(pubId) {
+            const payload = { pubId };            
+            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_DISLIKE_URL}`, payload)
+            .then(
+                (/*success*/) => {
+                    this.refresh();
+                },
+                (/*failed*/) => {
+
+                },
+            );
+
+        },
         // function used for show or unshow home view
         trigger(payload) {
             if(payload.ready) {
@@ -275,9 +301,7 @@ export default {
         },
     },
     mounted() {
-        // updatePubs funtionupdate publications and comments 
-        // using asynchronous chained funtions
-        this.updatePub();
+        this.refresh();
     },
 }
 </script>

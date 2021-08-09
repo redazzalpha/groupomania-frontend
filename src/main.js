@@ -3,7 +3,7 @@ import app from './app.vue';
 import router from './router/router';
 import store from './store/store';
 import vuetify from './plugins/vuetify';
-import vueRessource from 'vue-resource';
+import vueRessource from 'vue-resource';                                                                                                                                                         
 
 Vue.use(vueRessource);
 Vue.http.interceptors.push(function (req) {
