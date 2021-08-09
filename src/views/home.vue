@@ -56,7 +56,7 @@
                             <v-col v-for="item in buttons" :key="item.label" :class="item.class">
                                 <v-btn small @click="item.action">{{ item.label }}</v-btn>
                             </v-col>
-                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="onFilePicked" />
+                            <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="putImg" />
                         </v-row>
                     </v-container>
                 </v-card-actions>
@@ -65,16 +65,20 @@
             <pubcard
                 v-for="item in publications"
                 :key="item.pubId" 
+                :userId="userData.userId"
                 :userImg="userData.img"
-                :authorImg="item.img"
-                :authorName="item.pseudo"
-                :text="item.text" 
-                :time="item.time" 
-                :likeCount="item.postLike"
-                :dislikeCount="item.postDislike"
                 :pubId="item.pubId"
+                :pubUserId="item.userId"
+                :pubPseudo="item.pseudo"
+                :pubImg="item.img"
+                :pubText="item.text" 
+                :pubTime="item.time.substring(0,19)" 
+                :pubLike="item.postLike"
+                :pubDislike="item.postDislike"
                 :comments="comments"
-                @comment="postComment"
+                @comment="comment"
+                @delPub="delPub"
+                @refresh="updatePub"
             ></pubcard>
             <!--error-dial-->
             <errordial
@@ -107,7 +111,7 @@ export default {
     },
     data(){
         return {
-            auth_url: `${process.env.VUE_APP_SERVER_URL}${defines.HOME_URL}`, 
+            auth_url: `${defines.SERVER_URL}${defines.HOME_URL}`, 
             userData: null,
             showPage: false,
             pubTextArea: "",
@@ -115,11 +119,10 @@ export default {
             dialogErrText: "",
             publications: [],
             comments: [],
-            test: [],
             buttons: [
                 {label: "Ajouter une image", class: "col-8",action: this.onPickFile},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish },
-            ]
+            ],
         };
     },
     methods: {
@@ -131,22 +134,17 @@ export default {
 
             //post publication
             // check if publication if empty   
-            if(this.pubTextArea && services.checkPublication(this.pubTextArea)) {
-
+            if(this.pubTextArea && services.isNotEmpty(this.pubTextArea)) {
                 // create payload
-                let payload = {
-                    url: `${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`,
-                    data: { publication: this.pubTextArea }
-                };
-
+                const payload = { publication: this.pubTextArea };
                 // post request
-                this.$http.post(payload.url, payload.data)
+                this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, payload)
                 .then(
                     (/*success*/) => {
                         this.pubTextArea = "";
-                        this.updatePost();
+                        this.updatePub();
                     },
-                    failed => {
+                    (failed) => {
                         switch(failed.body.error.code) {
                             default:
                                 throw new Error("Unknown error");    
@@ -160,70 +158,77 @@ export default {
                 this.dialogErr = true;
             }  
         },
-        postComment(comData) {
-            const payload = {
-                url: `${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`,
-                data: {
+        comment(comData) {
+            // check if publication if empty   
+            if(comData.comText && services.isNotEmpty(comData.comText)) {
+                // create payload
+                const payload = {
                     pubId: comData.pubId,
-                    text: comData.comText,
-                }
-            };
-            this.$http.post(payload.url, payload.data)
-            .then(
-                (/*success*/) => {this.updatePost();},
-                (/*failed*/) => {}
-            );
+                    comment: comData.comText,
+                };
+                // post request
+                this.$http.post(`${defines.SERVER_URL}${defines.COMMENT_URL}`, payload)
+                .then(
+                    (/*success*/) => {this.updatePub();},
+                    (/*failed*/) => {}
+                );
+            }
+            // if comment is empty set error dialog
+            else {
+                this.dialogErrText = "Vous ne pouvez pas créer de commentaire vide"
+                this.dialogErr = true;
+            }  
         },
         getPubs() {
-            // get request
-            this.$http.get(`${process.env.VUE_APP_SERVER_URL}${defines.PUBLISH_URL}`)
-            .then(
-                (success) => {
-                    if(success.body.results.length >= 1) {
+            return new Promise((resolve, reject) => {
+                // get request
+                this.$http.get(`${defines.SERVER_URL}${defines.PUBLISH_URL}`)
+                .then(
+                    (success) => {
                         this.publications = success.body.results;
-                        for(let item of this.publications)
-                            item.time = services.dateTime(item.time);
-                    }
-                },
-                (/*failed*/) => {}
-            );
+                        resolve();
+                    },
+                    (failed) => {reject(failed);}
+                );
+            });
         },
         getComs() {
-            // get request
-            this.$http.get(`${process.env.VUE_APP_SERVER_URL}${defines.COMMENT_URL}`)
-            .then(
-                (success) => {
-                    if(success.body.results.length >= 1) {
+            return new Promise((resolve, reject) => {
+                // get request
+                this.$http.get(`${defines.SERVER_URL}${defines.COMMENT_URL}`)
+                .then(
+                    (success) => {
                         this.comments = success.body.results;
-                        for(let item of this.comments)
-                            item.time = services.dateTime(item.time);
-                    }
+                        resolve();
+                    },
+                    (failed) => {reject(failed);}
+                );
+            });
+        },
+        delPub(pubId) {
+            const payload = { pubId };
+            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}`, payload)
+            .then(
+                (/*success*/) => { 
+                    this.updatePub();
                 },
-                (/*failed*/) => {}
+                (/*failed*/) => {
+                }
             );
         },
-        updatePost() {
-            this.getPubs();
-            this.getComs();
+        updatePub() {
+            this.getPubs()
+                .then(() => {
+                    this.getComs();
+                })
+                .catch();
+
+            //this.getComs();
         },
         insertImg() {
 
         },
-        // function used for show or unshow home view
-        trigger(payload) {
-            if(payload.ready) {
-                this.showPage = payload.ready;                                                                                                                         
-                this.userData = payload.userData;
-            }
-        },
-        // function used to close error dialog
-        close() {
-            this.dialogErr = !this.dialogErr;
-        },
-        onPickFile () { 
-            this.$refs.fileInput.click();
-        }, 
-        onFilePicked (event) { 
+        putImg (event) { 
 
             let textarea = document.getElementById("textarea");                                                   
             let img = document.createElement("img");
@@ -243,20 +248,36 @@ export default {
                 textarea.focus();   
             }, false);
 
-            //let formData = new FormData();
-            //formData.append("image", file, file.name);
+            //let payload = new FormData();
+            //payload.append("image", file, file.name);
 
-            //this.$http.post(`${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_IMG_URL}`, formData)
+            //this.$http.post(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, payload)
             //.then(
-               //(/*success*/) => {
+                //(/*success*/) => {
                 //},
-               //(/*failed*/) => {
-               //}
-           //);
+                //(/*failed*/) => {
+                //}
+            //);
+        },
+        onPickFile () { 
+            this.$refs.fileInput.click();
+        }, 
+        // function used for show or unshow home view
+        trigger(payload) {
+            if(payload.ready) {
+                this.showPage = payload.ready;                                                                                                                         
+                this.userData = payload.userData;
+            }
+        },
+        // function used to close error dialog
+        close() {
+            this.dialogErr = !this.dialogErr;
         },
     },
     mounted() {
-        this.updatePost();
+        // updatePubs funtionupdate publications and comments 
+        // using asynchronous chained funtions
+        this.updatePub();
     },
 }
 </script>

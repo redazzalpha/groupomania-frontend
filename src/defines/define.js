@@ -1,5 +1,5 @@
-// internal url
 const defines = {
+    SERVER_URL: "http://localhost:4000",
     ROOT_URL: "/",
     LOGIN_URL: "/login",
     SIGNUP_URL: "/signup",
@@ -14,7 +14,12 @@ const defines = {
     NOTIFICATION_URL: "/app/notification",
     LOGOUT_URL: "/app/logout",
     PUBLISH_URL: "/app/publish",
+    PUBLISH_LIKE_URL: "/app/publish/like",
+    PUBLISH_DISLIKE_URL: "/app/publish/dislike",
+    PUBLISH_DEL_URL: "/app/publish/delete",
     COMMENT_URL: "/app/publish/comment",
+    COMMENT_DEL_URL: "/app/publish/comment/delete",
+    AUTO_LOG_URL: "/app/autolog",
     UNKNOWN_URL: "/*",
 };
 

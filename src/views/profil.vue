@@ -20,7 +20,7 @@
                         >
                             <v-icon>mdi-camera</v-icon>
                         </v-btn> 
-                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="postImg" />
+                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="putImg" />
                     </div>
                 </v-card-title>
                 <v-card-text class="text-center">
@@ -128,7 +128,7 @@ export default {
     },
     data() {
         return {
-            auth_url: `${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_URL}`,
+            auth_url: `${defines.SERVER_URL}${defines.PROFIL_URL}`,
             showPage: false,
             userData: null,
             showPasswd: false,
@@ -142,10 +142,10 @@ export default {
     },
     methods: {
         postDesc() {
-            const data = {
+            const payload = {
                 description: this.description,
             };
-            this.$http.post(`${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_DESC_URL}`, data)
+            this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}`, payload)
             .then(
                 (success) => {
                     success.text()
@@ -159,17 +159,7 @@ export default {
                 }
             );
         },
-        // function used for show or unshow home view
-        trigger(payload) {
-            if(payload.ready) {
-                this.showPage = payload.ready;                                                                                                                         
-                this.userData = payload.userData;
-            }
-        },
-        onPickImg () { 
-            this.$refs.fileInput.click();
-        }, 
-        postImg (event) { 
+        putImg (event) { 
 
             let file = event.target.files[0];
             let fileReader = new FileReader();
@@ -180,10 +170,10 @@ export default {
             fileReader.addEventListener('load', function (){ 
             }, false);
 
-            let formData = new FormData();
-            formData.append("image", file, file.name);
+            let payload = new FormData();
+            payload.append("image", file, file.name);
 
-            this.$http.post(`${process.env.VUE_APP_SERVER_URL}${defines.PROFIL_IMG_URL}`, formData)
+            this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, payload)
             .then(
                 (success) => {
                     success.text()
@@ -196,6 +186,16 @@ export default {
                 }
             );
 
+        },
+        onPickImg () { 
+            this.$refs.fileInput.click();
+        }, 
+        // function used for show or unshow home view
+        trigger(payload) {
+            if(payload.ready) {
+                this.showPage = payload.ready;                                                                                                                         
+                this.userData = payload.userData;
+            }
         },
     },
 }

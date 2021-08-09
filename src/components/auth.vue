@@ -23,7 +23,7 @@
 
 <script>
 import errordial from "../components/errordial.vue"
-
+const jwt  = require('jsonwebtoken');
 export default {
     name: "auth",
     components: {
@@ -44,14 +44,11 @@ export default {
     methods: {
     },
     beforeMount() {
-    
-        // get request
         this.$http.get(this.auth_url)
         .then(
-            (success) => {
-                this.dialogErr = false;
-                this.$emit("onReady", {ready: !this.dialogErr, userData: success.body });
-                
+            (/*success*/) => {
+                const decoded = jwt.decode(JSON.parse(localStorage.grpm_store).data.token);
+                this.$emit("onReady", {ready: !this.dialogErr, userData: decoded });
             },
             (/*failed*/) =>{
                 this.dialogErr = true;

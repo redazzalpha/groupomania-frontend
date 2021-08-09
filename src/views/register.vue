@@ -70,13 +70,13 @@
         :text="dialogErrText"
         :model="dialogErr"
         >
-        <template v-slot:bottom>
-            <v-row>
-                <v-card-actions>
-                    <v-btn @click="close">Ok</v-btn>
-                </v-card-actions>
-            </v-row>
-        </template >
+            <template v-slot:bottom>
+                <v-row>
+                    <v-card-actions>
+                        <v-btn @click="close">Ok</v-btn>
+                    </v-card-actions>
+                </v-row>
+            </template >
         </errordial>
     </div>
 
@@ -97,7 +97,7 @@ export default {
             registerValid: false,
             showLoginfield: false,
             showRgstrField: false,
-            dialogSign: true,
+            dialogSign: false,
             dialogErr : false,
             dialogErrText: "",
             emailLogin: "",
@@ -137,15 +137,12 @@ export default {
             if (this.fromRgstr || this.$refs.loginForm.validate()) {
 
                 // create payload
-                let payload = {
-                    url: `${process.env.VUE_APP_SERVER_URL}${defines.LOGIN_URL}`,
-                    data: {
-                        email: this.fromRgstr? this.fromRgstr.email : this.emailLogin,
-                        password: this.fromRgstr? this.fromRgstr.password : this.paasswordLogin, 
-                    }
+                const payload = {
+                    email: this.fromRgstr? this.fromRgstr.email : this.emailLogin,
+                    password: this.fromRgstr? this.fromRgstr.password : this.paasswordLogin, 
                 };
                 // post request
-                this.$http.post(payload.url, payload.data)
+                this.$http.post(`${defines.SERVER_URL}${defines.LOGIN_URL}`, payload)
                 .then(
                     success => {            
                         success.text()
@@ -175,17 +172,13 @@ export default {
             if (this.$refs.registerForm.validate()) {
 
                 //create paylod
-                let payload = {
-                    url: `${process.env.VUE_APP_SERVER_URL}${defines.SIGNUP_URL}`,
-                    data: {
-                        pseudo: this.pseudoRgstr,
-                        email: this.emailRgstr,
-                        password: this.passwordRgstr,
-                    },
+                const payload = {
+                    pseudo: this.pseudoRgstr,
+                    email: this.emailRgstr,
+                    password: this.passwordRgstr,
                 };
-
                 // post request
-                this.$http.post(payload.url, payload.data)
+                this.$http.post(`${defines.SERVER_URL}${defines.SIGNUP_URL}`, payload)
                 .then(
                     (/*success*/) => {
                         this.fromRgstr = {email: this.emailRgstr, password: this.passwordRgstr};
@@ -215,13 +208,19 @@ export default {
         },
     },
     created() {
-        // auto loggin
-        if(localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
-            this.dialogSign = false;
-            this.$router.push(defines.HOME_URL);
-        }
+
+        // auto logging
+        this.$http.get(`${defines.SERVER_URL}${defines.AUTO_LOG_URL}`)
+        .then(
+            (success) => {
+                localStorage.grpm_store = JSON.stringify(success.body);
+                this.$router.push(defines.HOME_URL);
+            },
+            (/*failed*/) => {
+                this.dialogSign = true;
+            }
+        );
     },
-    
 }
 </script>
 
