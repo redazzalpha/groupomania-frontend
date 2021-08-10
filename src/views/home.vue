@@ -72,8 +72,10 @@
                 @delPub="delPub"
                 @delCom="delCom"
                 @like="like"
-                @refresh="refresh"
                 @dislike="dislike"
+                @unlike="unlike"
+                @undislike="undislike"
+                @refresh="refresh"
             ></pubcard>
             <!--error-dial-->
             <errordial
@@ -221,13 +223,50 @@ export default {
                 }
             );
         },
+        like(data){
+            if(data.userIdLike)             
+                data.userIdLike.push(this.userData.userId)
+            else data.userIdLike = [this.userData.userId];
+            const payload = { data };  
+            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_LIKE_URL}`, payload)
+            .then(
+                (/*success*/) => { this.refresh(); },
+                (/*failed*/) => {},
+            );
+        },
+        dislike(data) {
+            if(data.userIdDislike)
+                data.userIdDislike.push(this.userData.userId)
+            else data.userIdDislike = [this.userData.userId];
+            const payload = { data };            
+            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_DISLIKE_URL}`, payload)
+            .then(
+                (/*success*/) => { this.refresh(); },
+                (/*failed*/) => {},
+            );
+        },
+        unlike(data) {
+            data.userIdLike = data.userIdLike.filter(item => {return item != this.userData.userId;} );
+            const payload = { data };  
+            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_UNLIKE_URL}`, payload)
+            .then(
+                (/*success*/) => { this.refresh(); },
+                (/*failed*/) => {},
+            );
+        },
+        undislike(data) {
+            data.userIdDislike = data.userIdDislike.filter(item => {return item != this.userData.userId;} );
+            const payload = { data };            
+            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_UNDISLIKE_URL}`, payload)
+            .then(
+                (/*success*/) => { this.refresh(); },
+                (/*failed*/) => {},
+            );
+        },
         refresh() {
             this.getPubs()
                 .then( () => this.getComs() )
                 .catch();
-        },
-        insertImg() {
-
         },
         putImg (event) { 
 
@@ -242,7 +281,6 @@ export default {
                 this.img = file;
             }
             fileReader.addEventListener('load', function (){ 
-
                 img.setAttribute("src", fileReader.result);
                 img.setAttribute("width", "100%");
                 textarea.appendChild(img);
@@ -262,31 +300,6 @@ export default {
         },
         onPickFile () { 
             this.$refs.fileInput.click();
-        },
-        like(pubId){
-            const payload = { pubId };            
-            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_LIKE_URL}`, payload)
-            .then(
-                (/*success*/) => {
-                    this.refresh();
-                },
-                (/*failed*/) => {
-
-                },
-            );
-        },
-        dislike(pubId) {
-            const payload = { pubId };            
-            this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_DISLIKE_URL}`, payload)
-            .then(
-                (/*success*/) => {
-                    this.refresh();
-                },
-                (/*failed*/) => {
-
-                },
-            );
-
         },
         // function used for show or unshow home view
         trigger(payload) {

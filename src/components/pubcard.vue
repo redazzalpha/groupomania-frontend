@@ -57,13 +57,21 @@
                 <!--like-dislike-row-->
                 <v-row>
                     <v-col class="pr-0 pl-0">
-                        <v-btn width="100%" title="J'aime" @click="like(item.pubId)">
-                            <v-icon>mdi-thumb-up</v-icon> {{ item.postLike }}
+                        <v-btn 
+                        width="100%"
+                        title="J'aime" 
+                        @click="like({pubId: item.pubId, userIdLike: item.userIdLike, userIdDislike: item.userIdDislike})"
+                        >
+                            <v-icon :color='item.userIdLike && item.userIdLike.find(item => item == userId) ? "green": ""'>mdi-thumb-up</v-icon> {{ item.postLike }}
                         </v-btn>
                     </v-col>
                     <v-col class="pr-0 pl-0">
-                        <v-btn width="100%" title="Je n'aime pas" @click="dislike(item.pubId)">
-                            <v-icon>mdi-thumb-down</v-icon> {{ item.postDislike }}
+                        <v-btn 
+                        width="100%"
+                        title="Je n'aime pas" 
+                        @click="dislike({pubId: item.pubId, userIdDislike: item.userIdDislike, userIdLike: item.userIdLike})"
+                        >
+                            <v-icon :color='item.userIdDislike && item.userIdDislike.find(item => item == userId) ? "red": ""'>mdi-thumb-down</v-icon> {{ item.postDislike }}
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -119,6 +127,7 @@ export default {
     data() {
         return {
             comText: "",
+            color: ""
         };
     },
     methods: {
@@ -132,14 +141,57 @@ export default {
         delCom(comId) {
             this.$emit("delCom", comId);
         },
-        like(pubId) {
-            this.$emit("like", pubId);
+        like(data) {
+
+            const userIdLike = data.userIdLike;
+            const userIdDislike = data.userIdDislike;
+            
+            if(userIdLike == null && userIdDislike == null) {
+                this.$emit("like", data);
+            }
+            else if(userIdLike && userIdDislike == null) {
+                if(userIdLike && !userIdLike.find(item => item == this.userId))
+                    this.$emit("like", data);
+                else if(userIdLike && userIdLike.find(item => item == this.userId))
+                    this.$emit("unlike", data);
+            }
+            else if(userIdLike == null && userIdDislike) {
+                (userIdDislike && !userIdDislike.find(item => item == this.userId)) ?
+                this.$emit("like", data) : "";
+            }
+            else if(userIdLike && userIdDislike) {
+                if((userIdLike && !userIdLike.find(item => item == this.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userId)))
+                    this.$emit("like", data);
+    
+                else if((userIdLike && userIdLike.find(item => item == this.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userId)))
+                    this.$emit("unlike", data);
+            }
         },
-        dislike(pubId) {
-            this.$emit("dislike", pubId);
-        }
+        dislike(data) {
+            const userIdLike = data.userIdLike;
+            const userIdDislike = data.userIdDislike;
+
+            if(userIdDislike == null && userIdLike == null) {
+                this.$emit("dislike", data);
+            }
+            else if(userIdDislike && userIdLike == null) {
+                if(userIdDislike && !userIdDislike.find(item => item == this.userId))
+                    this.$emit("dislike", data);
+                else if(userIdDislike && userIdDislike.find(item => item == this.userId))
+                    this.$emit("undislike", data);
+            }
+            else if(userIdDislike == null && userIdLike) {
+                (userIdLike && !userIdLike.find(item => item == this.userId)) ?
+                this.$emit("dislike", data) : "";
+            }
+            else if(userIdDislike && userIdLike) {
+                if((userIdDislike && !userIdDislike.find(item => item == this.userId)) && (userIdLike && !userIdLike.find(item => item == this.userId)))
+                    this.$emit("dislike", data);
+    
+                else if((userIdDislike && userIdDislike.find(item => item == this.userId)) && (userIdLike && !userIdLike.find(item => item == this.userId)))
+                    this.$emit("undislike", data);
+            }
+        },
     },
-    created() {
-    }
 }
 </script>
