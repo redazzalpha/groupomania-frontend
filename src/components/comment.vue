@@ -13,12 +13,12 @@
                         <div class="arrow" style="">&#9664;</div>
                         <v-row class="pl-2 pt-1 white--text"> 
                             <v-col class="text-decoration-underline flex-grow-0 pa-0">{{ item.pseudo}}</v-col>
-                            <v-col class="font-italic pa-0 pl-2 flex-grow-1">le {{ item.time.substring(0,19)}}</v-col>
+                            <v-col class="font-italic pa-0 pl-2 flex-grow-1">le {{ item.time.substring(0,20)}}</v-col>
                         </v-row>
                         <v-row class="align-center pl-2">
                             <v-col cols=10 class="pa-0 pt-1 white--text" style="word-break: break-all;">{{ item.text}}</v-col>
                             <v-col v-show="item.userId == userId"  >
-                                <v-btn icon color="red darken-3" style="position: absolute; top: 36%; right: -2px;" @click="delCom(item.comId)"><v-icon class="white--text">mdi-delete-sweep</v-icon></v-btn>
+                                <v-btn icon color="red darken-3" style="position: absolute; top: 36%; right: -2px;" @click="delCom({comId: item.comId, pubId: item.pubId})"><v-icon class="white--text">mdi-delete-sweep</v-icon></v-btn>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -37,8 +37,8 @@ export default {
         comments: Array,
     },
     methods: {
-        delCom(comId) {
-            this.$emit("delCom", comId);
+        delCom(data) {
+            this.$emit("delCom", data);
         },
     }
 }

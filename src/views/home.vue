@@ -214,8 +214,11 @@ export default {
                 );
             });
         },
-        delCom(comId) {
-            const payload = { comId };
+        delCom(data) {
+            const payload = { 
+                comId: data.comId,
+                pubId: data.pubId,
+            };
             this.$http.post(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}`, payload)
             .then(
                 (/*success*/) => { this.refresh(); },
@@ -313,7 +316,7 @@ export default {
             this.dialogErr = !this.dialogErr;
         },
     },
-    mounted() {
+    created() {
         this.refresh();
     },
 }

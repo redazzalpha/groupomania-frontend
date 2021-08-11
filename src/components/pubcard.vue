@@ -1,6 +1,7 @@
 <template>
     <div class="pubCard">
         <!--Publications-cards-->
+        <div v-if="publications.length <= 0" class="title text-center">Il n'y a pas encore de publication soyez le premier à en créer une !</div>
         <v-card
         v-for="item in publications"
         :key="item.pubId"
@@ -36,7 +37,7 @@
                                 </v-col>
                             </v-row>
                             <v-row no-gutters class="body-2 font-italic">
-                                <v-col>publié le {{ item.time.substring(0,19) }}</v-col>
+                                <v-col>publié le {{ item.time.substring(0,20) }}</v-col>
                             </v-row>
                         </v-container>
                     </v-col>
@@ -131,15 +132,15 @@ export default {
         };
     },
     methods: {
-        delPub(pubId) {
-            this.$emit("delPub", pubId);
-        },
         comment(data) {
             this.$emit("comment", data);
             this.comText = "";
         },
-        delCom(comId) {
-            this.$emit("delCom", comId);
+        delPub(pubId) {
+            this.$emit("delPub", pubId);
+        },
+        delCom(data) {
+            this.$emit("delCom", data);
         },
         like(data) {
 
