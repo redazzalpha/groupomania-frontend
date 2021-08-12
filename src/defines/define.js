@@ -11,16 +11,15 @@ const defines = {
     PROFIL_PASSWD_URL: "/app/profil/password",
     PROFIL_ACC_URL: "/app/profil/account",
     TEAM_URL: "/app/team",
-    NOTIFICATION_URL: "/app/notification",
+    NOTIFICATION_URL: "/app/notification/notifs",
+    DEL_NOTIFICATION_URL: "/app/notification/delete",
+    READ_NOTIFICATION_URL: "/app/notification/read",
     LOGOUT_URL: "/app/logout",
     PUBLISH_URL: "/app/publish",
     PUBLISH_LIKE_URL: "/app/publish/like",
     PUBLISH_DISLIKE_URL: "/app/publish/dislike",
-
     PUBLISH_UNLIKE_URL: "/app/publish/unlike",
     PUBLISH_UNDISLIKE_URL: "/app/publish/undislike",
-
-
     PUBLISH_DEL_URL: "/app/publish/delete",
     COMMENT_URL: "/app/publish/comment",
     COMMENT_DEL_URL: "/app/publish/comment/delete",

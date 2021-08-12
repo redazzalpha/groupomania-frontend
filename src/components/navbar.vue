@@ -7,12 +7,12 @@
     >
         <v-list-item>
             <v-list-item-avatar>
-                <v-img v-if="0==1" :src="userData.img"></v-img>
+                <v-img v-if="userData" :src="userData.img"></v-img>
                 <v-icon v-else color="primary">mdi-account-circle</v-icon>
             </v-list-item-avatar>
 
             <v-list-item-content>
-            <v-list-item-title>redazzwolf</v-list-item-title>
+            <v-list-item-title v-if="userData">{{ userData.pseudo }}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
 
@@ -20,7 +20,7 @@
 
         <v-list dense>
             <v-list-item
-            v-for="item in items"
+            v-for="item in listItems"
             :key="item.title"
             :to="item.url"
             >
@@ -37,20 +37,22 @@
 </template>
 
 <script>
-
+import { mapState } from 'vuex';
 import defines from "../defines/define";
 export default {
     name: "navbar",
     data() {
         return {
-            userData: null,
-            items: [
+            listItems: [
                 { title: 'Accueil', url: defines.HOME_URL, icon: 'mdi-home' },
                 { title: 'Mon profil', url: defines.PROFIL_URL, icon: 'mdi-account' },
                 { title: 'Se déconnecter', url: defines.LOGOUT_URL, icon: 'mdi-logout' },
             ],
         };
     },
+    computed: {
+        ...mapState(["userData"]),
+    }
 }
 </script>
 

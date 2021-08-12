@@ -5,6 +5,7 @@
         </div>
         <!--error-dialog-->
         <errordial 
+        v-if="useDialErr"
         title="Erreur système"
         text="Vous n'êtes pas authentifié."
         :model="dialogErr"
@@ -22,6 +23,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex';
 import errordial from "../components/errordial.vue"
 const jwt  = require('jsonwebtoken');
 export default {
@@ -31,6 +33,10 @@ export default {
     },
     props: {
         tag: String,
+        useDialErr: {
+            type: Boolean,
+            default: true
+        },
         auth_url: {
             type: String,
             required: true,
@@ -41,18 +47,23 @@ export default {
             dialogErr: false,
         };
     },
+    computed: {
+        ...mapState(["userData"]),
+    },
     methods: {
+        ...mapActions(["setUserData"])
     },
     beforeMount() {
         this.$http.get(this.auth_url)
         .then(
             (/*success*/) => {
                 const decoded = jwt.decode(JSON.parse(localStorage.grpm_store).data.token);
-                this.$emit("onReady", {ready: !this.dialogErr, userData: decoded });
+                this.setUserData(decoded);
+                this.$emit("onReady", !this.dialogErr);
             },
             (/*failed*/) =>{
                 this.dialogErr = true;
-                this.$emit("onReady", {ready: !this.dialogErr, userData: null });
+                this.$emit("onReady", !this.dialogErr);
             } 
         );
     },

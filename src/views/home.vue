@@ -3,7 +3,7 @@
         <slot v-if="showPage">
             <h2 class="pa-5">Dernières publiations</h2>
             <!--express your-self-card-->
-            <v-card elevation="15" color="grey lighten-3" max-width=550 class="ma-auto mb-8" style="position: relative">
+            <v-card elevation="15" color="grey lighten-3" max-width=550 class="mx-auto mb-8" style="position: relative">
                 <v-container>
                     <v-row>
                         <v-col>
@@ -92,9 +92,10 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
 import services from "../services/home.service";
-import defines from "../defines/define";
 import auth from "../components/auth.vue";
+import defines from "../defines/define";
 import errordial from "../components/errordial.vue";
 import pubcard from "../components/pubcard.vue";
 import btnClose from "../components/btnClose.vue";
@@ -109,7 +110,6 @@ export default {
     data(){
         return {
             auth_url: `${defines.SERVER_URL}${defines.HOME_URL}`, 
-            userData: null,
             showPage: false,
             pubTextArea: "",
             dialogErr: false,
@@ -122,7 +122,11 @@ export default {
             ],
         };
     },
+    computed: {
+        ...mapState(["userData", "notifs"]),
+    },
     methods: {
+        ...mapActions(["setNotifs"]),
         publish() {
             //let textarea = document.getElementById("textarea");
             //alert(textarea.innerHTML.split(/<img.+\/>/gi));
@@ -185,6 +189,7 @@ export default {
             if(data.comText && services.isNotEmpty(data.comText)) {
                 // create payload
                 const payload = {
+                    userId: data.userId,
                     pubId: data.pubId,
                     comment: data.comText,
                 };
@@ -225,6 +230,18 @@ export default {
                 (/*failed*/) => {
                 }
             );
+        },
+        getNotifs() {
+            return new Promise((resolve, reject) => {
+                this.$http.get(`${defines.SERVER_URL}${defines.NOTIFICATION_URL}`)
+                .then(
+                    (success) => {
+                        this.setNotifs(success.body.results);
+                        resolve();
+                    },
+                    (failed) => { reject(failed); }
+                );
+            });
         },
         like(data){
             if(data.userIdLike)             
@@ -268,7 +285,13 @@ export default {
         },
         refresh() {
             this.getPubs()
-                .then( () => this.getComs() )
+                .then( () => {
+                    this.getComs()
+                        .then( () => {
+                            this.getNotifs()
+                        })
+                        .catch();
+                })
                 .catch();
         },
         putImg (event) { 
@@ -305,11 +328,8 @@ export default {
             this.$refs.fileInput.click();
         },
         // function used for show or unshow home view
-        trigger(payload) {
-            if(payload.ready) {
-                this.showPage = payload.ready;                                                                                                                         
-                this.userData = payload.userData;
-            }
+        trigger(ready) {
+            this.showPage = ready;                                                                                                                         
         },
         // function used to close error dialog
         close() {

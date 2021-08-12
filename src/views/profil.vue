@@ -1,7 +1,7 @@
 <template>
     <auth tab="profil" :auth_url="auth_url"  @onReady="trigger">
         <slot v-if="showPage">
-            <h2 class="pa-5">Mon profil</h2>
+            <h2 class="pa-5">Profil</h2>
             <!--main-card-container-->
             <v-card elevation=10 class="pb-4 ">
                 <!--main-card-container-title-->
@@ -32,7 +32,7 @@
                         <!--tab-Email-->
                         <v-tab>E-mail</v-tab>
                         <v-tab-item class="pa-4">
-                            <v-card class="d-flex flex-column align-center justify-center ma-auto pb-4 pt-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                            <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
                                 <v-card-title>E-mail</v-card-title>
                                 <v-card-text class="d-flex justify-center">{{ userData.email }}</v-card-text>
                             </v-card>
@@ -40,7 +40,7 @@
                         <!--tab-description-->
                         <v-tab>Description</v-tab>
                         <v-tab-item class="pa-4">
-                            <v-card class="d-flex flex-column align-center justify-center ma-auto pb-4 pt-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                            <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
                                 <v-card-title>Description</v-card-title>
                                 <v-card-text class="d-flex justify-center">
                                     <div v-if="userData.description" class="text-center">{{ userData.description }}</div>
@@ -60,7 +60,7 @@
                         <!--tab-password-->
                         <v-tab>Mot de passe</v-tab>
                         <v-tab-item class="pa-4">
-                            <v-card class="d-flex flex-column align-center justify-center ma-auto pb-4 pt-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                            <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
                                 <v-card-title>Changer le mot de passe</v-card-title>
                                 <v-form>
                                     <v-container fluid >
@@ -104,7 +104,7 @@
                         <!--tab-account-->
                         <v-tab>Compte</v-tab>
                         <v-tab-item class="pa-4">
-                            <v-card class="d-flex flex-column align-center justify-center ma-auto pb-4 pt-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                            <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
                                 <v-card-title>Supprimer mon compte</v-card-title>
                                 <v-card-actions>
                                     <v-btn>Supprimer</v-btn>
@@ -119,6 +119,7 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
 import auth from "../components/auth.vue";
 import defines from '../defines/define';
 export default {
@@ -130,7 +131,6 @@ export default {
         return {
             auth_url: `${defines.SERVER_URL}${defines.PROFIL_URL}`,
             showPage: false,
-            userData: null,
             showPasswd: false,
             description: "",
             rules: {
@@ -140,7 +140,11 @@ export default {
             },
         };
     },
+    computed: {
+        ...mapState(["userData"]),
+    },
     methods: {
+        ...mapActions(["setNotifs"]),
         postDesc() {
             const payload = {
                 description: this.description,
@@ -191,12 +195,28 @@ export default {
             this.$refs.fileInput.click();
         }, 
         // function used for show or unshow home view
-        trigger(payload) {
-            if(payload.ready) {
-                this.showPage = payload.ready;                                                                                                                         
-                this.userData = payload.userData;
-            }
+        trigger(ready) {
+            this.showPage = ready;                                                                                                                         
+        },
+        getNotifs() {
+            return new Promise((resolve, reject) => {
+                this.$http.get(`${defines.SERVER_URL}${defines.NOTIFICATION_URL}`)
+                .then(
+                    (success) => {
+                        this.setNotifs(success.body.results);
+                        resolve();
+                    },
+                    (failed) => { reject(failed); }
+                );
+            });
+        },
+        refresh() {
+            this.getNotifs();
         },
     },
+    mounted() {
+        this.refresh();
+    },
+
 }
 </script>

@@ -3,10 +3,15 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import defines from "../defines/define";
 export default {
     name: "logout",
-    beforeCreate() {
+    methods: {
+        ...mapActions(["setNotifs"]),
+    },
+    created() {
+        this.setNotifs([]);
         localStorage.removeItem("grpm_store"); 
         this.$router.push(`${defines.ROOT_URL}`);
     }

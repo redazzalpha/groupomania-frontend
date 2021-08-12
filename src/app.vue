@@ -7,7 +7,6 @@
                 <router-view></router-view>
             </v-container>
         </v-main>
-
     </v-app>
 </template>
 
@@ -19,6 +18,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped>
-</style>

@@ -6,9 +6,9 @@
         v-for="item in publications"
         :key="item.pubId"
         max-width=550 
-        class="ma-auto mt-8" 
+        class="mx-auto mt-8" 
         elevation="15" 
-        color="grey lighten-1" 
+        color="grey lighten-2" 
         outlined 
         shaped
         >
@@ -28,7 +28,7 @@
                                 <v-col class="text-right" v-show="item.userId == userId">
                                     <v-btn
                                     icon 
-                                    color="red darken-3"
+                                    color="grey lighten-1"
                                     title="Supprimer la publication"
                                     @click="delPub(item.pubId)"
                                     >
@@ -100,7 +100,14 @@
                                     </v-avatar>
                                 </template>
                                 <template v-slot:append>
-                                    <v-btn title="Envoyer" icon size=40 color="primary" @click="comment({pubId: item.pubId, comText})"><v-icon>mdi-send</v-icon></v-btn>
+                                    <v-btn 
+                                    title="Envoyer" 
+                                    icon size=40 
+                                    color="primary" 
+                                    @click="comment({userId: item.userId, pubId: item.pubId, comText})"
+                                    >
+                                        <v-icon>mdi-send</v-icon>
+                                    </v-btn>
                                 </template>
                             </v-textarea>
                         </v-row>
