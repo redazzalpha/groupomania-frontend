@@ -30,6 +30,7 @@
                                     icon 
                                     color="grey lighten-1"
                                     title="Supprimer la publication"
+                                    style="position: absolute; right: 0px; top: 5px"
                                     @click="delPub(item.pubId)"
                                     >
                                         <v-icon>mdi-close-circle</v-icon>
@@ -92,7 +93,20 @@
                 <v-row>
                     <v-card-text>   
                         <v-row>
-                            <v-textarea v-model="comText" background-color="white" placeholder="Votre commentaire" solo rounded rows="1" auto-grow full-width outlined no-resize>
+                            <v-textarea 
+                            v-model="comText" 
+                            background-color="white" 
+                            placeholder="Votre commentaire" 
+                            solo 
+                            rounded 
+                            rows="1" 
+                            auto-grow 
+                            full-width 
+                            outlined 
+                            no-resize
+                            counter
+                            :rules="rules"
+                            >
                                 <template v-slot:prepend>
                                     <v-avatar size=40>
                                         <v-img v-if="userImg" :src="userImg"  />
@@ -135,13 +149,16 @@ export default {
     data() {
         return {
             comText: "",
-            color: ""
+            color: "",
+            rules: [v => v.length <= 255 || '255 Caractères max.'],
         };
     },
     methods: {
         comment(data) {
-            this.$emit("comment", data);
-            this.comText = "";
+            if(this.comText.length <= 255) {
+                this.$emit("comment", data);
+                this.comText = "";
+            }
         },
         delPub(pubId) {
             this.$emit("delPub", pubId);

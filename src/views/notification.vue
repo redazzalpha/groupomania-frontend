@@ -44,8 +44,6 @@
                     <v-expansion-panels>
                         <v-expansion-panel>
                             <v-expansion-panel-header color="grey lighten-2" @click="readNotif(item)">
-
-                                
                                 <v-icon color="primary">mdi-comment-processing</v-icon>
                                 <!--
                                 <v-badge :value="notifCount" :dot="!hover" :content="notifCount" color="warning">

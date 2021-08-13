@@ -53,6 +53,8 @@
                                 rows=1
                                 background-color="white" 
                                 placeholder="Ajouter un texte"
+                                counter
+                                :rules="descRules"
                                 ></v-textarea>
                                 <v-btn @click="postDesc">Changer ma description</v-btn>
                             </v-card>
@@ -138,6 +140,7 @@ export default {
                 min: v => v.length >= 8 || 'Min 8 characters',
                 emailMatch: () => (`The password you entered don't match`),
             },
+            descRules: [v => v.length <= 255 || '255 Caractères max.'],
         };
     },
     computed: {
@@ -146,22 +149,26 @@ export default {
     methods: {
         ...mapActions(["setNotifs"]),
         postDesc() {
-            const payload = {
-                description: this.description,
-            };
-            this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}`, payload)
-            .then(
-                (success) => {
-                    success.text()
-                    .then( token => {
-                        localStorage.grpm_store = token;
-                        this.userData.description = this.description;
-                        this.description = "";
-                    });
-                },
-                (/*failed*/) => {
-                }
-            );
+            // Empty string is authorized 
+            // to delete previous description
+            if(this.description.length <= 255) {
+                const payload = {
+                    description: this.description,
+                };
+                this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}`, payload)
+                .then(
+                    (success) => {
+                        success.text()
+                        .then( token => {
+                            localStorage.grpm_store = token;
+                            this.userData.description = this.description;
+                            this.description = "";
+                        });
+                    },
+                    (/*failed*/) => {
+                    }
+                );
+            }
         },
         putImg (event) { 
 

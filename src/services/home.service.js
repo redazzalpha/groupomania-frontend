@@ -1,6 +1,6 @@
 const services = {
     isNotEmpty: (text) => {
-        return !/^\s+$/gi.test(text);
+        return !/^\s*$/gi.test(text);
     },
 
 };
