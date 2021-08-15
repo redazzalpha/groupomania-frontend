@@ -56,7 +56,7 @@
                                 counter
                                 :rules="descRules"
                                 ></v-textarea>
-                                <v-btn @click="postDesc">Changer ma description</v-btn>
+                                <v-btn @click="postDesc" :loading="loading" :disabled="loading">Changer ma description</v-btn>
                             </v-card>
                         </v-tab-item>
                         <!--tab-password-->
@@ -135,6 +135,7 @@ export default {
             showPage: false,
             showPasswd: false,
             description: "",
+            loading: false,
             rules: {
                 required: value => !!value || 'Required.',
                 min: v => v.length >= 8 || 'Min 8 characters',
@@ -152,6 +153,7 @@ export default {
             // Empty string is authorized 
             // to delete previous description
             if(this.description.length <= 255) {
+                this.loading = true;
                 const payload = {
                     description: this.description,
                 };
@@ -163,10 +165,10 @@ export default {
                             localStorage.grpm_store = token;
                             this.userData.description = this.description;
                             this.description = "";
+                            setTimeout(() => { this.loading = false; }, defines.TIMEOUT);
                         });
                     },
-                    (/*failed*/) => {
-                    }
+                    (/*failed*/) => { setTimeout(() => { this.loading = false; }, defines.TIMEOUT); }
                 );
             }
         },
@@ -187,30 +189,23 @@ export default {
             this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, payload)
             .then(
                 (success) => {
-                    success.text()
-                        .then(token => {
-                            localStorage.grpm_store = token;
-                            this.userData.img = success.body.data.imgUrl;
-                        });         
+                    localStorage.grpm_store = JSON.stringify(success.body);
+                    this.userData.img = success.body.data.imgUrl;
                 },
                 (/*failed*/) => {
                 }
             );
-
         },
         onPickImg () { 
             this.$refs.fileInput.click();
         }, 
-        // function used for show or unshow home view
-        trigger(ready) {
-            this.showPage = ready;                                                                                                                         
-        },
         getNotifs() {
             return new Promise((resolve, reject) => {
                 this.$http.get(`${defines.SERVER_URL}${defines.NOTIFICATION_URL}`)
                 .then(
                     (success) => {
-                        this.setNotifs(success.body.results);
+                        const notifs = success.body.results.filter(item => item.whereId == this.userData.userId);
+                        this.setNotifs(notifs);
                         resolve();
                     },
                     (failed) => { reject(failed); }
@@ -220,9 +215,13 @@ export default {
         refresh() {
             this.getNotifs();
         },
+        // function used for show or unshow home view
+        trigger(ready) {
+            this.showPage = ready;                                                                                                                         
+        },
     },
     mounted() {
-        this.refresh();
+        //this.refresh();
     },
 
 }

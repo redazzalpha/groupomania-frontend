@@ -8,7 +8,7 @@
             <!--header-logo-->
             <v-row no-gutters>
                 <v-col>
-                    <img class="header-logo" src="../assets/header_logo.svg" alt="header logo" />
+                    <img class="header-logo" src="../assets/header_logo.svg" alt="header logo" width="70%" style="max-width: 300px;" />
                 </v-col>
             </v-row>
             <!--toolbar-->
@@ -29,12 +29,5 @@ export default {
         toolbar,
     },
 }
-
 </script>
 
-<style lang="scss" scoped>
-    .header-logo {
-        width: 70%;
-        max-width: 300px;
-    }
-</style>

@@ -1,4 +1,5 @@
 const defines = {
+    // urls
     SERVER_URL: "http://localhost:4000",
     ROOT_URL: "/",
     LOGIN_URL: "/login",
@@ -25,6 +26,8 @@ const defines = {
     COMMENT_DEL_URL: "/app/publish/comment/delete",
     AUTO_LOG_URL: "/app/autolog",
     UNKNOWN_URL: "/*",
+    // variables
+    TIMEOUT: 1000,
 };
 
 module.exports = defines;

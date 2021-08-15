@@ -7,7 +7,7 @@
     >
         <v-list-item>
             <v-list-item-avatar>
-                <v-img v-if="userData" :src="userData.img"></v-img>
+                <v-img v-if="getUserImg" :src="getUserImg"></v-img>
                 <v-icon v-else color="primary">mdi-account-circle</v-icon>
             </v-list-item-avatar>
 
@@ -52,6 +52,9 @@ export default {
     },
     computed: {
         ...mapState(["userData"]),
+        getUserImg() {
+            return this.userData.img;
+        }
     }
 }
 </script>

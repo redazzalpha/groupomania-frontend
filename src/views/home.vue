@@ -54,7 +54,14 @@
                     <v-container>
                         <v-row no-gutters class="d-flex justify-space-between">
                             <v-col v-for="item in buttons" :key="item.label" :class="item.class">
-                                <v-btn small @click="item.action">{{ item.label }}</v-btn>
+                                <v-btn 
+                                small 
+                                :loading="gloading(item)"
+                                :disabled="false"
+                                @click="item.action" 
+                                >
+                                    {{ item.label }}
+                                </v-btn>
                             </v-col>
                             <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="putImg" />
                         </v-row>
@@ -63,11 +70,8 @@
             </v-card>
             <!--publication-card-->
             <pubcard
-                :userId="userData.userId"
                 :userPseudo="userData.pseudo"
                 :userImg="userData.img"
-                :publications="publications"
-                :comments="comments"
                 @comment="comment"
                 @delPub="delPub"
                 @delCom="delCom"
@@ -114,19 +118,26 @@ export default {
             pubTextArea: "",
             dialogErr: false,
             dialogErrText: "",
-            publications: [],
-            comments: [],
+            loading: false,
+            loading2: false,
+            loader: null,
+            loader2: null,
             buttons: [
                 {label: "Ajouter une image", class: "col-8",action: this.onPickFile},
-                {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish },
+                {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish},
             ],
+        gloading(item) {
+            if(/^Publiez !$/gi.test(item.label))
+            return this.loading2;
+            else return this.loading;
+        }
         };
     },
     computed: {
-        ...mapState(["userData", "notifs"]),
+        ...mapState(["userData"]),
     },
     methods: {
-        ...mapActions(["setNotifs"]),
+        ...mapActions(["setPublications", "setComments", "setNotifs"]),
         publish() {
             //let textarea = document.getElementById("textarea");
             //alert(textarea.innerHTML.split(/<img.+\/>/gi));
@@ -135,6 +146,7 @@ export default {
             //post publication
             // check if publication if empty   
             if(this.pubTextArea && services.isNotEmpty(this.pubTextArea)) {
+                this.loading2 = true
                 // create payload
                 const payload = { publication: this.pubTextArea };
                 // post request
@@ -142,13 +154,12 @@ export default {
                 .then(
                     (/*success*/) => {
                         this.pubTextArea = "";
+                        setTimeout(() => {this.loading2 = false;}, defines.TIMEOUT);
                         this.refresh();
                     },
                     (failed) => {
-                        switch(failed.body.error.code) {
-                            default:
-                                throw new Error("Unknown error");    
-                        }
+                        setTimeout(() => {this.loading2 = false;}, defines.TIMEOUT);
+                            throw new Error(failed.body.message);    
                     }
                 );
             }
@@ -164,7 +175,7 @@ export default {
                 this.$http.get(`${defines.SERVER_URL}${defines.PUBLISH_URL}`)
                 .then(
                     (success) => {
-                        this.publications = success.body.results;
+                        this.setPublications(success.body.results);
                         resolve();
                     },
                     (failed) => {
@@ -189,9 +200,9 @@ export default {
             if(data.comText && services.isNotEmpty(data.comText)) {
                 // create payload
                 const payload = {
-                    userId: data.userId,
-                    pubId: data.pubId,
-                    comment: data.comText,
+                    parentId: data.parentId,
+                    comText: data.comText,
+                    authorId: data.authorId,
                 };
                 // post request
                 this.$http.post(`${defines.SERVER_URL}${defines.COMMENT_URL}`, payload)
@@ -212,7 +223,7 @@ export default {
                 this.$http.get(`${defines.SERVER_URL}${defines.COMMENT_URL}`)
                 .then(
                     (success) => {
-                        this.comments = success.body.results;
+                        this.setComments(success.body.results);
                         resolve();
                     },
                     (failed) => {reject(failed);}
@@ -236,7 +247,8 @@ export default {
                 this.$http.get(`${defines.SERVER_URL}${defines.NOTIFICATION_URL}`)
                 .then(
                     (success) => {
-                        this.setNotifs(success.body.results);
+                        const notifs = success.body.results.filter(item => item.whereId == this.userData.userId);
+                        this.setNotifs(notifs);
                         resolve();
                     },
                     (failed) => { reject(failed); }
@@ -325,7 +337,10 @@ export default {
             //);
         },
         onPickFile () { 
+            this.loading = true;
             this.$refs.fileInput.click();
+
+            setTimeout(() => {this.loading = false;}, defines.TIMEOUT)
         },
         // function used for show or unshow home view
         trigger(ready) {
@@ -335,6 +350,9 @@ export default {
         close() {
             this.dialogErr = !this.dialogErr;
         },
+    },
+    beforeCreate() {
+
     },
     created() {
         this.refresh();

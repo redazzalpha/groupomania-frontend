@@ -2,10 +2,14 @@
     <auth tab="notification" :auth_url="auth_url"  @onReady="trigger">
         <slot v-if="showPage">
             <h2 class="pa-5">Notifications</h2>
-            <div v-if="empty" class="text-center title">Vous n'avez pas de notifications</div>
+            <div v-if="getEmpty" class="text-center title">Vous n'avez pas de notifications !</div>
+            <!--notification-item-->
             <v-hover v-for="item in notifs" :key="item.comId" style="overflow: hidden">
                 <template v-slot:default="{ hover }">
-                <v-card  shaped color="grey lighten-2" max-width=550 class="mx-auto mb-5 transition-swing" :elevation="hover ? 11 : 4">
+                <v-card shaped color="grey lighten-2" max-width=550 class="mx-auto mb-5 transition-swing" :elevation="hover ? 11 : 4">
+                    <!--
+                    {{ getPubOfNotif(item.pubId) }}
+                    -->
                     <v-container class="pb-0">
                         <v-row no-gutters>
                             <v-col class="flex-grow-0">
@@ -23,7 +27,7 @@
                                     </v-row>
                                     <v-row no-gutters>
                                         <v-col>
-                                            <v-card-text class="pa-0 font-italic">{{ item.time.substring(0,20) }}</v-card-text>
+                                            <v-card-text class="pa-0 font-italic">le {{ item.comTime.substring(0,20) }}</v-card-text>
                                         </v-col>
                                     </v-row>
                                 </v-container>
@@ -34,10 +38,16 @@
                                 color="grey lighten-1"
                                 title="Supprimer la notification"
                                 class="pr-3"
+                                :loading="loading"
+                                :disabled="loading"
                                 @click="delNotif(item.notifId)"
                                 >
                                     <v-icon>mdi-close-circle</v-icon>
                                 </v-btn>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -45,12 +55,11 @@
                         <v-expansion-panel>
                             <v-expansion-panel-header color="grey lighten-2" @click="readNotif(item)">
                                 <v-icon color="primary">mdi-comment-processing</v-icon>
-                                <!--
-                                <v-badge :value="notifCount" :dot="!hover" :content="notifCount" color="warning">
-                                    --->
                                 <v-badge :dot="!hover" :value="item.state == 'unread'" content="Nouveau" color="warning" style="position: absolute; left: 50%; top: 20px;"></v-badge>
-                                </v-expansion-panel-header>
-                            <v-expansion-panel-content color="grey lighten-2">{{ item.text }}</v-expansion-panel-content>
+                            </v-expansion-panel-header>
+                            <v-expansion-panel-content color="grey lighten-2">
+                                {{ item.comText }}
+                            </v-expansion-panel-content>
                         </v-expansion-panel>
                     </v-expansion-panels>
                 </v-card>
@@ -75,19 +84,31 @@ export default {
             showPage: false,
             hover: false,
             empty: false,
+            loading: false,
         };
     },
     computed: {
-        ...mapState(["notifs"]),
+        ...mapState(["userData", "publications", "notifs"]),
+        getEmpty() {
+            return !this.notifs.length >= 1;
+        }
     },
     methods: {
         ...mapActions(["setNotifs"]),
+        getPubOfNotif(pubId) {
+                //alert(JSON.stringify(`this.publications.length: ${this.publications.length}`))
+            for(let item of this.publications) {
+                alert(JSON.stringify(`item: ${item}`))
+            }
+            alert(JSON.stringify(`pubId: ${pubId}`))
+        },
         getNotifs() {
             return new Promise((resolve, reject) => {
                 this.$http.get(`${defines.SERVER_URL}${defines.NOTIFICATION_URL}`)
                 .then(
                     (success) => {
-                        this.setNotifs(success.body.results);
+                        const notifs = success.body.results.filter(item => item.whereId == this.userData.userId);
+                        this.setNotifs(notifs);
                         this.empty = !this.notifs.length >= 1;
                         resolve();
                     },
@@ -96,7 +117,6 @@ export default {
             });
         },
         readNotif(item) {
-
             if(item.state == "unread") {
                 this.$http.post(`${defines.SERVER_URL}${defines.READ_NOTIFICATION_URL}`, {notifId: item.notifId})
                 .then(
@@ -106,11 +126,16 @@ export default {
             }
         },
         delNotif(notifId) {
-
+            this.loading = true;
             this.$http.post(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}`, {notifId})
             .then(
-                (/*success*/) => this.refresh(), 
-                (/*failed*/) => {alert("failed")} 
+                (/*success*/) => {
+                    setTimeout(() => {this.loading = false}, defines.TIMEOUT);
+                    this.refresh(); 
+                }, 
+                (/*failed*/) => {
+                    setTimeout(() => {this.loading = false}, defines.TIMEOUT);
+                } 
             );
         },
         refresh() {

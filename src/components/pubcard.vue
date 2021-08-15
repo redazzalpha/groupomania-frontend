@@ -25,12 +25,14 @@
                         <v-container class="pa-0 pl-1">
                             <v-row no-gutters class="subtitle-1 blue--text text--darken-4">
                                 <v-col>{{ item.pseudo }}</v-col>
-                                <v-col class="text-right" v-show="item.userId == userId">
+                                <v-col class="text-right" v-show="item.userId == userData.userId">
                                     <v-btn
                                     icon 
                                     color="grey lighten-1"
                                     title="Supprimer la publication"
                                     style="position: absolute; right: 0px; top: 5px"
+                                    :loading="loading4"
+                                    :disabled="loading4"
                                     @click="delPub(item.pubId)"
                                     >
                                         <v-icon>mdi-close-circle</v-icon>
@@ -61,32 +63,28 @@
                     <v-col class="pr-0 pl-0">
                         <v-btn 
                         width="100%"
-                        title="J'aime" 
+                        title="J'aime"
+                        :loading="loading" 
+                        :disabled="loading" 
                         @click="like({pubId: item.pubId, userIdLike: item.userIdLike, userIdDislike: item.userIdDislike})"
                         >
-                            <v-icon :color='item.userIdLike && item.userIdLike.find(item => item == userId) ? "green": ""'>mdi-thumb-up</v-icon> {{ item.postLike }}
+                            <v-icon :color='item.userIdLike && item.userIdLike.find(item => item == userData.userId) ? "green": ""'>mdi-thumb-up</v-icon> {{ item.postLike }}
                         </v-btn>
                     </v-col>
                     <v-col class="pr-0 pl-0">
                         <v-btn 
                         width="100%"
                         title="Je n'aime pas" 
+                        :loading="loading2" 
+                        :disabled="loading2" 
                         @click="dislike({pubId: item.pubId, userIdDislike: item.userIdDislike, userIdLike: item.userIdLike})"
                         >
-                            <v-icon :color='item.userIdDislike && item.userIdDislike.find(item => item == userId) ? "red": ""'>mdi-thumb-down</v-icon> {{ item.postDislike }}
+                            <v-icon :color='item.userIdDislike && item.userIdDislike.find(item => item == userData.userId) ? "red": ""'>mdi-thumb-down</v-icon> {{ item.postDislike }}
                         </v-btn>
                     </v-col>
                 </v-row>
-                <!--comments-row-->
-                <v-row v-if="comments.length >= 1">
-                    <v-col class="text-decoration-underline">
-                        Commentaires:
-                    </v-col>
-                </v-row>
                 <comment
-                :userId="userId"
                 :pubId="item.pubId"
-                :comments="comments"                
                 @delCom="delCom"
                 ></comment>
                 <!--add-comment-row-->
@@ -118,7 +116,9 @@
                                     title="Envoyer" 
                                     icon size=40 
                                     color="primary" 
-                                    @click="comment({userId: item.userId, pubId: item.pubId, comText})"
+                                    :loading="loading3"
+                                    :disabled="loading3"
+                                    @click="comment({authorId: item.authorId, parentId: item.pubId, comText})"
                                     >
                                         <v-icon>mdi-send</v-icon>
                                     </v-btn>
@@ -133,6 +133,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import defines from "../defines/define";
 import comment from "../components/comment.vue";
 export default {
     name: "pubcard",
@@ -140,34 +142,43 @@ export default {
         comment,
     },
     props: {
-        userId: Number,
         userPseudo: String,
         userImg: String,
-        publications: Array,
-        comments: Array,
     },
     data() {
         return {
             comText: "",
             color: "",
+            loading: false,
+            loading2: false,
+            loading3: false,
+            loading4: false,
             rules: [v => v.length <= 255 || '255 Caractères max.'],
         };
     },
+    computed: {
+        ...mapState(["userData", "publications"]),
+    },
     methods: {
         comment(data) {
+            this.loading3 = true;
             if(this.comText.length <= 255) {
                 this.$emit("comment", data);
                 this.comText = "";
             }
+            setTimeout(() => {this.loading3 = false}, defines.TIMEOUT);
         },
         delPub(pubId) {
+            this.loading4 = true;
             this.$emit("delPub", pubId);
+            setTimeout(() => { this.loading4 = false }, defines.TIMEOUT);
         },
         delCom(data) {
             this.$emit("delCom", data);
         },
         like(data) {
 
+            this.loading = true;
             const userIdLike = data.userIdLike;
             const userIdDislike = data.userIdDislike;
             
@@ -175,24 +186,27 @@ export default {
                 this.$emit("like", data);
             }
             else if(userIdLike && userIdDislike == null) {
-                if(userIdLike && !userIdLike.find(item => item == this.userId))
+                if(userIdLike && !userIdLike.find(item => item == this.userData.userId))
                     this.$emit("like", data);
-                else if(userIdLike && userIdLike.find(item => item == this.userId))
+                else if(userIdLike && userIdLike.find(item => item == this.userData.userId))
                     this.$emit("unlike", data);
             }
             else if(userIdLike == null && userIdDislike) {
-                (userIdDislike && !userIdDislike.find(item => item == this.userId)) ?
+                (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)) ?
                 this.$emit("like", data) : "";
             }
             else if(userIdLike && userIdDislike) {
-                if((userIdLike && !userIdLike.find(item => item == this.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userId)))
+                if((userIdLike && !userIdLike.find(item => item == this.userData.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)))
                     this.$emit("like", data);
     
-                else if((userIdLike && userIdLike.find(item => item == this.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userId)))
+                else if((userIdLike && userIdLike.find(item => item == this.userData.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)))
                     this.$emit("unlike", data);
             }
+
+            setTimeout(() => {this.loading = false}, defines.TIMEOUT);
         },
         dislike(data) {
+            this.loading2 = true;
             const userIdLike = data.userIdLike;
             const userIdDislike = data.userIdDislike;
 
@@ -200,22 +214,24 @@ export default {
                 this.$emit("dislike", data);
             }
             else if(userIdDislike && userIdLike == null) {
-                if(userIdDislike && !userIdDislike.find(item => item == this.userId))
+                if(userIdDislike && !userIdDislike.find(item => item == this.userData.userId))
                     this.$emit("dislike", data);
-                else if(userIdDislike && userIdDislike.find(item => item == this.userId))
+                else if(userIdDislike && userIdDislike.find(item => item == this.userData.userId))
                     this.$emit("undislike", data);
             }
             else if(userIdDislike == null && userIdLike) {
-                (userIdLike && !userIdLike.find(item => item == this.userId)) ?
+                (userIdLike && !userIdLike.find(item => item == this.userData.userId)) ?
                 this.$emit("dislike", data) : "";
             }
             else if(userIdDislike && userIdLike) {
-                if((userIdDislike && !userIdDislike.find(item => item == this.userId)) && (userIdLike && !userIdLike.find(item => item == this.userId)))
+                if((userIdDislike && !userIdDislike.find(item => item == this.userData.userId)) && (userIdLike && !userIdLike.find(item => item == this.userData.userId)))
                     this.$emit("dislike", data);
     
-                else if((userIdDislike && userIdDislike.find(item => item == this.userId)) && (userIdLike && !userIdLike.find(item => item == this.userId)))
+                else if((userIdDislike && userIdDislike.find(item => item == this.userData.userId)) && (userIdLike && !userIdLike.find(item => item == this.userData.userId)))
                     this.$emit("undislike", data);
             }
+
+            setTimeout(() => {this.loading2 = false}, defines.TIMEOUT);
         },
     },
 }
