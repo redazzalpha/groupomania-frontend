@@ -177,24 +177,27 @@ export default {
             let file = event.target.files[0];
             let fileReader = new FileReader();
 
-            if(file) 
+            if(file){
                 fileReader.readAsDataURL(file);
 
-            fileReader.addEventListener('load', function (){ 
+            }
+
+            fileReader.addEventListener('load', () =>{ 
+
+                let payload = new FormData();
+                payload.append("image", file, file.name);
+    
+                this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, payload)
+                .then(
+                    (success) => {
+                        localStorage.grpm_store = JSON.stringify(success.body);
+                        this.userData.img = success.body.data.imgUrl;
+                    },
+                    (/*failed*/) => {
+                    }
+                );
             }, false);
 
-            let payload = new FormData();
-            payload.append("image", file, file.name);
-
-            this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, payload)
-            .then(
-                (success) => {
-                    localStorage.grpm_store = JSON.stringify(success.body);
-                    this.userData.img = success.body.data.imgUrl;
-                },
-                (/*failed*/) => {
-                }
-            );
         },
         onPickImg () { 
             this.$refs.fileInput.click();

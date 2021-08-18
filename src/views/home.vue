@@ -3,7 +3,7 @@
         <slot v-if="showPage">
             <h2 class="pa-5">Dernières publiations</h2>
             <!--express your-self-card-->
-            <v-card elevation="15" color="grey lighten-3" max-width=550 class="mx-auto mb-8" style="position: relative">
+            <v-card elevation="15" color="grey lighten-3" max-width=550 class="mx-auto mb-8" style="position: relative; border: solid red 3px;">
                 <v-container>
                     <v-row>
                         <v-col>
@@ -17,38 +17,11 @@
                                     <v-icon v-else size=60 color="primary">mdi-account-circle</v-icon>
                                 </v-avatar>
                             </v-btn>
-
                         </v-col>
                     </v-row>
                 </v-container>
                 <v-card-text>
-
-                <v-textarea 
-                v-model="pubTextArea" 
-                background-color="white" 
-                placeholder="Ajouter un texte"
-                outlined 
-                no-resize
-                auto-grow
-                >
-                </v-textarea>
-
-                <!--
-                <div id="textarea"
-                contentEditable="true" 
-                style="border: solid grey 1px;
-                min-height: 200px; 
-                background-color: white;
-                padding: 10px;
-                outline: none;
-                border-radius: 10px;
-                color: black;
-                caret-color: red;
-                "    
-                >
-                </div>
-                -->
-
+                    <ckeditor  class="area" :editor="editor" v-model="editorData" :config="editorConfig"> </ckeditor> 
                 </v-card-text>
                 <v-card-actions>
                     <v-container>
@@ -103,6 +76,9 @@ import defines from "../defines/define";
 import errordial from "../components/errordial.vue";
 import pubcard from "../components/pubcard.vue";
 import btnClose from "../components/btnClose.vue";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import '@ckeditor/ckeditor5-build-classic/build/translations/fr';
+
 export default {
     name: "home",
     components: {
@@ -113,9 +89,28 @@ export default {
     },
     data(){
         return {
+            editor: ClassicEditor,
+            editorData: '',
+            editorConfig: {
+                language: 'fr',
+                toolbar: [
+                    'heading', '|', 
+                    'bold', 
+                    'italic', 
+                    'link', 
+                    'bulletedList', 
+                    'numberedList', '|', 
+                    'outdent', 
+                    'indent', '|', 
+                    'blockQuote', 
+                    'mediaEmbed', 
+                    'undo', 
+                    'redo',
+                ],
+            },
+
             auth_url: `${defines.SERVER_URL}${defines.HOME_URL}`, 
             showPage: false,
-            pubTextArea: "",
             dialogErr: false,
             dialogErrText: "",
             loading: false,
@@ -126,11 +121,11 @@ export default {
                 {label: "Ajouter une image", class: "col-8",action: this.onPickFile},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish},
             ],
-        gloading(item) {
-            if(/^Publiez !$/gi.test(item.label))
-            return this.loading2;
-            else return this.loading;
-        }
+            gloading(item) {
+                if(/^Publiez !$/gi.test(item.label))
+                return this.loading2;
+                else return this.loading;
+            }
         };
     },
     computed: {
@@ -139,31 +134,14 @@ export default {
     methods: {
         ...mapActions(["setPublications", "setComments", "setNotifs"]),
         publish() {
-            //let textarea = document.getElementById("textarea");
-            //alert(textarea.innerHTML.split(/<img.+\/>/gi));
-            //alert(textarea.innerHTML.match(/<img.*<\/img>/gi));
-
-            //post publication
-            // check if publication if empty   
-            if(this.pubTextArea && services.isNotEmpty(this.pubTextArea)) {
-                this.loading2 = true
-                // create payload
-                const payload = { publication: this.pubTextArea };
-                // post request
-                this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, payload)
-                .then(
-                    (/*success*/) => {
-                        this.pubTextArea = "";
-                        setTimeout(() => {this.loading2 = false;}, defines.TIMEOUT);
-                        this.refresh();
-                    },
-                    (failed) => {
-                        setTimeout(() => {this.loading2 = false;}, defines.TIMEOUT);
-                            throw new Error(failed.body.message);    
-                    }
-                );
+            if(this.editorData && services.isNotEmpty(this.editorData)) {
+                const pub = this.editorData.replace("'", "\\'");
+                this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, {publication: pub})
+                .then( () => {
+                    this.refresh();
+                    this.editorData = '';
+                });
             }
-            // if publication is empty set error dialog
             else {
                 this.dialogErrText = "Vous ne pouvez pas créer de publication vide"
                 this.dialogErr = true;
@@ -207,7 +185,9 @@ export default {
                 // post request
                 this.$http.post(`${defines.SERVER_URL}${defines.COMMENT_URL}`, payload)
                 .then(
-                    (/*success*/) => { this.refresh(); },
+                    (/*success*/) => { 
+                        this.refresh(); 
+                    },
                     (/*failed*/) => {}
                 );
             }
@@ -306,53 +286,33 @@ export default {
                 })
                 .catch();
         },
-        putImg (event) { 
-
-            let textarea = document.getElementById("textarea");                                                   
-            let img = document.createElement("img");
-
-            let file = event.target.files[0];
-            let fileReader = new FileReader();
-
-            if(file) {
-                fileReader.readAsDataURL(file);
-                this.img = file;
-            }
-            fileReader.addEventListener('load', function (){ 
-                img.setAttribute("src", fileReader.result);
-                img.setAttribute("width", "100%");
-                textarea.appendChild(img);
-                textarea.focus();   
-            }, false);
-
-            //let payload = new FormData();
-            //payload.append("image", file, file.name);
-
-            //this.$http.post(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, payload)
-            //.then(
-                //(/*success*/) => {
-                //},
-                //(/*failed*/) => {
-                //}
-            //);
-        },
         onPickFile () { 
             this.loading = true;
             this.$refs.fileInput.click();
 
             setTimeout(() => {this.loading = false;}, defines.TIMEOUT)
         },
+        putImg (e) { 
+
+            const file = e.target.files[0];
+            const freader = new FileReader();
+            if(file)
+                freader.readAsDataURL(file);
+            freader.onload = () => {
+                let img = document.createElement('img');
+                img.src = freader.result;
+                img.width = "100%";
+                this.editorData += img.outerHTML;
+            };            
+        },
         // function used for show or unshow home view
         trigger(ready) {
-            this.showPage = ready;                                                                                                                         
+            this.showPage = ready;
         },
         // function used to close error dialog
         close() {
             this.dialogErr = !this.dialogErr;
         },
-    },
-    beforeCreate() {
-
     },
     created() {
         this.refresh();

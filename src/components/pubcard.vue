@@ -50,10 +50,7 @@
                 <!--publication-row-->
                 <v-row>
                     <v-col>
-                        <!--
-                        style="box-shadow: 5px 5px 5px grey; background-color: white; border-radius: 5px;"
-                        -->
-                        <v-card-text class="subtitle-1">{{ item.text }}</v-card-text>
+                        <ckeditor :disabled="true" :editor="editor" :value="geditorData(item.text)" :config="editorConfig"> </ckeditor> 
                     </v-col>
                 </v-row>
                 <!--horizontal-line-separation-->
@@ -89,7 +86,7 @@
                 ></comment>
                 <!--add-comment-row-->
                 <v-row>
-                    <v-card-text>   
+                    <v-card-text>
                         <v-row>
                             <v-textarea 
                             v-model="comText" 
@@ -136,6 +133,8 @@
 import { mapState } from 'vuex';
 import defines from "../defines/define";
 import comment from "../components/comment.vue";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 export default {
     name: "pubcard",
     components: {
@@ -147,6 +146,12 @@ export default {
     },
     data() {
         return {
+            editor: ClassicEditor,
+            editorData: '',
+            editorConfig: {
+                toolbar: [],
+            },
+
             comText: "",
             color: "",
             loading: false,
@@ -154,6 +159,10 @@ export default {
             loading3: false,
             loading4: false,
             rules: [v => v.length <= 255 || '255 Caractères max.'],
+            
+            geditorData(text) {
+                return  this.editorData = text;
+            }
         };
     },
     computed: {
