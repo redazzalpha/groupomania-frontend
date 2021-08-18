@@ -3,8 +3,6 @@
         <!--Publications-cards-->
         <div v-if="publications.length <= 0" class="title text-center">Il n'y a pas encore de publication soyez le premier à en créer une !</div>
         <v-card
-        v-for="item in publications"
-        :key="item.pubId"
         max-width=550 
         class="mx-auto mt-8" 
         elevation="15" 
@@ -104,7 +102,7 @@
                             >
                                 <template v-slot:prepend>
                                     <v-avatar size=40>
-                                        <v-img v-if="userImg" :src="userImg"  />
+                                        <v-img v-if="userData.img" :src="userData.img" />
                                         <v-icon v-else size=40 color="primary">mdi-account-circle</v-icon>
                                     </v-avatar>
                                 </template>
@@ -141,8 +139,7 @@ export default {
         comment,
     },
     props: {
-        userPseudo: String,
-        userImg: String,
+        item: Object,
     },
     data() {
         return {

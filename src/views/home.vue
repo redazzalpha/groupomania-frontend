@@ -43,8 +43,9 @@
             </v-card>
             <!--publication-card-->
             <pubcard
-                :userPseudo="userData.pseudo"
-                :userImg="userData.img"
+                v-for="item in publications"
+                :key="item.pubId"
+                :item="item"
                 @comment="comment"
                 @delPub="delPub"
                 @delCom="delCom"
@@ -102,8 +103,8 @@ export default {
                     'numberedList', '|', 
                     'outdent', 
                     'indent', '|', 
-                    'blockQuote', 
                     'mediaEmbed', 
+                    'blockQuote', 
                     'undo', 
                     'redo',
                 ],
@@ -129,7 +130,7 @@ export default {
         };
     },
     computed: {
-        ...mapState(["userData"]),
+        ...mapState(["userData", "publications"]),
     },
     methods: {
         ...mapActions(["setPublications", "setComments", "setNotifs"]),

@@ -1,5 +1,6 @@
 <template>
     <v-row class="comments">
+        <!--Comment-title-->
         <v-container>
             <v-row v-if="comments.length >= 1">
                 <v-col class="text-decoration-underline">
@@ -7,8 +8,10 @@
                 </v-col>
             </v-row>
         </v-container>
+        <!--comment-row-->
         <v-container v-for="item in comments" :key="item.comId" class="pa-0">
             <v-row v-if="item.parentId == pubId" class="pl-5 pr-5 mb-1">
+                <!--avatar-->
                 <v-col v-if="item.parentId == pubId" class="flex-grow-0 d-flex align-center pr-2">
                     <v-avatar size=40>
                         <v-img v-if="item.img" :src="item.img" />
@@ -24,7 +27,7 @@
                         </v-row>
                         <v-row class="align-center pl-2">
                             <v-col cols=10 class="pa-0 pt-1 white--text" style="word-break: break-all;">{{ item.comText}}</v-col>
-                            <v-col v-show="item.writerId == userData.userId"  >
+                            <v-col v-show="item.writerId == userData.userId">
                                 <v-btn 
                                 icon 
                                 color="red darken-3" 
@@ -74,7 +77,7 @@ export default {
 .arrow {
     position: absolute;
     left: -17px;
-    top: 35%;
+    top: 22%;
     color: #2962FF;
     z-index: 100;
     font-size: 2em;
