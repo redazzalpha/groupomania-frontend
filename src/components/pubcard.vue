@@ -151,7 +151,9 @@ export default {
             editorConfig: {
                 toolbar: [],
             },
-
+            geditorData(text) {
+                return  this.editorData = text;
+            },
             comText: "",
             color: "",
             loading: false,
@@ -160,9 +162,6 @@ export default {
             loading4: false,
             rules: [v => v.length <= 255 || '255 Caractères max.'],
             
-            geditorData(text) {
-                return  this.editorData = text;
-            }
         };
     },
     computed: {

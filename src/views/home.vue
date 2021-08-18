@@ -135,7 +135,7 @@ export default {
         ...mapActions(["setPublications", "setComments", "setNotifs"]),
         publish() {
             if(this.editorData && services.isNotEmpty(this.editorData)) {
-                const pub = this.editorData.replace("'", "\\'");
+                const pub = this.editorData.replace("'", "\\'").replace("\\", "/");
                 this.$http.post(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, {publication: pub})
                 .then( () => {
                     this.refresh();

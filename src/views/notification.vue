@@ -11,6 +11,7 @@
                     {{ getPubOfNotif(item.pubId) }}
                     -->
                     <v-container class="pb-0">
+                        <!--header-notif-->
                         <v-row no-gutters>
                             <v-col class="flex-grow-0">
                                 <v-avatar size=60>
@@ -19,7 +20,7 @@
                                 </v-avatar>
                             </v-col>
                             <v-col>
-                                    <v-container class="py-2">
+                                <v-container class="py-2">
                                     <v-row no-gutters>
                                         <v-col>
                                             <v-card-text class="pa-0">{{ item.pseudo}} a commenté votre publication.</v-card-text>
@@ -46,19 +47,33 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <v-row>
-                            <v-col>
-                            </v-col>
-                        </v-row>
                     </v-container>
+                    <!--expanded-notif-->
                     <v-expansion-panels>
                         <v-expansion-panel>
                             <v-expansion-panel-header color="grey lighten-2" @click="readNotif(item)">
                                 <v-icon color="primary">mdi-comment-processing</v-icon>
                                 <v-badge :dot="!hover" :value="item.state == 'unread'" content="Nouveau" color="warning" style="position: absolute; left: 50%; top: 20px;"></v-badge>
                             </v-expansion-panel-header>
+                            <!--expanded-message-->
                             <v-expansion-panel-content color="grey lighten-2">
-                                {{ item.comText }}
+                                <v-container>
+                                    <v-row>                                        
+                                        <v-col class="body-2">
+                                                &#x27a1;&#xfe0f; Publication du <span class="font-italic">{{ item.time.substring(0,20) }}</span>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            <ckeditor :disabled="true" :editor="editor" :value="geditorData(item.text)" :config="editorConfig"> </ckeditor> 
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            {{ item.comText }}
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
                             </v-expansion-panel-content>
                         </v-expansion-panel>
                     </v-expansion-panels>
@@ -73,6 +88,8 @@
 import { mapState, mapActions } from 'vuex';
 import auth from "../components/auth.vue";
 import defines from "../defines/define";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 export default {
     name: "notification",
     components: {
@@ -80,6 +97,15 @@ export default {
     },
     data() {
         return {
+            editor: ClassicEditor,
+            editorData: '',
+            editorConfig: {
+                toolbar: [],
+            },
+            geditorData(text) {
+                return  this.editorData = text;
+            },
+
             auth_url: `${defines.SERVER_URL}${defines.NOTIFICATION_URL}`, 
             showPage: false,
             hover: false,
@@ -146,8 +172,8 @@ export default {
             this.showPage = ready;                                                                                                                         
         },
     },
-    mounted() {
-        //this.refresh();
+    created() {
+        this.refresh();
     },
 }
 </script>
