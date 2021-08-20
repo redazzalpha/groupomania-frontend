@@ -12,6 +12,7 @@ const defines = {
     PROFIL_PASSWD_URL: "/app/profil/password",
     PROFIL_ACC_URL: "/app/profil/account",
     TEAM_URL: "/app/team",
+    USERS_URL: "/app/team/users",
     NOTIFICATION_URL: "/app/notification/notifs",
     DEL_NOTIFICATION_URL: "/app/notification/delete",
     READ_NOTIFICATION_URL: "/app/notification/read",

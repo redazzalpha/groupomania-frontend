@@ -1,7 +1,6 @@
 <template>
     <div class="pubCard">
         <!--Publications-cards-->
-        <div v-if="publications.length <= 0" class="title text-center">Il n'y a pas encore de publication soyez le premier à en créer une !</div>
         <v-card
         max-width=550 
         class="mx-auto mt-8" 
@@ -31,7 +30,7 @@
                                     style="position: absolute; right: 0px; top: 5px"
                                     :loading="loading4"
                                     :disabled="loading4"
-                                    @click="delPub(item.pubId)"
+                                    @click="deletePub(item.pubId)"
                                     >
                                         <v-icon>mdi-close-circle</v-icon>
                                     </v-btn>
@@ -61,7 +60,7 @@
                         title="J'aime"
                         :loading="loading" 
                         :disabled="loading" 
-                        @click="like({pubId: item.pubId, userIdLike: item.userIdLike, userIdDislike: item.userIdDislike})"
+                        @click="postLike({pubId: item.pubId, userIdLike: item.userIdLike, userIdDislike: item.userIdDislike})"
                         >
                             <v-icon :color='item.userIdLike && item.userIdLike.find(item => item == userData.userId) ? "green": ""'>mdi-thumb-up</v-icon> {{ item.postLike }}
                         </v-btn>
@@ -72,7 +71,7 @@
                         title="Je n'aime pas" 
                         :loading="loading2" 
                         :disabled="loading2" 
-                        @click="dislike({pubId: item.pubId, userIdDislike: item.userIdDislike, userIdLike: item.userIdLike})"
+                        @click="postDislike({pubId: item.pubId, userIdDislike: item.userIdDislike, userIdLike: item.userIdLike})"
                         >
                             <v-icon :color='item.userIdDislike && item.userIdDislike.find(item => item == userData.userId) ? "red": ""'>mdi-thumb-down</v-icon> {{ item.postDislike }}
                         </v-btn>
@@ -80,7 +79,6 @@
                 </v-row>
                 <comment
                 :pubId="item.pubId"
-                @delCom="delCom"
                 ></comment>
                 <!--add-comment-row-->
                 <v-row>
@@ -100,6 +98,7 @@
                             counter
                             :rules="rules"
                             >
+
                                 <template v-slot:prepend>
                                     <v-avatar size=40>
                                         <v-img v-if="userData.img" :src="userData.img" />
@@ -128,7 +127,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import defines from "../defines/define";
 import comment from "../components/comment.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -158,43 +157,42 @@ export default {
             loading3: false,
             loading4: false,
             rules: [v => v.length <= 255 || '255 Caractères max.'],
-            
         };
     },
     computed: {
         ...mapState(["userData", "publications"]),
+        gpubLength() {
+            return this.publications.length <= 0;
+        }
     },
     methods: {
-        comment(data) {
-            this.loading3 = true;
-            if(this.comText.length <= 255) {
-                this.$emit("comment", data);
-                this.comText = "";
-            }
-            setTimeout(() => {this.loading3 = false}, defines.TIMEOUT);
-        },
-        delPub(pubId) {
+        ...mapActions([
+            "delPub",
+            "comment",
+            "like",
+            "unlike",
+            "dislike",
+            "undislike",
+        ]),
+        deletePub(pubId) {
             this.loading4 = true;
-            this.$emit("delPub", pubId);
+            this.delPub(pubId),
             setTimeout(() => { this.loading4 = false }, defines.TIMEOUT);
         },
-        delCom(data) {
-            this.$emit("delCom", data);
-        },
-        like(data) {
+        postLike(data) {
 
             this.loading = true;
             const userIdLike = data.userIdLike;
             const userIdDislike = data.userIdDislike;
             
             if(userIdLike == null && userIdDislike == null) {
-                this.$emit("like", data);
+                this.like(data);
             }
             else if(userIdLike && userIdDislike == null) {
                 if(userIdLike && !userIdLike.find(item => item == this.userData.userId))
-                    this.$emit("like", data);
+                this.like(data);
                 else if(userIdLike && userIdLike.find(item => item == this.userData.userId))
-                    this.$emit("unlike", data);
+                this.unlike(data);
             }
             else if(userIdLike == null && userIdDislike) {
                 (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)) ?
@@ -202,38 +200,38 @@ export default {
             }
             else if(userIdLike && userIdDislike) {
                 if((userIdLike && !userIdLike.find(item => item == this.userData.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)))
-                    this.$emit("like", data);
+                this.like(data);
     
                 else if((userIdLike && userIdLike.find(item => item == this.userData.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)))
-                    this.$emit("unlike", data);
+                this.unlike(data);
             }
 
             setTimeout(() => {this.loading = false}, defines.TIMEOUT);
         },
-        dislike(data) {
+        postDislike(data) {
             this.loading2 = true;
             const userIdLike = data.userIdLike;
             const userIdDislike = data.userIdDislike;
 
             if(userIdDislike == null && userIdLike == null) {
-                this.$emit("dislike", data);
+                this.dislike(data);
             }
             else if(userIdDislike && userIdLike == null) {
                 if(userIdDislike && !userIdDislike.find(item => item == this.userData.userId))
-                    this.$emit("dislike", data);
+                this.dislike(data);
                 else if(userIdDislike && userIdDislike.find(item => item == this.userData.userId))
-                    this.$emit("undislike", data);
+                this.undislike(data);
             }
             else if(userIdDislike == null && userIdLike) {
                 (userIdLike && !userIdLike.find(item => item == this.userData.userId)) ?
-                this.$emit("dislike", data) : "";
+                this.dislike(data) : "";
             }
             else if(userIdDislike && userIdLike) {
                 if((userIdDislike && !userIdDislike.find(item => item == this.userData.userId)) && (userIdLike && !userIdLike.find(item => item == this.userData.userId)))
-                    this.$emit("dislike", data);
+                this.dislike(data);
     
                 else if((userIdDislike && userIdDislike.find(item => item == this.userData.userId)) && (userIdLike && !userIdLike.find(item => item == this.userData.userId)))
-                    this.$emit("undislike", data);
+                this.undislike(data);
             }
 
             setTimeout(() => {this.loading2 = false}, defines.TIMEOUT);

@@ -34,7 +34,7 @@
                                 style="position: absolute; top: 36%; right: -2px;" 
                                 :loading="loading"
                                 :disabled="loading"
-                                @click="delCom({comId: item.comId, pubId: item.pubId})"
+                                @click="postDelCom({comId: item.comId, pubId: item.pubId})"
                                 >
                                     <v-icon class="white--text">mdi-delete-sweep</v-icon>
                                 </v-btn>
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions} from 'vuex';
 import defines from '../defines/define';
 export default {
     name: "comment",
@@ -61,12 +61,18 @@ export default {
         };
     },
     computed: {
-        ...mapState(["userData", "comments"]),
+        ...mapState([
+            "userData", 
+            "comments",
+        ]),
     },
     methods: {
-        delCom(data) {
+        ...mapActions([
+            "delCom"
+        ]),
+        postDelCom(data) {
             this.loading = true;
-            this.$emit("delCom", data);
+            this.delCom(data);
             setTimeout(() => {this.loading = false}, defines.TIMEOUT);
         },
     }
