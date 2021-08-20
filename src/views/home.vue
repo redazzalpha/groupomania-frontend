@@ -110,7 +110,7 @@ export default {
             loader2: null,
             buttons: [
                 {label: "Ajouter une image", class: "flex-grow-0",action: this.onPickFile},
-                {label: "Publiez !", class: "d-flex justify-end col-4", action: this.publish},
+                {label: "Publiez !", class: "d-flex justify-end col-4", action: this.postPub},
             ],
             gloading(item) {
                 if(/^Publiez !$/gi.test(item.label))
@@ -133,6 +133,10 @@ export default {
             "refresh",
             "setDialErr",
         ]),
+        postPub(editorData) {
+            this.publish(editorData);
+            this.editorData = "";
+        },
         onPickFile () { 
             this.loading = true;
             this.$refs.fileInput.click();

@@ -112,7 +112,7 @@
                                     color="primary" 
                                     :loading="loading3"
                                     :disabled="loading3"
-                                    @click="comment({authorId: item.authorId, parentId: item.pubId, comText})"
+                                    @click="postCom({authorId: item.authorId, parentId: item.pubId, comText})"
                                     >
                                         <v-icon>mdi-send</v-icon>
                                     </v-btn>
@@ -174,10 +174,9 @@ export default {
             "dislike",
             "undislike",
         ]),
-        deletePub(pubId) {
-            this.loading4 = true;
-            this.delPub(pubId),
-            setTimeout(() => { this.loading4 = false }, defines.TIMEOUT);
+        postCom(data) {
+            this.comment(data);
+            this.comText = "";
         },
         postLike(data) {
 
@@ -236,6 +235,12 @@ export default {
 
             setTimeout(() => {this.loading2 = false}, defines.TIMEOUT);
         },
+        deletePub(pubId) {
+            this.loading4 = true;
+            this.delPub(pubId),
+            setTimeout(() => { this.loading4 = false }, defines.TIMEOUT);
+        },
+
     },
 }
 </script>

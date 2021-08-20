@@ -67,7 +67,7 @@
                                             </v-row>
                                             <v-row>
                                                 <v-col>	
-                                                    &#10148; {{ item.comText }}
+                                                    {{ item.pseudo }} a dit &#10148; <span class="font-italic">{{ item.comText }}</span>
                                                 </v-col>
                                             </v-row>
                                         </v-container>

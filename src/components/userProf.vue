@@ -1,6 +1,5 @@
 <template>
     <v-card>
-        <v-btn color="success" @click="test">button test</v-btn>
         <!--toolbar-title-->
         <v-toolbar color="primary" dark class="d-flex justify-center title">
             Profil de {{ item.pseudo }}
@@ -33,21 +32,13 @@
                     </v-row>
                     <v-row>
                         <v-col>
+                            <!--profil-publication-card-->
                             <div class="text-center text-h6">Dernières publications</div>
-
-
-
-
-
-
-
-
-                            <!--publication-card-->
-                            <v-card-text v-if="publications.length <= 0" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
-                            <pubcard
-                                v-for="item in publications"
-                                :key="item.pubId"
-                                :item="item"
+                            <v-card-text v-if="publications.find(pub => !(pub.authorId == item.userId))" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
+                            <v-card-text v-for="pub in publications" :key="pub.pubId">
+                                <pubcard
+                                v-if="item.userId == pub.authorId"
+                                :item="pub"
                                 @comment="comment"
                                 @delPub="delPub"
                                 @delCom="delCom"
@@ -56,20 +47,8 @@
                                 @unlike="unlike"
                                 @undislike="undislike"
                                 @refresh="refresh"
-                            ></pubcard>
-
-
-
-
-
-
-
-
-
-
-
-
-
+                                ></pubcard>
+                            </v-card-text>
                         </v-col>
                     </v-row>
             </v-container>
@@ -84,21 +63,32 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-//import pubcard from "../components/pubcard.vue"
+import pubcard from "../components/pubcard.vue"
 export default {
     name: "userProf",
     components: {
-        //pubcard,
+        pubcard,
     },
     props: {
         dialog: Object,
         item: Object,
     },
     computed: {
-        ...mapState(["publications"]),
+        ...mapState([
+            "publications"
+        ]),
     },
     methods: {
-        ...mapActions(["test"]),
+        ...mapActions([
+            "comment",
+            "delPub",
+            "delCom",
+            "like",
+            "dislike",
+            "unlike",
+            "undislike",
+            "refresh",
+        ]),
     },
 
 }
