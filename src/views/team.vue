@@ -10,6 +10,8 @@
                         <v-text-field
                             outlined
                             label="Trouver un utilisateur "
+                            v-model="fieldValue"
+                            @input="findUser"
                         >
                             <template v-slot:prepend-inner>
                                 <v-avatar
@@ -30,7 +32,7 @@
                     <v-col class="d-sm-flex ">
                         <!--dialog-->
                         <v-dialog
-                        v-for="item in users" :key="item.userId"
+                        v-for="item in userList" :key="item.userId"
                         transition="dialog-top-transition"
                         max-width="600"
                         >
@@ -49,6 +51,8 @@
                                     </v-row>
                                 </v-container>
                             </template>
+
+
                             <!--dialog-expanded-->
                             <template v-slot:default="dialog">
                                 <!--user-profil-card-->
@@ -56,7 +60,9 @@
                                 :dialog="dialog"
                                 :item="item"
                                 ></userProf>
-                            </template>        
+                            </template>  
+
+
                         </v-dialog>                        
                     </v-col>
                 </v-row>
@@ -82,18 +88,30 @@ export default {
             auth_url: `${defines.SERVER_URL}${defines.TEAM_URL}`, 
             showPage: false,
             users: [],
+            userList: [],
             input: "",
             hover: "",
+            fieldValue: "",
         };
     },
     computed: {
     },
     methods: {
+        findUser() {
+            if(this.fieldValue != "") {
+                let regex = new RegExp(this.fieldValue, "gi");
+                this.userList = this.users.filter(item => {
+                    return regex.test(item.pseudo);
+                });
+            }
+            else this.userList = this.users;
+        },
         getUsers() {
             this.$http.get(`${defines.SERVER_URL}${defines.USERS_URL}`)
             .then(
                 success => {
                     this.users = success.body.results;
+                    this.userList = this.users;
                 },
                 (/*failed*/) => {
 

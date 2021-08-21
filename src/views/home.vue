@@ -21,7 +21,7 @@
                     </v-row>
                 </v-container>
                 <v-card-text>
-                    <ckeditor  class="area" :editor="editor" v-model="editorData" :config="editorConfig"> </ckeditor> 
+                    <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"> </ckeditor> 
                 </v-card-text>
                 <v-card-actions>
                     <v-container>
@@ -72,6 +72,7 @@ import btnClose from "../components/btnClose.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import '@ckeditor/ckeditor5-build-classic/build/translations/fr';
 
+
 export default {
     name: "home",
     components: {
@@ -85,6 +86,7 @@ export default {
             editor: ClassicEditor,
             editorData: '',
             editorConfig: {
+                height: "500",
                 language: 'fr',
                 toolbar: [
                     'heading', '|', 
@@ -171,3 +173,8 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.ck.ck-editor__main>.ck-editor__editable {
+    min-height: 150px;
+}
+</style>

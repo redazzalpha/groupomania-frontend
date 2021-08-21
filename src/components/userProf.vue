@@ -34,7 +34,7 @@
                         <v-col>
                             <!--profil-publication-card-->
                             <div class="text-center text-h6">Dernières publications</div>
-                            <v-card-text v-if="publications.find(pub => !(pub.authorId == item.userId))" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
+                            <v-card-text v-if="undefined == publications.find(pub => pub.authorId == item.userId)" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
                             <v-card-text v-for="pub in publications" :key="pub.pubId">
                                 <pubcard
                                 v-if="item.userId == pub.authorId"

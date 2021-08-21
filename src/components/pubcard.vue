@@ -46,17 +46,17 @@
                 <v-row><v-divider></v-divider></v-row>
                 <!--publication-row-->
                 <v-row>
-                    <v-col>
-                        <ckeditor :disabled="true" :editor="editor" :value="geditorData(item.text)" :config="editorConfig"> </ckeditor> 
+                    <v-col class="test">
+                        <ckeditor :disabled="true" :editor="editor" :value="geditorData(item.text)" :config="editorConfig"></ckeditor> 
                     </v-col>
                 </v-row>
                 <!--horizontal-line-separation-->
                 <v-row><v-divider></v-divider></v-row>
                 <!--like-dislike-row-->
                 <v-row>
-                    <v-col class="pr-0 pl-0">
+                    <v-col class="px-0 text-center">
                         <v-btn 
-                        width="100%"
+                        plain icon
                         title="J'aime"
                         :loading="loading" 
                         :disabled="loading" 
@@ -65,15 +65,16 @@
                             <v-icon :color='item.userIdLike && item.userIdLike.find(item => item == userData.userId) ? "green": ""'>mdi-thumb-up</v-icon> {{ item.postLike }}
                         </v-btn>
                     </v-col>
-                    <v-col class="pr-0 pl-0">
+                    <v-col class="px-0 text-center" >
                         <v-btn 
-                        width="100%"
+                        plain icon
                         title="Je n'aime pas" 
                         :loading="loading2" 
                         :disabled="loading2" 
                         @click="postDislike({pubId: item.pubId, userIdDislike: item.userIdDislike, userIdLike: item.userIdLike})"
                         >
-                            <v-icon :color='item.userIdDislike && item.userIdDislike.find(item => item == userData.userId) ? "red": ""'>mdi-thumb-down</v-icon> {{ item.postDislike }}
+                            <v-icon
+                            :color='item.userIdDislike && item.userIdDislike.find(item => item == userData.userId) ? "red": ""'>mdi-thumb-down</v-icon> {{ item.postDislike }}
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -244,3 +245,9 @@ export default {
     },
 }
 </script>
+
+<style lang="scss">
+.v-btn--plain:not(.v-btn--active):not(.v-btn--loading):not(:focus):not(:hover) .v-btn__content {
+    opacity: 1;
+}
+</style>
