@@ -3,7 +3,6 @@ import Vuex from 'vuex';
 import createPersistedState from "vuex-persistedstate";
 import services from '../services/app.service';
 import defines from '../defines/define';
-
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -13,7 +12,8 @@ export default new Vuex.Store({
         comments: [],
         notifs: [],
         dialogErrText: "",
-        dialogErr:false,
+        dialogErr: false,
+        success: false,
         drawer: false,
     },
     mutations: {
@@ -38,6 +38,60 @@ export default new Vuex.Store({
         },
     },
     actions: {
+        login(context, data) {
+                return new Promise((resolve, reject) => {
+                    Vue.http.post(`${defines.SERVER_URL}${defines.LOGIN_URL}`, data)
+                    .then(
+                        success => {
+                            success.text()
+                            .then(token => {
+                                localStorage.grpm_store = token;
+                                resolve();
+                            });         
+                        },
+                        failed => {
+                            switch(failed.body.error.code) {
+                                case "ER_UNK_USER":
+                                    context.state.dialogErrText = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
+                                    context.state.dialogErr = true;
+                                    break;
+                                case "ER_INV_PASS":
+                                    context.state.dialogErrText = "Le mot de passe que vous avez saisi est invalide";
+                                    context.state.dialogErr = true;
+                                    break;
+                                default:
+                                    throw new Error("Unknown error");    
+                            }
+                            reject();
+                        }
+                    );
+                });
+        },
+        register(context, data) {
+            return new Promise((resolve, reject) => {
+
+                Vue.http.post(`${defines.SERVER_URL}${defines.SIGNUP_URL}`, data)
+                .then(
+                    (/*success*/) => {
+                        context.dispatch("login", data)
+                            .then(() => {
+                                resolve();
+                            });
+                    },
+                    failed => {
+                        switch(failed.body.error.code) {
+                            case "ER_DUP_ENTRY":
+                                context.state.dialogErr = true;
+                                context.state.dialogErrText = "L'utilisateur que vous essayez de créer existe déjà.";
+                                break;
+                            default:
+                                throw new Error("Unknown error");    
+                        }
+                        reject();
+                    }
+                );
+            });
+        },
         publish(context, editorData) {
             if (editorData && services.isNotEmpty(editorData)) {
                 let pub = editorData.replace("\\", "/");
@@ -178,42 +232,38 @@ export default new Vuex.Store({
             Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_UNDISLIKE_URL}`, payload)
             .then( () =>  context.dispatch("refresh") );
         },
-
-
-
-
-
-
-        /*
-        onPickFile () { 
-            Vue.loading = true;
-            Vue.$refs.fileInput.click();
-
-            setTimeout(() => {Vue.loading = false;}, defines.TIMEOUT)
+        savePasswd(context, data) {
+            return new Promise((resolve, reject) => {
+                Vue.http.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}/${data.passwd}&${data.passwdChange}`)
+                .then(
+                    () => {
+                        context.state.success = true;
+                        setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 2);
+                        resolve();
+                    },
+                    () => {
+                        context.state.dialogErrText = "Le mot de passe que vous avez saisi est incorrect";
+                        context.state.dialogErr = true;
+                        context.state.success = false;
+                        reject();
+                    }
+                );  
+                
+            });
         },
-        putImg (context, e) { 
-
-            const file = e.target.files[0];
-            const freader = new FileReader();
-            if(file)
-                freader.readAsDataURL(file);
-            freader.onload = () => {
-                let img = document.createElement('img');
-                img.src = freader.result;
-                img.width = "100%";
-                Vue.editorData += img.outerHTML;
-            };            
+        deleteProfil(context, id) {
+            return new Promise((resolve, reject) => {
+                Vue.http.delete(`${defines.SERVER_URL}${defines.PROFIL_URL}/${id}`)
+                    .then(
+                        (/*sucess*/) => resolve(),
+                        (/*failed*/) => {
+                            context.state.dialogErrText = "Une erreur est survenue lors de la suppression de votre compte.\nVeuillez réessayer.";
+                            context.state.dialogErr = true;
+                            reject();
+                        },
+                    );
+            });
         },
-        // function used for show or unshow home view
-        trigger(ready) {
-            Vue.showPage = ready;
-        },
-
-        */
-
-
-
-
         setDialErr(context, bool) {
             context.commit("SET_DIAL_ERR", bool);
         },
@@ -231,9 +281,6 @@ export default new Vuex.Store({
         },
         toggleDrawer(context) {
             context.commit("TOGGLE_DRAWER");
-        },
-        test() {
-            Vue.http.post("http://localhost:4000/app/hook");
         },
     },
     modules: {

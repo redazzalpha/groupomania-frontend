@@ -130,6 +130,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import defines from "../defines/define";
+import services from '../services/app.service';
 import comment from "../components/comment.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
@@ -157,7 +158,9 @@ export default {
             loading2: false,
             loading3: false,
             loading4: false,
-            rules: [v => v.length <= 255 || '255 Caractères max.'],
+            rules: [
+                services.max255,
+            ],
         };
     },
     computed: {

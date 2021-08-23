@@ -24,13 +24,14 @@
                     <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"> </ckeditor> 
                 </v-card-text>
                 <v-card-actions>
+                    <!--buttons-->
                     <v-container>
                         <v-row no-gutters class="d-flex  justify-space-between">
                             <v-col v-for="item in buttons" :key="item.label" :class="item.class">
                                 <v-btn 
                                 small 
-                                :loading="gloading(item)"
-                                :disabled="false"
+                                :loading="loading"
+                                :disabled="loading"
                                 @click="item.action(editorData)" 
                                 >
                                     {{ item.label }}
@@ -71,8 +72,6 @@ import pubcard from "../components/pubcard.vue";
 import btnClose from "../components/btnClose.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import '@ckeditor/ckeditor5-build-classic/build/translations/fr';
-
-
 export default {
     name: "home",
     components: {
@@ -86,7 +85,6 @@ export default {
             editor: ClassicEditor,
             editorData: '',
             editorConfig: {
-                height: "500",
                 language: 'fr',
                 toolbar: [
                     'heading', '|', 
@@ -107,18 +105,12 @@ export default {
             auth_url: `${defines.SERVER_URL}${defines.HOME_URL}`, 
             showPage: false,
             loading: false,
-            loading2: false,
             loader: null,
             loader2: null,
             buttons: [
                 {label: "Ajouter une image", class: "flex-grow-0",action: this.onPickFile},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.postPub},
             ],
-            gloading(item) {
-                if(/^Publiez !$/gi.test(item.label))
-                return this.loading2;
-                else return this.loading;
-            }
         };
     },
     computed: {
@@ -136,17 +128,25 @@ export default {
             "setDialErr",
         ]),
         postPub(editorData) {
+            this.loading = true
             this.publish(editorData);
             this.editorData = "";
+            setTimeout(() => {
+                this.editorData = "";
+                this.loading = false;
+            }, defines.TIMEOUT);
         },
         onPickFile () { 
             this.loading = true;
             this.$refs.fileInput.click();
 
-            setTimeout(() => {this.loading = false;}, defines.TIMEOUT)
+            setTimeout(
+                () => {
+                    this.loading = false;
+            }, defines.TIMEOUT);
         },
         putImg (e) { 
-
+            this.loading = true;
             const file = e.target.files[0];
             const freader = new FileReader();
             if(file)
@@ -156,6 +156,9 @@ export default {
                 img.src = freader.result;
                 img.width = "100%";
                 this.editorData += img.outerHTML;
+                setTimeout(() => {
+                    this.loading = false;
+                }, defines.TIMEOUT);
             };            
         },
         // function used for show or unshow home view

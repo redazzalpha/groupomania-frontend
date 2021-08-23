@@ -10,6 +10,7 @@ const defines = {
     PROFIL_IMG_URL: "/app/profil/img",
     PROFIL_DESC_URL: "/app/profil/description",
     PROFIL_PASSWD_URL: "/app/profil/password",
+    PASSWORD_URL: "/app/password",
     PROFIL_ACC_URL: "/app/profil/account",
     TEAM_URL: "/app/team",
     USERS_URL: "/app/team/users",

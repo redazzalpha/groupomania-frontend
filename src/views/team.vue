@@ -8,6 +8,7 @@
                 <v-row>
                     <v-col>
                         <v-text-field
+                            autofocus
                             outlined
                             label="Trouver un utilisateur "
                             v-model="fieldValue"
@@ -128,7 +129,7 @@ export default {
     },
     created() {
         this.refresh();
-    }
+    },
 }
 </script>
 

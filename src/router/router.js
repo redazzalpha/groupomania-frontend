@@ -52,7 +52,7 @@ const routes = [
         name: "notFound",
         path: defines.UNKNOWN_URL,
         component: notfound
-    }
+    },
 ];
 
 const router = new VueRouter({

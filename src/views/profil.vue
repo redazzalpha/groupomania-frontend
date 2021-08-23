@@ -25,11 +25,11 @@
                 </v-card-title>
                 <v-card-text class="text-center">
                 </v-card-text>
-                <!--tabs-main-block-->
+                <!--main-block-tabs-->
                 <v-tabs-items>
-                    <!--tabs-container-->
+                    <!--container-tabs-->
                     <v-tabs center-active centered>
-                        <!--tab-Email-->
+                        <!--Email-tab-->
                         <v-tab>E-mail</v-tab>
                         <v-tab-item class="pa-4">
                             <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
@@ -37,7 +37,7 @@
                                 <v-card-text class="d-flex justify-center">{{ userData.email }}</v-card-text>
                             </v-card>
                         </v-tab-item>
-                        <!--tab-description-->
+                        <!--description-tab-->
                         <v-tab>Description</v-tab>
                         <v-tab-item class="pa-4">
                             <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
@@ -56,42 +56,47 @@
                                 counter
                                 :rules="descRules"
                                 ></v-textarea>
-                                <v-btn @click="postDesc" :loading="loading" :disabled="loading">Changer ma description</v-btn>
+                                <v-btn 
+                                :loading="loading" 
+                                :disabled="loading"
+                                @click="postDesc" 
+                                >Changer ma description</v-btn>
                             </v-card>
                         </v-tab-item>
-                        <!--tab-password-->
+                        <!--password-tab--->
                         <v-tab>Mot de passe</v-tab>
                         <v-tab-item class="pa-4">
                             <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                                <!--success-dialog-->
+                                <v-alert v-if="success" outlined type="success" text dismissible>
+                                    Votre mot de passe a été modifié avec succès
+                                </v-alert>
+                                <!--password-card-->
                                 <v-card-title>Changer le mot de passe</v-card-title>
-                                <v-form>
+                                <v-form ref="passwdForm" v-model="passwdValid">
                                     <v-container fluid >
                                         <v-row class="d-flex flex-column">
                                             <v-col>
                                                 <!--password-field-->
                                                 <v-text-field
-                                                    :append-icon="showPasswd ? 'mdi-eye' : 'mdi-eye-off'"
-                                                    :rules="[rules.required, rules.min]"
-                                                    :type="showPasswd ? 'text' : 'password'"
-                                                    name="input-10-2"
+                                                    v-model="passwd"
                                                     hint="At least 8 characters"
-                                                    value=""
                                                     placeholder="Mot de passe actuel"
-                                                    class="input-group--focused"
+                                                    :append-icon="showPasswd ? 'mdi-eye' : 'mdi-eye-off'"
+                                                    :rules="passwdRules"
+                                                    :type="showPasswd ? 'text' : 'password'"
                                                     @click:append="showPasswd = !showPasswd"
                                                 ></v-text-field>
                                             </v-col>
                                             <v-col>
-                                                <!--confirme-password-field-->
+                                                <!--confirm-password-field-->
                                                 <v-text-field
-                                                    :append-icon="showPasswd ? 'mdi-eye' : 'mdi-eye-off'"
-                                                    :rules="[rules.required, rules.emailMatch]"
-                                                    :type="showPasswd ? 'text' : 'password'"
-                                                    name="input-10-2"
+                                                    v-model="passwdChange"
                                                     hint="At least 8 characters"
-                                                    value=""
                                                     placeholder="Nouveau mot de passe"
-                                                    error
+                                                    :append-icon="showPasswd ? 'mdi-eye' : 'mdi-eye-off'"
+                                                    :rules="passwdRules"
+                                                    :type="showPasswd ? 'text' : 'password'"
                                                     @click:append="showPasswd = !showPasswd"
                                                 ></v-text-field>
                                             </v-col>
@@ -99,23 +104,83 @@
                                     </v-container>
                                 </v-form>
                                 <v-card-actions>
-                                    <v-btn>Sauvegarder</v-btn>
+                                    <v-btn 
+                                    :color='passwdValid? "success": ""'
+                                    :disabled='!passwdValid'
+                                    :loading='loading'
+                                    @click="modifyPasswd"
+                                    >Sauvegarder</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-tab-item>
-                        <!--tab-account-->
+                        <!--account-delete-tab-->
                         <v-tab>Compte</v-tab>
                         <v-tab-item class="pa-4">
-                            <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
-                                <v-card-title>Supprimer mon compte</v-card-title>
-                                <v-card-actions>
-                                    <v-btn>Supprimer</v-btn>
-                                </v-card-actions>
-                            </v-card>
+
+                            <v-dialog
+                                v-model="dialog"
+                                persistent :overlay="false"
+                                max-width="500px"
+                                transition="dialog-top-transition"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                                        <v-card-title>Supprimer mon compte</v-card-title>
+                                        <v-card-actions>
+                                            <v-btn
+                                            color="red"
+                                            v-on="on"
+                                            >Supprimer</v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </template>
+                                <template v-slot>
+                                    <v-alert 
+                                    :value="dialog"
+                                    dark
+                                    shaped
+                                    >
+                                        <div primary-title class="text-center">
+                                            Attenton &#x2757;
+                                        </div>
+                                        <v-card-text>
+                                            <p>Vous êtes sur le point de supprimer votre compte. <br />
+                                            Toutes les informations relatives a votre compte seront supprimées et seront donc irrécupérables.<br />
+                                            Souhaitez-vous vraiment supprimer votre compte ?  
+                                            </p>
+
+                                        </v-card-text>
+                                        <v-card-actions>
+                                            <v-btn color="success"
+                                            @click="dialog = false"
+                                            >Annuler</v-btn>
+                                            <v-spacer></v-spacer>
+                                            <v-btn color="success"
+                                            @click="delProf"
+                                            >Oui</v-btn>
+                                        </v-card-actions>
+                                    </v-alert>
+                                </template>
+                            </v-dialog>
                         </v-tab-item>
                     </v-tabs>
                 </v-tabs-items>
             </v-card>
+            <!--error-dialog-->
+            <errordial
+            title="Erreur Système"
+            :text="dialogErrText"
+            :model="dialogErr"
+            >
+                <template v-slot:bottom>
+                    <v-row>
+                        <v-card-actions>
+                            <v-btn @click="close">Ok</v-btn>
+                        </v-card-actions>
+                    </v-row>
+                </template >
+            </errordial>
+
         </slot>
     </auth>
 </template>
@@ -123,32 +188,67 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import auth from "../components/auth.vue";
+import errordial from "../components/errordial.vue";
 import defines from '../defines/define';
+import services from '../services/app.service';
 export default {
     name: "profil",
     components: {
         auth,
+        errordial,
     },
     data() {
         return {
             auth_url: `${defines.SERVER_URL}${defines.PROFIL_URL}`,
-            showPage: false,
-            showPasswd: false,
+            passwd: "",
+            passwdChange:"",
             description: "",
+            showPage: false,
+            passwdValid: false,
+            showPasswd: false,
             loading: false,
-            rules: {
-                required: value => !!value || 'Required.',
-                min: v => v.length >= 8 || 'Min 8 characters',
-                emailMatch: () => (`The password you entered don't match`),
-            },
-            descRules: [v => v.length <= 255 || '255 Caractères max.'],
+            dialog:false,
+            passwdRules:[
+                services.requiredPasswd,
+                services.passwdValidator,
+            ],
+            descRules: [
+                services.max255,
+            ],
         };
     },
     computed: {
-        ...mapState(["userData"]),
+        ...mapState([
+            "userData",
+            "dialogErr",
+            "dialogErrText", 
+            "success"
+        ]),
     },
     methods: {
-        ...mapActions(["setNotifs"]),
+        ...mapActions([
+            "setNotifs", 
+            "savePasswd", 
+            "deleteProfil", 
+            "setDialErr"
+        ]),
+        modifyPasswd() {
+            if(this.$refs.passwdForm.validate()) {
+                this.loading = true;
+                this.savePasswd({passwd: this.passwd, passwdChange: this.passwdChange})
+                .then(() => {
+                    this.$refs.passwdForm.reset();
+                    setTimeout(() => {
+                        this.loading = false;
+                    }, defines.TIMEOUT);
+                })
+                .catch(() => {
+                    setTimeout(() => {
+                        this.loading = false;
+                    }, defines.TIMEOUT);
+                });
+            }
+        },
         postDesc() {
             // Empty string is authorized 
             // to delete previous description
@@ -202,30 +302,17 @@ export default {
         onPickImg () { 
             this.$refs.fileInput.click();
         }, 
-        getNotifs() {
-            return new Promise((resolve, reject) => {
-                this.$http.get(`${defines.SERVER_URL}${defines.NOTIFICATION_URL}`)
-                .then(
-                    (success) => {
-                        const notifs = success.body.results.filter(item => item.whereId == this.userData.userId);
-                        this.setNotifs(notifs);
-                        resolve();
-                    },
-                    (failed) => { reject(failed); }
-                );
-            });
+        delProf() {
+            this.deleteProfil(this.userData.userId)
+            .then( () => this.$router.push(defines.REGISTER_URL) )
         },
-        refresh() {
-            this.getNotifs();
+        close() {
+            this.setDialErr(false);
         },
         // function used for show or unshow home view
         trigger(ready) {
             this.showPage = ready;                                                                                                                         
         },
     },
-    mounted() {
-        //this.refresh();
-    },
-
 }
 </script>
