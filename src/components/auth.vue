@@ -25,7 +25,6 @@
 <script>
 import { mapActions } from 'vuex';
 import errordial from "../components/errordial.vue"
-const jwt  = require('jsonwebtoken');
 export default {
     name: "auth",
     components: {
@@ -37,7 +36,7 @@ export default {
             type: Boolean,
             default: true
         },
-        auth_url: {
+        authUrl: {
             type: String,
             required: true,
         }
@@ -48,25 +47,20 @@ export default {
         };
     },
     methods: {
-        ...mapActions(["setUserData"])
+        ...mapActions([
+            "access"
+        ]),
     },
     beforeMount() {
-        this.$http.get(this.auth_url)
-        .then(
-            (success) => {
-                if(success.body.data != undefined && success.body.data != null)
-                    localStorage.grpm_store = JSON.stringify(success.body);
-
-                const decoded = jwt.decode(JSON.parse(localStorage.grpm_store).data.token);
-                this.setUserData(decoded);
-                
-                this.$emit("onReady", !this.dialogErr);
-            },
-            (/*failed*/) =>{
-                this.dialogErr = true;
-                this.$emit("onReady", !this.dialogErr);
-            } 
-        );
+        this.access(this.authUrl)
+        .then(() => {
+            this.dialogErr = false;
+            this.$emit("onReady", !this.dialogErr)
+        })
+        .catch(() => {
+            this.dialogErr = true;
+            this.$emit("onReady", !this.dialogErr);
+        });
     },
 }
 </script>

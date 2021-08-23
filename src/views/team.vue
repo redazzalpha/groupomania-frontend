@@ -1,5 +1,5 @@
 <template>
-    <auth tab="team" :auth_url="auth_url"  @onReady="trigger">
+    <auth tab="team" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h2 class="pa-5">&Eacute;quipe</h2>
             <!--search-field-->
@@ -86,7 +86,7 @@ export default {
     },
     data() {
         return {
-            auth_url: `${defines.SERVER_URL}${defines.TEAM_URL}`, 
+            authUrl: `${defines.SERVER_URL}${defines.TEAM_URL}`, 
             showPage: false,
             users: [],
             userList: [],

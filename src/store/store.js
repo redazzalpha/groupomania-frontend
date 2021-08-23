@@ -3,6 +3,8 @@ import Vuex from 'vuex';
 import createPersistedState from "vuex-persistedstate";
 import services from '../services/app.service';
 import defines from '../defines/define';
+const jwt  = require('jsonwebtoken');
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -38,6 +40,24 @@ export default new Vuex.Store({
         },
     },
     actions: {
+        access(context, authUrl) {
+            return new Promise((resolve, reject) => {
+                Vue.http.head(authUrl)
+                    .then(
+                        (success) => {
+                            if (success.body.data != undefined && success.body.data != null) {
+                                localStorage.grpm_store = JSON.stringify(success.body);
+                                const decoded = jwt.decode(JSON.parse(localStorage.grpm_store).data.token);
+                                context.state.userData = decoded;
+                            }
+                            resolve();
+                        },
+                        (/*failed*/) => {
+                            reject();
+                        }
+                    );
+            });
+        },
         login(context, data) {
                 return new Promise((resolve, reject) => {
                     Vue.http.post(`${defines.SERVER_URL}${defines.LOGIN_URL}`, data)
@@ -170,35 +190,6 @@ export default new Vuex.Store({
                 .then( () => context.dispatch("refresh") );
             }
         },
-        delPub(context, pubId) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}/${pubId}`)
-            .then( () => context.dispatch("refresh") );
-        },
-        delCom(context, data) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}/${data.comId}`)
-            .then( () => context.dispatch("refresh") );
-        },
-        delNotif(context, notifId) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}/${notifId}`)
-                .then(
-                    (/*success*/) => {
-                        context.dispatch("refresh");
-                    },
-                    (/*failed*/) => {
-                    }
-                );
-        },
-        refresh(context) {
-            context.dispatch("getPubs")
-                .then( () => {
-                    context.dispatch("getComs")
-                        .then( () => {
-                            context.dispatch("getNotifs");
-                        })
-                        .catch();
-                })
-                .catch();
-        },
         like(context, data){
             if(data.userIdLike)             
                 data.userIdLike.push(context.state.userData.userId);
@@ -227,50 +218,23 @@ export default new Vuex.Store({
             Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_UNDISLIKE_URL}`, payload)
             .then( () =>  context.dispatch("refresh") );
         },
-        savePasswd(context, data) {
-            return new Promise((resolve, reject) => {
-                Vue.http.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}/${data.passwd}&${data.passwdChange}`)
+        delPub(context, pubId) {
+            Vue.http.delete(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}/${pubId}`)
+            .then( () => context.dispatch("refresh") );
+        },
+        delCom(context, data) {
+            Vue.http.delete(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}/${data.comId}`)
+            .then( () => context.dispatch("refresh") );
+        },
+        delNotif(context, notifId) {
+            Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}/${notifId}`)
                 .then(
-                    () => {
-                        context.state.success = true;
-                        setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 2);
-                        resolve();
+                    (/*success*/) => {
+                        context.dispatch("refresh");
                     },
-                    () => {
-                        context.state.dialogErrText = "Le mot de passe que vous avez saisi est incorrect";
-                        context.state.dialogErr = true;
-                        context.state.success = false;
-                        reject();
+                    (/*failed*/) => {
                     }
-                );  
-                
-            });
-        },
-        deleteProfil(context, id) {
-            return new Promise((resolve, reject) => {
-                Vue.http.delete(`${defines.SERVER_URL}${defines.PROFIL_URL}/${id}`)
-                    .then(
-                        (/*sucess*/) => resolve(),
-                        (/*failed*/) => {
-                            context.state.dialogErrText = "Une erreur est survenue lors de la suppression de votre compte.\nVeuillez réessayer.";
-                            context.state.dialogErr = true;
-                            reject();
-                        },
-                    );
-            });
-        },
-        uploadImg(context, file) {
-            return new Promise((resolve, reject) => {
-
-                const formData = new FormData();
-                formData.append("image", file, file.name);
-     
-                Vue.http.post(`${defines.SERVER_URL}${defines.IMG_URL}`, formData)
-                .then(
-                    (success) => resolve(success.body.imgUrl),
-                    (/*failed*/) => reject(),
-                ); 
-            });
+                );
         },
         uptImgProf(context, file) {
             return new Promise((resolve, reject) => {
@@ -303,6 +267,62 @@ export default new Vuex.Store({
                         },
                         (/*failed*/) => reject(),
                 );
+            });
+        },
+        uptPasswdProf(context, data) {
+            return new Promise((resolve, reject) => {
+                Vue.http.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}/${data.passwd}&${data.passwdChange}`)
+                .then(
+                    () => {
+                        context.state.success = true;
+                        setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 2);
+                        resolve();
+                    },
+                    () => {
+                        context.state.dialogErrText = "Le mot de passe que vous avez saisi est incorrect";
+                        context.state.dialogErr = true;
+                        context.state.success = false;
+                        reject();
+                    }
+                );  
+                
+            });
+        },
+        uploadImg(context, file) {
+            return new Promise((resolve, reject) => {
+
+                const formData = new FormData();
+                formData.append("image", file, file.name);
+     
+                Vue.http.post(`${defines.SERVER_URL}${defines.IMG_URL}`, formData)
+                .then(
+                    (success) => resolve(success.body.imgUrl),
+                    (/*failed*/) => reject(),
+                ); 
+            });
+        },
+        refresh(context) {
+            context.dispatch("getPubs")
+                .then( () => {
+                    context.dispatch("getComs")
+                        .then( () => {
+                            context.dispatch("getNotifs");
+                        })
+                        .catch();
+                })
+                .catch();
+        },
+        deleteProfil(context, id) {
+            return new Promise((resolve, reject) => {
+                Vue.http.delete(`${defines.SERVER_URL}${defines.PROFIL_URL}/${id}`)
+                    .then(
+                        (/*sucess*/) => resolve(),
+                        (/*failed*/) => {
+                            context.state.dialogErrText = "Une erreur est survenue lors de la suppression de votre compte.\nVeuillez réessayer.";
+                            context.state.dialogErr = true;
+                            reject();
+                        },
+                    );
             });
         },
         setDialErr(context, bool) {

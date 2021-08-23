@@ -1,5 +1,5 @@
 <template>
-    <auth tab="home" :auth_url="auth_url"  @onReady="trigger">
+    <auth tab="home" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h2 class="pa-5">Dernières publiations</h2>
             <!--express your-self-card-->
@@ -102,7 +102,7 @@ export default {
                 ],
             },
 
-            auth_url: `${defines.SERVER_URL}${defines.HOME_URL}`, 
+            authUrl: `${defines.SERVER_URL}${defines.HOME_URL}`, 
             showPage: false,
             loading: false,
             loader: null,

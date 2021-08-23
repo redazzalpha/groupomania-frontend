@@ -1,5 +1,5 @@
 <template>
-    <auth tab="notification" :auth_url="auth_url"  @onReady="trigger">
+    <auth tab="notification" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h2 class="pa-5">Notifications</h2>
             <div v-if="getEmpty" class="text-center title">Vous n'avez pas de notifications !</div>
@@ -105,7 +105,7 @@ export default {
                 return  this.editorData = text;
             },
 
-            auth_url: `${defines.SERVER_URL}${defines.NOTIFICATION_URL}`, 
+            authUrl: `${defines.SERVER_URL}${defines.NOTIFICATION_URL}`, 
             showPage: false,
             hover: false,
             empty: false,

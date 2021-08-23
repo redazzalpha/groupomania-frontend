@@ -1,5 +1,5 @@
 <template>
-    <auth tab="profil" :auth_url="auth_url"  @onReady="trigger">
+    <auth tab="profil" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h2 class="pa-5">Profil</h2>
             <!--main-card-container-->
@@ -199,7 +199,7 @@ export default {
     },
     data() {
         return {
-            auth_url: `${defines.SERVER_URL}${defines.PROFIL_URL}`,
+            authUrl: `${defines.SERVER_URL}${defines.PROFIL_URL}`,
             passwd: "",
             passwdChange:"",
             description: "",
@@ -228,7 +228,7 @@ export default {
     methods: {
         ...mapActions([
             "setNotifs", 
-            "savePasswd", 
+            "uptPasswdProf", 
             "uptImgProf",
             "uptDescProf",
             "deleteProfil", 
@@ -237,7 +237,7 @@ export default {
         modifyPasswd() {
             if(this.$refs.passwdForm.validate()) {
                 this.loading = true;
-                this.savePasswd({passwd: this.passwd, passwdChange: this.passwdChange})
+                this.uptPasswdProf({passwd: this.passwd, passwdChange: this.passwdChange})
                 .then(() => {
                     this.$refs.passwdForm.reset();
                     setTimeout(() => {
