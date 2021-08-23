@@ -166,12 +166,20 @@ export default new Vuex.Store({
         },
         readNotif(context, item) {
             if(item.state == "unread") {
-                Vue.http.post(`${defines.SERVER_URL}${defines.READ_NOTIFICATION_URL}`, {notifId: item.notifId})
+                Vue.http.patch(`${defines.SERVER_URL}${defines.READ_NOTIFICATION_URL}/${item.notifId}`)
                 .then( () => context.dispatch("refresh") );
             }
         },
+        delPub(context, pubId) {
+            Vue.http.delete(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}/${pubId}`)
+            .then( () => context.dispatch("refresh") );
+        },
+        delCom(context, data) {
+            Vue.http.delete(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}/${data.comId}`)
+            .then( () => context.dispatch("refresh") );
+        },
         delNotif(context, notifId) {
-            Vue.http.post(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}`, { notifId })
+            Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}/${notifId}`)
                 .then(
                     (/*success*/) => {
                         context.dispatch("refresh");
@@ -179,19 +187,6 @@ export default new Vuex.Store({
                     (/*failed*/) => {
                     }
                 );
-        },
-        delPub(context, pubId) {
-            const payload = { pubId };
-            Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}`, payload)
-            .then( () => context.dispatch("refresh") );
-        },
-        delCom(context, data) {
-            const payload = { 
-                comId: data.comId,
-                pubId: data.pubId,
-            };
-            Vue.http.post(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}`, payload)
-            .then( () => context.dispatch("refresh") );
         },
         refresh(context) {
             context.dispatch("getPubs")
@@ -275,6 +270,39 @@ export default new Vuex.Store({
                     (success) => resolve(success.body.imgUrl),
                     (/*failed*/) => reject(),
                 ); 
+            });
+        },
+        uptImgProf(context, file) {
+            return new Promise((resolve, reject) => {
+
+                const formData = new FormData();
+                formData.append("image", file, file.name);
+    
+                Vue.http.post(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, formData)
+                .then(
+                    (success) => {
+                        localStorage.grpm_store = JSON.stringify(success.body);
+                        resolve(success.body.data.imgUrl);
+                    },
+                    (/*failed*/) => reject()
+                );
+            });
+
+        },
+        uptDescProf(context, desc) {
+            return new Promise((resolve, reject) => {
+
+                Vue.http.patch(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}/${desc}`)
+                    .then(
+                        (success) => {
+                            success.text()
+                                .then(token => {
+                                    localStorage.grpm_store = token;
+                                    resolve();
+                                });
+                        },
+                        (/*failed*/) => reject(),
+                );
             });
         },
         setDialErr(context, bool) {

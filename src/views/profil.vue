@@ -229,6 +229,8 @@ export default {
         ...mapActions([
             "setNotifs", 
             "savePasswd", 
+            "uptImgProf",
+            "uptDescProf",
             "deleteProfil", 
             "setDialErr"
         ]),
@@ -254,49 +256,29 @@ export default {
             // to delete previous description
             if(this.description.length <= 255) {
                 this.loading = true;
-                const payload = {
-                    description: this.description,
-                };
-                this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}`, payload)
-                .then(
-                    (success) => {
-                        success.text()
-                        .then( token => {
-                            localStorage.grpm_store = token;
-                            this.userData.description = this.description;
-                            this.description = "";
-                            setTimeout(() => { this.loading = false; }, defines.TIMEOUT);
-                        });
-                    },
-                    (/*failed*/) => { setTimeout(() => { this.loading = false; }, defines.TIMEOUT); }
-                );
+
+                this.uptDescProf(this.description)
+                .then( () => {
+                    this.userData.description = this.description;
+                    this.description = "";
+                    setTimeout(() => { 
+                        this.loading = false;
+                    }, defines.TIMEOUT);
+                })
+                .catch( () => {
+                    setTimeout(() => { 
+                        this.loading = false;
+                    }, defines.TIMEOUT);
+                });
             }
         },
         putImg (event) { 
-
             let file = event.target.files[0];
-            let fileReader = new FileReader();
-
-            if(file){
-                fileReader.readAsDataURL(file);
-            }
-
-            fileReader.addEventListener('load', () =>{ 
-
-                let payload = new FormData();
-                payload.append("image", file, file.name);
-    
-                this.$http.put(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, payload)
-                .then(
-                    (success) => {
-                        localStorage.grpm_store = JSON.stringify(success.body);
-                        this.userData.img = success.body.data.imgUrl;
-                    },
-                    (/*failed*/) => {
-                    }
-                );
-            }, false);
-
+            this.uptImgProf(file)
+            .then( imgUrl => {
+                this.userData.img = imgUrl;
+            })
+            .catch();
         },
         onPickImg () { 
             this.$refs.fileInput.click();
