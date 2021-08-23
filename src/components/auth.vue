@@ -46,10 +46,15 @@ export default {
             dialogErr: false,
         };
     },
+    computed: {
+    },
     methods: {
         ...mapActions([
-            "access"
+            "access",
         ]),
+    },
+    created() {
+
     },
     beforeMount() {
         this.access(this.authUrl)

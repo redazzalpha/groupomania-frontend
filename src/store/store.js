@@ -16,6 +16,7 @@ export default new Vuex.Store({
         dialogErrText: "",
         dialogErr: false,
         success: false,
+        progress: false,
         drawer: false,
     },
     mutations: {
@@ -34,6 +35,9 @@ export default new Vuex.Store({
         },
         SET_NOTIFS(state, payload) {
             state.notifs = payload;
+        },
+        SET_PROGRESS(state, bool) {
+            state.progress = bool;
         },
         TOGGLE_DRAWER(state) {
             state.drawer = !state.drawer;
@@ -302,15 +306,28 @@ export default new Vuex.Store({
             });
         },
         refresh(context) {
-            context.dispatch("getPubs")
-                .then( () => {
-                    context.dispatch("getComs")
-                        .then( () => {
-                            context.dispatch("getNotifs");
-                        })
-                        .catch();
-                })
-                .catch();
+            return new Promise((resolve, reject) => {
+                context.state.progress = true;
+                context.dispatch("getPubs")
+                    .then( () => {
+                        context.dispatch("getComs")
+                            .then( () => {
+                                context.dispatch("getNotifs")
+                                    .then(() => {
+                                        setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
+                                        //context.state.progress = false;
+                                        resolve();
+                                    })
+                                    .catch(() => {
+                                        setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
+                                        //context.state.progress = false;
+                                        reject();
+                                    });
+                            })
+                            .catch();
+                    })
+                    .catch();
+            });
         },
         deleteProfil(context, id) {
             return new Promise((resolve, reject) => {
@@ -339,6 +356,9 @@ export default new Vuex.Store({
         },
         setNotifs(context, payload) {
             context.commit("SET_NOTIFS", payload);  
+        },
+        setProgress(context, bool) {
+            context.commit('SET_PROGRESS', bool);
         },
         toggleDrawer(context) {
             context.commit("TOGGLE_DRAWER");

@@ -57,6 +57,7 @@
                                 :rules="descRules"
                                 ></v-textarea>
                                 <v-btn 
+                                text
                                 :loading="loading" 
                                 :disabled="loading"
                                 @click="postDesc" 
@@ -105,6 +106,7 @@
                                 </v-form>
                                 <v-card-actions>
                                     <v-btn 
+                                    text
                                     :color='passwdValid? "success": ""'
                                     :disabled='!passwdValid'
                                     :loading='loading'
@@ -116,50 +118,62 @@
                         <!--account-delete-tab-->
                         <v-tab>Compte</v-tab>
                         <v-tab-item class="pa-4">
-
+                            <!--alert-delete-account-dialog-->
                             <v-dialog
                                 v-model="dialog"
                                 persistent :overlay="false"
                                 max-width="500px"
                                 transition="dialog-top-transition"
                             >
+                                <!--alert-delete-account-activator-->
                                 <template v-slot:activator="{ on }">
                                     <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
                                         <v-card-title>Supprimer mon compte</v-card-title>
                                         <v-card-actions>
                                             <v-btn
+                                            text
                                             color="red"
                                             v-on="on"
                                             >Supprimer</v-btn>
                                         </v-card-actions>
                                     </v-card>
                                 </template>
+                                <!--alert-delete-account-view-->
                                 <template v-slot>
-                                    <v-alert 
-                                    :value="dialog"
+                                    <v-dialog 
+                                    v-model="dialog"
+                                    persistent
                                     dark
-                                    shaped
+                                    max-width=500
                                     >
-                                        <div primary-title class="text-center">
-                                            Attenton &#x2757;
-                                        </div>
-                                        <v-card-text>
-                                            <p>Vous êtes sur le point de supprimer votre compte. <br />
-                                            Toutes les informations relatives a votre compte seront supprimées et seront donc irrécupérables.<br />
-                                            Souhaitez-vous vraiment supprimer votre compte ?  
-                                            </p>
-
-                                        </v-card-text>
-                                        <v-card-actions>
-                                            <v-btn color="success"
-                                            @click="dialog = false"
-                                            >Annuler</v-btn>
-                                            <v-spacer></v-spacer>
-                                            <v-btn color="success"
-                                            @click="delProf"
-                                            >Oui</v-btn>
-                                        </v-card-actions>
-                                    </v-alert>
+                                        <v-card>
+                                            <v-container class="d-flex flex-column align-center">
+                                                <v-row class="text-center" no-gutters>
+                                                    <v-card-title class="white--text">Attention &#x2757;</v-card-title>
+                                                </v-row>
+                                                <v-row class="text-center" no-gutters>
+                                                    <v-card-text class="red--text" >
+                                                        Vous êtes sur le point de supprimer votre compte.
+                                                        Toutes les informations relatives a votre compte seront supprimées et seront donc irrécupérables.<br />
+                                                        Souhaitez-vous vraiment supprimer votre compte ? 
+                                                    </v-card-text>
+                                                </v-row>
+                                            </v-container>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                text
+                                                color="success" 
+                                                @click="dialog = false"
+                                                >Annuler</v-btn>
+                                                <v-btn 
+                                                text
+                                                color="success"
+                                                @click="delProf"
+                                                >Oui</v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
                                 </template>
                             </v-dialog>
                         </v-tab-item>

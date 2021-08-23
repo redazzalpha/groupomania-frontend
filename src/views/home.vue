@@ -29,6 +29,7 @@
                         <v-row no-gutters class="d-flex  justify-space-between">
                             <v-col v-for="item in buttons" :key="item.label" :class="item.class">
                                 <v-btn 
+                                text
                                 small 
                                 :loading="loading"
                                 :disabled="loading"
@@ -118,15 +119,16 @@ export default {
             "userData",
             "publications",
             "dialogErrText",
-            "dialogErr"
+            "dialogErr",
         ]),
     },
     methods: {
         ...mapActions([
             "publish",
             "uploadImg",
-            "refresh",
             "setDialErr",
+            "refresh",
+
         ]),
         postPub(editorData) {
             this.loading = true

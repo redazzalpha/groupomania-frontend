@@ -3,7 +3,6 @@
     <v-dialog v-model="modelFct" max-width=500  persistent dark transition="dialog-top-transition" >
         <v-card>
             <v-container class="d-flex flex-column align-center">
-
                 <v-row class="text-center" no-gutters>
                     <v-card-title class="white--text">{{ title }} &#x2757;</v-card-title>
                 </v-row>

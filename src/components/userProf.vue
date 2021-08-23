@@ -54,7 +54,10 @@
             </v-container>
         </v-card-text>
         <v-card-actions class="justify-end">
-            <v-btn outlined text @click="dialog.value = false" >
+            <v-btn 
+            text
+            @click="dialog.value = false"
+            >
                 <v-icon>mdi-close</v-icon> fermer
             </v-btn>
         </v-card-actions>
