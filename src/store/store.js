@@ -264,6 +264,19 @@ export default new Vuex.Store({
                     );
             });
         },
+        uploadImg(context, file) {
+            return new Promise((resolve, reject) => {
+
+                const formData = new FormData();
+                formData.append("image", file, file.name);
+     
+                Vue.http.post(`${defines.SERVER_URL}${defines.IMG_URL}`, formData)
+                .then(
+                    (success) => resolve(success.body.imgUrl),
+                    (/*failed*/) => reject(),
+                ); 
+            });
+        },
         setDialErr(context, bool) {
             context.commit("SET_DIAL_ERR", bool);
         },

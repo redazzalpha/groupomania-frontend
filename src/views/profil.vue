@@ -279,7 +279,6 @@ export default {
 
             if(file){
                 fileReader.readAsDataURL(file);
-
             }
 
             fileReader.addEventListener('load', () =>{ 

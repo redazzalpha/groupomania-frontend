@@ -124,6 +124,7 @@ export default {
     methods: {
         ...mapActions([
             "publish",
+            "uploadImg",
             "refresh",
             "setDialErr",
         ]),
@@ -148,18 +149,22 @@ export default {
         putImg (e) { 
             this.loading = true;
             const file = e.target.files[0];
-            const freader = new FileReader();
-            if(file)
-                freader.readAsDataURL(file);
-            freader.onload = () => {
+
+           this.uploadImg(file)
+           .then( imgUrl => {
                 let img = document.createElement('img');
-                img.src = freader.result;
+                img.src = imgUrl;
                 img.width = "100%";
                 this.editorData += img.outerHTML;
                 setTimeout(() => {
                     this.loading = false;
                 }, defines.TIMEOUT);
-            };            
+           })
+           .catch( () => {
+                setTimeout(() => {
+                    this.loading = false;
+                }, defines.TIMEOUT);
+           });
         },
         // function used for show or unshow home view
         trigger(ready) {

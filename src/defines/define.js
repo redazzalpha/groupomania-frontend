@@ -27,6 +27,7 @@ const defines = {
     COMMENT_URL: "/app/publish/comment",
     COMMENT_DEL_URL: "/app/publish/comment/delete",
     AUTO_LOG_URL: "/app/autolog",
+    IMG_URL: "/app/img",
     UNKNOWN_URL: "/*",
     // variables
     TIMEOUT: 1000,
