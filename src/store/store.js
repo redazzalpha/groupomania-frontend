@@ -3,7 +3,6 @@ import Vuex from 'vuex';
 import createPersistedState from "vuex-persistedstate";
 import services from '../services/app.service';
 import defines from '../defines/define';
-const jwt  = require('jsonwebtoken');
 
 Vue.use(Vuex);
 
@@ -47,19 +46,45 @@ export default new Vuex.Store({
         access(context, authUrl) {
             return new Promise((resolve, reject) => {
                 Vue.http.head(authUrl)
-                    .then(
-                        (success) => {
-                            if (success.body.data != undefined && success.body.data != null) {
-                                localStorage.grpm_store = JSON.stringify(success.body);
-                                const decoded = jwt.decode(JSON.parse(localStorage.grpm_store).data.token);
-                                context.state.userData = decoded;
+                .then(
+                    (/*success*/) => resolve(),
+                    (failed) => {
+                        if (failed.status == 401) {
+                            if (localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
+                                
+                                const tokenRfrsh = JSON.parse(localStorage.grpm_store).data.tokenRfrsh;
+                                Vue.http.post(`${defines.SERVER_URL}${defines.TOKEN_URL}`, { tokenRfrsh })
+                                    .then(
+                                        success => {
+                                            localStorage.grpm_store = JSON.stringify(success.body);
+                                            Vue.http.head(authUrl)
+                                                .then(
+                                                    () => {
+                                                        context.dispatch("refresh");
+                                                        resolve();
+                                                    },
+                                                    failed => {
+                                                        context.state.progress = false;
+                                                        reject(failed);
+                                                    }
+                                                );
+                                        },
+                                        failed => {
+                                            context.state.progress = false;
+                                            reject(failed);
+                                        }
+                                    );
                             }
-                            resolve();
-                        },
-                        (/*failed*/) => {
-                            reject();
+                            else {
+                                context.state.progress = false;
+                                reject(failed);
+                            } 
                         }
-                    );
+                        else {
+                            context.state.progress = false;
+                            reject(failed);
+                        } 
+                    });
             });
         },
         login(context, data) {
@@ -190,7 +215,7 @@ export default new Vuex.Store({
         },
         readNotif(context, item) {
             if(item.state == "unread") {
-                Vue.http.patch(`${defines.SERVER_URL}${defines.READ_NOTIFICATION_URL}/${item.notifId}`)
+                Vue.http.patch(`${defines.SERVER_URL}${defines.READ_NOTIFICATION_URL}`, { notifId: item.notifId })
                 .then( () => context.dispatch("refresh") );
             }
         },
@@ -223,15 +248,15 @@ export default new Vuex.Store({
             .then( () =>  context.dispatch("refresh") );
         },
         delPub(context, pubId) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}/${pubId}`)
+            Vue.http.delete(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}`, { params: { pubId }})
             .then( () => context.dispatch("refresh") );
         },
         delCom(context, data) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}/${data.comId}`)
+            Vue.http.delete(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}`, { params: { comId: data.comId } })
             .then( () => context.dispatch("refresh") );
         },
         delNotif(context, notifId) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}/${notifId}`)
+            Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}`, { params: { notifId } })
                 .then(
                     (/*success*/) => {
                         context.dispatch("refresh");
@@ -239,6 +264,19 @@ export default new Vuex.Store({
                     (/*failed*/) => {
                     }
                 );
+        },
+        delProfil(context, id) {
+            return new Promise((resolve, reject) => {
+                Vue.http.delete(`${defines.SERVER_URL}${defines.PROFIL_URL}`, { params: { id } })
+                    .then(
+                        (/*sucess*/) => resolve(),
+                        (/*failed*/) => {
+                            context.state.dialogErrText = "Une erreur est survenue lors de la suppression de votre compte.\nVeuillez réessayer.";
+                            context.state.dialogErr = true;
+                            reject();
+                        },
+                    );
+            });
         },
         uptImgProf(context, file) {
             return new Promise((resolve, reject) => {
@@ -260,7 +298,7 @@ export default new Vuex.Store({
         uptDescProf(context, desc) {
             return new Promise((resolve, reject) => {
 
-                Vue.http.patch(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}/${desc}`)
+                Vue.http.patch(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}`, { desc })
                     .then(
                         (success) => {
                             success.text()
@@ -269,13 +307,15 @@ export default new Vuex.Store({
                                     resolve();
                                 });
                         },
-                        (/*failed*/) => reject(),
+                        (/*failed*/) => {
+                            reject();
+                        },
                 );
             });
         },
         uptPasswdProf(context, data) {
             return new Promise((resolve, reject) => {
-                Vue.http.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}/${data.passwd}&${data.passwdChange}`)
+                Vue.http.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}`, { old: data.passwd, new: data.passwdChange })
                 .then(
                     () => {
                         context.state.success = true;
@@ -324,22 +364,9 @@ export default new Vuex.Store({
                                         reject();
                                     });
                             })
-                            .catch();
+                            .catch(() => setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT) );
                     })
-                    .catch();
-            });
-        },
-        deleteProfil(context, id) {
-            return new Promise((resolve, reject) => {
-                Vue.http.delete(`${defines.SERVER_URL}${defines.PROFIL_URL}/${id}`)
-                    .then(
-                        (/*sucess*/) => resolve(),
-                        (/*failed*/) => {
-                            context.state.dialogErrText = "Une erreur est survenue lors de la suppression de votre compte.\nVeuillez réessayer.";
-                            context.state.dialogErr = true;
-                            reject();
-                        },
-                    );
+                    .catch(setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT) );
             });
         },
         setDialErr(context, bool) {

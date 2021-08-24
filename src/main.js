@@ -18,12 +18,6 @@ Vue.http.interceptors.push(function (req) {
         const grpm_store =  JSON.parse(localStorage.grpm_store);
         req.headers.set("Authorization", `Bearer ${grpm_store.data.token}`);
     }
-    // modify response server
-    return function (res) {
-        if (res.body.token) {
-            // do something
-        }
-    };
 });
 Vue.config.productionTip = false;
 

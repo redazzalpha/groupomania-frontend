@@ -44,6 +44,7 @@
                                         <v-col class="d-flex" cols="12" sm="3" xsm="12" align-end>
                                             <!--login-button-->
                                             <v-btn
+                                            text
                                             large block 
                                             :color='loginValid? "success": ""'
                                             :disabled="!loginValid"
@@ -99,6 +100,7 @@
                                         <!--register-button-->
                                         <v-col class="d-flex ml-auto" cols="12" sm="3" xsm="12">
                                             <v-btn 
+                                            text
                                             large block 
                                             :color='registerValid? "success": ""'
                                             :disabled="!registerValid" 
@@ -187,6 +189,7 @@ export default {
     },
     methods: {
         ...mapActions([
+            "access",
             "login",
             "register",
             "setDialErr"
@@ -234,16 +237,20 @@ export default {
         },
     },
     created() {
-
         // auto logging
-        this.$http.get(`${defines.SERVER_URL}${defines.AUTO_LOG_URL}`)
+        this.$http.head(`${defines.SERVER_URL}${defines.AUTO_LOG_URL}`)
         .then(
             (success) => {
                 localStorage.grpm_store = JSON.stringify(success.body);
                 this.$router.push(defines.HOME_URL);
             },
-            (/*failed*/) => {
-                this.dialogSign = true;
+            (failed) => {
+                if(failed.status == 401) {
+                    this.access(`${defines.SERVER_URL}${defines.HOME_URL}`)
+                    .then(() => this.$router.push(defines.HOME_URL))
+                    .catch(() => this.dialogSign = true)
+                }
+                else this.dialogSign = true;
             }
         );
     },

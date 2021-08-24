@@ -20,7 +20,7 @@
                         >
                             <v-icon>mdi-camera</v-icon>
                         </v-btn> 
-                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="putImg" />
+                        <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="uptImg" />
                     </div>
                 </v-card-title>
                 <v-card-text class="text-center">
@@ -60,7 +60,7 @@
                                 text
                                 :loading="loading" 
                                 :disabled="loading"
-                                @click="postDesc" 
+                                @click="uptDesc" 
                                 >Changer ma description</v-btn>
                             </v-card>
                         </v-tab-item>
@@ -245,7 +245,7 @@ export default {
             "uptPasswdProf", 
             "uptImgProf",
             "uptDescProf",
-            "deleteProfil", 
+            "delProfil", 
             "setDialErr"
         ]),
         modifyPasswd() {
@@ -265,7 +265,15 @@ export default {
                 });
             }
         },
-        postDesc() {
+        uptImg (event) { 
+            let file = event.target.files[0];
+            this.uptImgProf(file)
+            .then( imgUrl => {
+                this.userData.img = imgUrl;
+            })
+            .catch();
+        },
+        uptDesc() {
             // Empty string is authorized 
             // to delete previous description
             if(this.description.length <= 255) {
@@ -286,21 +294,13 @@ export default {
                 });
             }
         },
-        putImg (event) { 
-            let file = event.target.files[0];
-            this.uptImgProf(file)
-            .then( imgUrl => {
-                this.userData.img = imgUrl;
-            })
-            .catch();
-        },
-        onPickImg () { 
-            this.$refs.fileInput.click();
-        }, 
         delProf() {
-            this.deleteProfil(this.userData.userId)
+            this.delProfil(this.userData.userId)
             .then( () => this.$router.push(defines.REGISTER_URL) )
         },
+        onPickImg () {
+            this.$refs.fileInput.click();
+        }, 
         close() {
             this.setDialErr(false);
         },

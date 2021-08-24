@@ -61,7 +61,7 @@
                 <v-icon>mdi-close</v-icon> fermer
             </v-btn>
         </v-card-actions>
-</v-card>
+    </v-card>
 </template>
 
 <script>

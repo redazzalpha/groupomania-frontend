@@ -53,9 +53,6 @@ export default {
             "access",
         ]),
     },
-    created() {
-
-    },
     beforeMount() {
         this.access(this.authUrl)
         .then(() => {
