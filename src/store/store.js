@@ -50,7 +50,8 @@ export default new Vuex.Store({
                     (/*success*/) => resolve(),
                     (failed) => {
                         if (failed.status == 401) {
-                            if (localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
+                            const grpm_store = JSON.parse(localStorage.grpm_store);
+                            if (grpm_store.data != null && grpm_store.data != undefined) {
                                 
                                 const tokenRfrsh = JSON.parse(localStorage.grpm_store).data.tokenRfrsh;
                                 Vue.http.post(`${defines.SERVER_URL}${defines.TOKEN_URL}`, { tokenRfrsh })
