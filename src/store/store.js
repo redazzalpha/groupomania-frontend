@@ -44,7 +44,10 @@ export default new Vuex.Store({
             return new Promise((resolve, reject) => {
                 Vue.http.head(authUrl)
                 .then(
-                    (/*success*/) => resolve(),
+                    (/*success*/) => {
+                        context.state.progress = false;
+                        resolve();
+                    },
                     (failed) => {
                         if (failed.status == 401) {
                             if (localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
