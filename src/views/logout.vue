@@ -8,11 +8,12 @@ import defines from "../defines/define";
 export default {
     name: "logout",
     methods: {
-        ...mapActions(["setNotifs"]),
+        ...mapActions([
+            "resetStore",
+        ]),
     },
     created() {
-        this.setNotifs([]);
-        localStorage.removeItem("grpm_store"); 
+        this.resetStore();
         this.$router.push(`${defines.ROOT_URL}`);
     }
 }

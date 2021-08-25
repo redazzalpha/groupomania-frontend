@@ -297,7 +297,6 @@ export default {
         delAcc() {
             this.delAccount(this.userData.userId)
             .then( () => {
-                localStorage.removeItem("grpm_store");
                 this.$router.push(defines.REGISTER_URL);
             })
         },

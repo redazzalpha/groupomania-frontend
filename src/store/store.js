@@ -3,6 +3,8 @@ import Vuex from 'vuex';
 import createPersistedState from "vuex-persistedstate";
 import services from '../services/app.service';
 import defines from '../defines/define';
+const jwt = require('jsonwebtoken');
+
 
 Vue.use(Vuex);
 
@@ -118,23 +120,27 @@ export default new Vuex.Store({
                             success.text()
                             .then(token => {
                                 localStorage.grpm_store = token;
+                                context.state.userData = jwt.decode(success.body.data.token);
+                                context.state.showWelcome = true;
                                 resolve();
                             });         
                         },
                         failed => {
-                            switch(failed.body.error.code) {
-                                case "ER_UNK_USER":
-                                    context.state.dialogErrText = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
-                                    context.state.dialogErr = true;
-                                    break;
-                                case "ER_INV_PASS":
-                                    context.state.dialogErrText = "Le mot de passe que vous avez saisi est invalide";
-                                    context.state.dialogErr = true;
-                                    break;
-                                default:
-                                    throw new Error("Unknown error");    
+                            if (failed.body.error) {
+                                switch(failed.body.error.code) {
+                                    case "ER_UNK_USER":
+                                        context.state.dialogErrText = "L’adresse email que vous avez saisie n’est associée à aucun un compte. Veuillez le vérifier et réessayer.";
+                                        context.state.dialogErr = true;
+                                        break;
+                                    case "ER_INV_PASS":
+                                        context.state.dialogErrText = "Le mot de passe que vous avez saisi est invalide";
+                                        context.state.dialogErr = true;
+                                        break;
+                                    default:
+                                        throw new Error("Unknown error");    
+                                }
                             }
-                            reject();
+                            reject(failed);
                         }
                     );
                 });
@@ -292,7 +298,10 @@ export default new Vuex.Store({
             return new Promise((resolve, reject) => {
                 Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_ACCOUNT_URL}`, { params: { id } })
                     .then(
-                        (/*sucess*/) => resolve(),
+                        (/*success*/) => {
+                            context.dispatch("resetStore");
+                            resolve();
+                        },
                         (/*failed*/) => {
                             context.state.dialogErrText = "Une erreur est survenue lors de la suppression de votre compte.\nVeuillez réessayer.";
                             context.state.dialogErr = true;
@@ -392,6 +401,11 @@ export default new Vuex.Store({
                     .catch(setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT) );
             });
         },
+        resetStore(context) {
+            context.state.userData = [];
+            localStorage.removeItem("vuex");
+            localStorage.removeItem("grpm_store");
+        },
         setDialErr(context, bool) {
             context.commit("SET_DIAL_ERR", bool);
         },
@@ -413,7 +427,6 @@ export default new Vuex.Store({
         setShowWelcome(context, bool) {
             context.commit("SET_SHOW_WELCOME", bool);
         },
-
     },
     modules: {
     },

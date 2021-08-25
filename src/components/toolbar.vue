@@ -48,7 +48,9 @@ export default {
             "notifs",
         ]),
         notifCount() {
-            return this.notifs.filter(item => item.state === "unread").length;
+            if(this.notifs)
+                return this.notifs.filter(item => item.state === "unread").length;
+            return 0;
         }
     },
 }

@@ -193,7 +193,6 @@ export default {
             "login",
             "register",
             "setDialErr",
-            "setShowWelcome",
 
         ]),
         validateLogin() {
@@ -205,16 +204,14 @@ export default {
                 };
 
                 this.login(payload)
-                .then( () => this.$router.push(defines.HOME_URL) )
+                .then(() => {
+                    this.$router.push(defines.HOME_URL);
+                })
                 .catch(() => {
                     setTimeout(() => {
                         this.loading = false;
                     }, defines.TIMEOUT);
                 });
-
-                this.setShowWelcome(true)
-
-
             }
         },
         validateRegister() {

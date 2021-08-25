@@ -55,8 +55,10 @@ export default {
             "userData",
         ]),
         getUserImg() {
-            return this.userData.img;
-        }
+            if(this.userData)
+                return this.userData.img;
+            return null;
+        },
     },
 }
 </script>
