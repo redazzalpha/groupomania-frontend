@@ -288,9 +288,9 @@ export default new Vuex.Store({
                     }
                 );
         },
-        delProfil(context, id) {
+        delAccount(context, id) {
             return new Promise((resolve, reject) => {
-                Vue.http.delete(`${defines.SERVER_URL}${defines.PROFIL_URL}`, { params: { id } })
+                Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_ACCOUNT_URL}`, { params: { id } })
                     .then(
                         (/*sucess*/) => resolve(),
                         (/*failed*/) => {

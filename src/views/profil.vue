@@ -169,7 +169,7 @@
                                                 <v-btn 
                                                 text
                                                 color="success"
-                                                @click="delProf"
+                                                @click="delAcc"
                                                 >Oui</v-btn>
                                             </v-card-actions>
                                         </v-card>
@@ -245,7 +245,7 @@ export default {
             "uptPasswdProf", 
             "uptImgProf",
             "uptDescProf",
-            "delProfil", 
+            "delAccount", 
             "setDialErr"
         ]),
         modifyPasswd() {
@@ -294,9 +294,12 @@ export default {
                 });
             }
         },
-        delProf() {
-            this.delProfil(this.userData.userId)
-            .then( () => this.$router.push(defines.REGISTER_URL) )
+        delAcc() {
+            this.delAccount(this.userData.userId)
+            .then( () => {
+                localStorage.removeItem("grpm_store");
+                this.$router.push(defines.REGISTER_URL);
+            })
         },
         onPickImg () {
             this.$refs.fileInput.click();

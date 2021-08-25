@@ -29,6 +29,7 @@ const defines = {
     AUTO_LOG_URL: "/app/autolog",
     IMG_URL: "/app/img",
     TOKEN_URL: "/app/token",
+    DEL_ACCOUNT_URL: "/app/account",
     UNKNOWN_URL: "/*",
     // variables
     TIMEOUT: 1000,
