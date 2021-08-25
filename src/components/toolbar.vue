@@ -1,10 +1,9 @@
 <template>
     <v-toolbar color="indigo">
-        
         <v-row justify="center">
             <!--navbar-toggler-button-->
             <v-col cols="2" class="d-flex justify-center">
-                <v-app-bar-nav-icon @click.stop="toggleDrawer" title="Menu"></v-app-bar-nav-icon>
+                <v-app-bar-nav-icon @click.stop="$store.state.showNav = !$store.state.showNav" title="Menu"></v-app-bar-nav-icon>
             </v-col>
             <!--toolbar-icons-->
             <v-col cols="2" class="d-flex justify-center">
@@ -34,7 +33,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapState } from "vuex";
 import defines from "../defines/define";
 export default {
     name: "toolbar",
@@ -45,13 +44,12 @@ export default {
         };
     },
     computed: {
-        ...mapState(["notifs"]),
+        ...mapState([
+            "notifs",
+        ]),
         notifCount() {
             return this.notifs.filter(item => item.state === "unread").length;
         }
-    },
-    methods: {
-        ...mapActions(["toggleDrawer"]),
     },
 }
 </script>

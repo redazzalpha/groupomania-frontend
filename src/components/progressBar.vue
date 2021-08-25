@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="model"  persistent width="300">
+    <v-dialog :value="model" persistent width="300">
         <v-card color="primary" dark>
             <v-card-text>
                 Veuillez patienter...
@@ -17,7 +17,10 @@
 export default {
     name: "progressBar",
     props: {
-        model: Boolean,
+        model: {
+            type: Boolean,
+            default: false,
+        },
     },
 }
 </script>

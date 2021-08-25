@@ -1,7 +1,7 @@
 <template>
     <!--navbar-collapse-->
     <v-navigation-drawer app
-    v-model="$store.state.drawer"
+    v-model="$store.state.showNav"
     absolute
     temporary
     >
@@ -51,11 +51,13 @@ export default {
         };
     },
     computed: {
-        ...mapState(["userData"]),
+        ...mapState([
+            "userData",
+        ]),
         getUserImg() {
             return this.userData.img;
         }
-    }
+    },
 }
 </script>
 

@@ -16,7 +16,7 @@ export default new Vuex.Store({
         dialogErr: false,
         success: false,
         progress: false,
-        drawer: false,
+        showNav: false,
     },
     mutations: {
 
@@ -38,9 +38,6 @@ export default new Vuex.Store({
         SET_PROGRESS(state, bool) {
             state.progress = bool;
         },
-        TOGGLE_DRAWER(state) {
-            state.drawer = !state.drawer;
-        },
     },
     actions: {
         access(context, authUrl) {
@@ -50,31 +47,36 @@ export default new Vuex.Store({
                     (/*success*/) => resolve(),
                     (failed) => {
                         if (failed.status == 401) {
-                            const grpm_store = JSON.parse(localStorage.grpm_store);
-                            if (grpm_store.data != null && grpm_store.data != undefined) {
-                                
-                                const tokenRfrsh = JSON.parse(localStorage.grpm_store).data.tokenRfrsh;
-                                Vue.http.post(`${defines.SERVER_URL}${defines.TOKEN_URL}`, { tokenRfrsh })
-                                    .then(
-                                        success => {
-                                            localStorage.grpm_store = JSON.stringify(success.body);
-                                            Vue.http.head(authUrl)
-                                                .then(
-                                                    () => {
-                                                        context.dispatch("refresh");
-                                                        resolve();
-                                                    },
-                                                    failed => {
-                                                        context.state.progress = false;
-                                                        reject(failed);
-                                                    }
-                                                );
-                                        },
-                                        failed => {
-                                            context.state.progress = false;
-                                            reject(failed);
-                                        }
-                                    );
+                            if (localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
+                                const grpm_store = JSON.parse(localStorage.grpm_store);
+                                if (grpm_store.data != null && grpm_store.data != undefined) {
+                                    const tokenRfrsh = JSON.parse(localStorage.grpm_store).data.tokenRfrsh;
+                                    Vue.http.post(`${defines.SERVER_URL}${defines.TOKEN_URL}`, { tokenRfrsh })
+                                        .then(
+                                            success => {
+                                                localStorage.grpm_store = JSON.stringify(success.body);
+                                                Vue.http.head(authUrl)
+                                                    .then(
+                                                        () => {
+                                                            context.dispatch("refresh");
+                                                            resolve();
+                                                        },
+                                                        failed => {
+                                                            context.state.progress = false;
+                                                            reject(failed);
+                                                        }
+                                                    );
+                                            },
+                                            failed => {
+                                                context.state.progress = false;
+                                                reject(failed);
+                                            }
+                                        );
+                                }
+                                else {
+                                    context.state.progress = false;
+                                    reject(failed);
+                                }
                             }
                             else {
                                 context.state.progress = false;
@@ -387,9 +389,6 @@ export default new Vuex.Store({
         },
         setProgress(context, bool) {
             context.commit('SET_PROGRESS', bool);
-        },
-        toggleDrawer(context) {
-            context.commit("TOGGLE_DRAWER");
         },
     },
     modules: {

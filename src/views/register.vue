@@ -238,19 +238,13 @@ export default {
     },
     created() {
         // auto logging
-        this.$http.head(`${defines.SERVER_URL}${defines.AUTO_LOG_URL}`)
+        this.access(`${defines.SERVER_URL}${defines.AUTO_LOG_URL}`)
         .then(
-            (success) => {
-                localStorage.grpm_store = JSON.stringify(success.body);
+            (/*success*/) => {
                 this.$router.push(defines.HOME_URL);
             },
-            (failed) => {
-                if(failed.status == 401) {
-                    this.access(`${defines.SERVER_URL}${defines.HOME_URL}`)
-                    .then(() => this.$router.push(defines.HOME_URL))
-                    .catch(() => this.dialogSign = true)
-                }
-                else this.dialogSign = true;
+            (/*failed*/) => {
+                this.dialogSign = true;
             }
         );
     },
