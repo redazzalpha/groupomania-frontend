@@ -192,7 +192,9 @@ export default {
             "access",
             "login",
             "register",
-            "setDialErr"
+            "setDialErr",
+            "setShowWelcome",
+
         ]),
         validateLogin() {
             if (this.$refs.loginForm.validate()) {
@@ -209,6 +211,9 @@ export default {
                         this.loading = false;
                     }, defines.TIMEOUT);
                 });
+
+                this.setShowWelcome(true)
+
 
             }
         },
@@ -244,8 +249,8 @@ export default {
                 this.$router.push(defines.HOME_URL);
             },
             (/*failed*/) => {
-                this.dialogSign = true;
-            }
+                this.dialogSign = true;                                                                             
+            }                               
         );
     },
 }

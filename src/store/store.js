@@ -17,6 +17,7 @@ export default new Vuex.Store({
         success: false,
         progress: false,
         showNav: false,
+        showWelcome: true,
     },
     mutations: {
 
@@ -38,10 +39,14 @@ export default new Vuex.Store({
         SET_PROGRESS(state, bool) {
             state.progress = bool;
         },
+        SET_SHOW_WELCOME(state, bool) {
+            state.showWelcome = bool;
+        }
     },
     actions: {
         access(context, authUrl) {
             return new Promise((resolve, reject) => {
+                //send request to access resource
                 Vue.http.head(authUrl)
                 .then(
                     (/*success*/) => {
@@ -50,17 +55,25 @@ export default new Vuex.Store({
                     },
                     (failed) => {
                         if (failed.status == 401) {
+                            // if  failed status is 401 
+                            // that means there is an error on token 
+                            // check storage and get refresh token from localStorage 
                             if (localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
                                 const grpm_store = JSON.parse(localStorage.grpm_store);
                                 if (grpm_store.data != null && grpm_store.data != undefined) {
                                     const tokenRfrsh = JSON.parse(localStorage.grpm_store).data.tokenRfrsh;
+                                    //send request to refresh token
                                     Vue.http.post(`${defines.SERVER_URL}${defines.TOKEN_URL}`, { tokenRfrsh })
                                         .then(
                                             success => {
+                                                // store new token on success
                                                 localStorage.grpm_store = JSON.stringify(success.body);
+                                                // resend request to access resource
                                                 Vue.http.head(authUrl)
                                                     .then(
                                                         () => {
+                                                            // don't need to stop progress bar here
+                                                            // cause refresh atcion already does it 
                                                             context.dispatch("refresh");
                                                             resolve();
                                                         },
@@ -71,22 +84,26 @@ export default new Vuex.Store({
                                                     );
                                             },
                                             failed => {
+                                                // on failed means refresh token is either expired or invalid
                                                 context.state.progress = false;
                                                 reject(failed);
                                             }
                                         );
                                 }
                                 else {
+                                    // if there is no data on localStore
                                     context.state.progress = false;
                                     reject(failed);
                                 }
                             }
                             else {
+                            // if there is no store on localStore
                                 context.state.progress = false;
                                 reject(failed);
                             } 
                         }
                         else {
+                            // if error other than 401 
                             context.state.progress = false;
                             reject(failed);
                         } 
@@ -393,6 +410,10 @@ export default new Vuex.Store({
         setProgress(context, bool) {
             context.commit('SET_PROGRESS', bool);
         },
+        setShowWelcome(context, bool) {
+            context.commit("SET_SHOW_WELCOME", bool);
+        },
+
     },
     modules: {
     },

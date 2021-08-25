@@ -2,6 +2,17 @@
     <auth tab="home" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h2 class="pa-5">Dernières publiations</h2>
+            <!--welcom-alert-->
+            <v-alert
+            class="text-center mx-auto"
+            color="deep-purple accent-4"
+            max-width="550px"
+            outlined
+            text
+            dismissible
+            :value="showWelcome"
+            >Bonjour {{ userData.pseudo }} !
+            </v-alert>
             <!--express your-self-card-->
             <v-card elevation="15" color="grey lighten-3" max-width=550 class="mx-auto mb-8 text-center" >
                 <v-container>
@@ -120,6 +131,7 @@ export default {
             "publications",
             "dialogErrText",
             "dialogErr",
+            "showWelcome"
         ]),
     },
     methods: {
@@ -128,6 +140,7 @@ export default {
             "uploadImg",
             "setDialErr",
             "refresh",
+            "setShowWelcome",
 
         ]),
         postPub(editorData) {
@@ -179,6 +192,7 @@ export default {
     },
     created() {
         this.refresh();
+        setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10);
     },
 }
 </script>
