@@ -137,11 +137,9 @@ export default {
     methods: {
         ...mapActions([
             "publish",
-            "uploadImg",
             "setDialErr",
             "refresh",
             "setShowWelcome",
-
         ]),
         postPub(editorData) {
             this.loading = true
