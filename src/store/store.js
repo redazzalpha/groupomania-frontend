@@ -171,16 +171,26 @@ export default new Vuex.Store({
             });
         },
         publish(context, editorData) {
-            if (editorData && services.isNotEmpty(editorData)) {
-                let pub = editorData.replace("\\", "/");
-                pub = pub.replace("'", "\\'");
-                Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, {publication: pub})
-                .then( () => context.dispatch("refresh") );
-            }
-            else {
-                context.state.dialogErrText = "Vous ne pouvez pas créer de publication vide";
-                context.state.dialogErr = true;
-            }  
+            return new Promise((resolve, reject) => {
+                if (editorData && services.isNotEmpty(editorData)) {
+                    let pub = editorData.replace("\\", "/");
+                    pub = pub.replace("'", "\\'");
+                    Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, {publication: pub})
+                        .then(
+                            (/*success*/) => {
+                                context.dispatch("refresh");
+                                resolve();
+                            },
+                            (/*failed*/) => {
+                                reject();
+                            }
+                        );
+                }
+                else {
+                    context.state.dialogErrText = "Vous ne pouvez pas créer de publication vide";
+                    context.state.dialogErr = true;
+                }  
+            });
         },
         comment(context, data) {
             // check if publication if empty   

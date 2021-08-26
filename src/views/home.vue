@@ -145,12 +145,41 @@ export default {
         ]),
         postPub(editorData) {
             this.loading = true
-            this.publish(editorData);
-            this.editorData = "";
-            setTimeout(() => {
+            this.publish(editorData)
+            .then( () => {
                 this.editorData = "";
-                this.loading = false;
-            }, defines.TIMEOUT);
+                setTimeout(() => {
+                    this.loading = false;
+                }, defines.TIMEOUT);
+            })
+            .catch( () => {
+                setTimeout(() => {
+                    this.loading = false;
+                }, defines.TIMEOUT);
+            });
+        },
+        putImg (e) { 
+            // put img function appends
+            //img into ckeditor field
+            this.loading = true;
+            const file = e.target.files[0];
+            const freader = new FileReader();
+            if(file)
+                freader.readAsDataURL(file);
+            else {
+                setTimeout(() => {
+                    this.loading = false;
+                }, defines.TIMEOUT);
+            }
+            freader.onload = () => {
+                let img = document.createElement('img');
+                img.src = freader.result;
+                img.width = "100%";
+                this.editorData += img.outerHTML;
+                setTimeout(() => {
+                    this.loading = false;
+                }, defines.TIMEOUT);
+            };
         },
         onPickFile () { 
             this.loading = true;
@@ -160,26 +189,6 @@ export default {
                 () => {
                     this.loading = false;
             }, defines.TIMEOUT);
-        },
-        putImg (e) { 
-            this.loading = true;
-            const file = e.target.files[0];
-
-           this.uploadImg(file)
-           .then( imgUrl => {
-                let img = document.createElement('img');
-                img.src = imgUrl;
-                img.width = "100%";
-                this.editorData += img.outerHTML;
-                setTimeout(() => {
-                    this.loading = false;
-                }, defines.TIMEOUT);
-           })
-           .catch( () => {
-                setTimeout(() => {
-                    this.loading = false;
-                }, defines.TIMEOUT);
-           });
         },
         // function used for show or unshow home view
         trigger(ready) {
