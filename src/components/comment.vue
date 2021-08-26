@@ -27,7 +27,7 @@
                         </v-row>
                         <v-row class="align-center pl-2">
                             <v-col cols=10 class="pa-0 pt-1 white--text" style="word-break: break-all;">{{ item.comText}}</v-col>
-                            <v-col v-show="item.writerId == userData.userId">
+                            <v-col v-show="item.writerId == userData.userId || userData.rights == 'super'">
                                 <v-btn 
                                 icon 
                                 color="red darken-3" 

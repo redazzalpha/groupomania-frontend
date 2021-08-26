@@ -1,32 +1,114 @@
 <template>
-    <!--header-->
-    <v-app-bar tag="header" app color="primary" height=115>
-        <!--navbar-->
-        <navbar/>
-        <!--header-container-->
+    <v-app-bar app tag="header" color="primary" class="d-flex flex-column" height=114>
         <v-container fluid>
-            <!--header-logo-->
+            <!--logo-row-->
             <v-row no-gutters>
                 <v-col>
                     <img class="header-logo" src="../assets/header_logo.svg" alt="header logo" width="70%" style="max-width: 300px;" />
                 </v-col>
             </v-row>
-            <!--toolbar-->
-            <v-row no-gutters>
-                <toolbar />
+            <!--toolbar-row-->
+            <v-row justify="center" no-gutters style="background-color: #3F51B5;">
+                <!--navbar-toggler-button-->
+                <v-col cols="2" class="d-flex justify-center">
+                    <v-app-bar-nav-icon @click.stop="drawer = !drawer" title="Menu"></v-app-bar-nav-icon>
+                </v-col>
+                <!--toolbar-icons-->
+                <v-col cols="2" class="d-flex justify-center">
+                    <v-btn icon dark :to="defines.PROFIL_URL" title="Mon profil"><v-icon>mdi-account</v-icon></v-btn>
+                </v-col>
+                <v-col cols="2" class="d-flex justify-center">
+                    <v-hover v-model="hover">
+                        <v-btn 
+                        icon dark 
+                        :to="defines.NOTIFICATION_URL" 
+                        title="Mes notifications"
+                        >
+                            <v-badge :value="notifCount" :dot="!hover" :content="notifCount" color="warning">
+                                    <v-icon>mdi-bell-ring</v-icon>
+                            </v-badge>
+                        </v-btn>
+                    </v-hover>
+                </v-col>
+                <v-col cols="2" class="d-flex justify-center">
+                    <v-btn icon dark :to="defines.TEAM_URL" title="Voir l'équipe"><v-icon>mdi-account-group</v-icon></v-btn>
+                </v-col>
+                <v-col cols="2" class="d-flex justify-center">
+                    <v-btn icon dark :to="defines.LOGOUT_URL" title="Se déconnecter"><v-icon>mdi-logout</v-icon></v-btn>
+                </v-col>
             </v-row>
         </v-container>
-    </v-app-bar>
+        <!--navbar-collapse-->
+        <v-navigation-drawer
+        app
+        v-model="drawer"
+        absolute
+        temporary
+        >
+            <v-list-item>
+                <v-list-item-avatar>
+                    <v-img v-if="getUserImg" :src="getUserImg"></v-img>
+                    <v-icon v-else color="primary">mdi-account-circle</v-icon>
+                </v-list-item-avatar>
+
+                <v-list-item-content>
+                <v-list-item-title v-if="userData">{{ userData.pseudo }}</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
+            <v-divider></v-divider>
+
+            <v-list dense>
+                <v-list-item
+                v-for="item in listItems"
+                :key="item.title"
+                :to="item.url"
+                >
+                    <v-list-item-icon>
+                        <v-icon>{{ item.icon }}</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+        </v-navigation-drawer>
+    </v-app-bar >
 </template>
 
 <script>
-import navbar from "../components/navbar.vue";
-import toolbar from '../components/toolbar.vue';
+import { mapState } from "vuex";
+import defines from "../defines/define";
 export default {
-    name: "hdr",
-    components: {
-        navbar,
-        toolbar,
+    name: "header",
+    data() {
+        return {
+            defines: defines,
+            hover: false,
+            drawer: false,
+            listItems: [
+                { title: 'Accueil', url: defines.HOME_URL, icon: 'mdi-home' },
+                { title: 'Mon profil', url: defines.PROFIL_URL, icon: 'mdi-account' },
+                { title: 'Se déconnecter', url: defines.LOGOUT_URL, icon: 'mdi-logout' },
+            ],
+        };
+    },
+    computed: {
+        ...mapState([
+            "userData",
+            "notifs",
+        ]),
+        getUserImg() {
+            if(this.userData)
+                return this.userData.img;
+            return null;
+        },
+        notifCount() {
+            if(this.notifs)
+                return this.notifs.filter(item => item.state === "unread").length;
+            return 0;
+        }
     },
 }
 </script>

@@ -18,7 +18,6 @@ export default new Vuex.Store({
         dialogErr: false,
         success: false,
         progress: false,
-        showNav: false,
         showWelcome: true,
     },
     mutations: {
@@ -323,6 +322,8 @@ export default new Vuex.Store({
         uptImgProf(context, file) {
             return new Promise((resolve, reject) => {
 
+                if (!file)
+                    return reject();
                 const formData = new FormData();
                 formData.append("image", file, file.name);
     
@@ -400,6 +401,7 @@ export default new Vuex.Store({
         },
         resetStore(context) {
             context.state.userData = [];
+            context.state.notifs = [];
             localStorage.removeItem("vuex");
             localStorage.removeItem("grpm_store");
         },

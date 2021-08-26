@@ -9,7 +9,7 @@
             <v-container grid-list-xs class="">
                 <!--user-img-row-->
                 <v-row class="justify-center">
-                    <v-col class="d-flex flex-grow-0">
+                    <v-col class="d-flex flex-grow-0" style="border: solid blue 3px;">
                         <v-avatar size="100" color="primary">
                             <v-img v-if="item.img" :src="item.img"  />
                             <v-icon v-else size= 50 color="white">mdi-account</v-icon>

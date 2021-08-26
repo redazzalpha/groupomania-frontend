@@ -22,7 +22,7 @@
                         <v-container class="pa-0 pl-1">
                             <v-row no-gutters class="subtitle-1 blue--text text--darken-4">
                                 <v-col>{{ item.pseudo }}</v-col>
-                                <v-col class="text-right" v-show="item.userId == userData.userId">
+                                <v-col class="text-right" v-show="item.userId == userData.userId || userData.rights == 'super'">
                                     <v-btn
                                     icon 
                                     color="grey lighten-1"
@@ -152,6 +152,7 @@ export default {
             geditorData(text) {
                 return  this.editorData = text;
             },
+
             comText: "",
             color: "",
             loading: false,
