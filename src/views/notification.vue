@@ -77,8 +77,6 @@
                         </v-card>
                 </template>
             </v-hover>
-
-
         </slot>
     </auth>
 </template>

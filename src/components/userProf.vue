@@ -9,11 +9,8 @@
             <v-container grid-list-xs class="">
                 <!--user-img-row-->
                 <v-row class="justify-center">
-                    <v-col class="d-flex flex-grow-0" style="border: solid blue 3px;">
-                        <v-avatar size="100" color="primary">
-                            <v-img v-if="item.img" :src="item.img"  />
-                            <v-icon v-else size= 50 color="white">mdi-account</v-icon>
-                        </v-avatar>
+                    <v-col class="d-flex flex-grow-0">
+                        <avatar :item="item" :size=100></avatar>
                     </v-col>
                 </v-row>
                 <!--description-row-->
@@ -67,10 +64,12 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import pubcard from "../components/pubcard.vue"
+import avatar from "../components/avatar.vue"
 export default {
     name: "userProf",
     components: {
         pubcard,
+        avatar,
     },
     props: {
         dialog: Object,

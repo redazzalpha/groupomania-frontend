@@ -1,7 +1,7 @@
 <template>
     <v-app id="wrapper">
         <!--header-->
-        <hdr></hdr>
+        <appbar></appbar>
         <v-main>
             <v-container fluid>
                 <progressBar :model="progress"></progressBar>
@@ -13,12 +13,11 @@
 
 <script>
 import { mapState } from 'vuex';
-//import hdr from "./components/header.vue";
-import hdr from "./components/header.vue";
+import appbar from "./components/appbar.vue";
 import progressBar from "./components/progressBar.vue";
 export default {
     components: {
-        hdr,
+        appbar,
         progressBar,
     },
     computed: {

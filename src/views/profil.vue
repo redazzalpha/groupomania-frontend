@@ -7,10 +7,7 @@
                 <!--main-card-container-title-->
                 <v-card-title class="d-flex justify-center">
                     <div style="position: relative">
-                        <v-avatar size=100>
-                            <v-img v-if="userData.img" :src="userData.img" />
-                            <v-icon v-else size=100 color="primary">mdi-account-circle</v-icon>
-                        </v-avatar>
+                        <avatar :item="userData" :size=100></avatar>
                         <v-btn 
                             icon 
                             color="primary" 
@@ -203,6 +200,7 @@
 import { mapState, mapActions } from 'vuex';
 import auth from "../components/auth.vue";
 import errordial from "../components/errordial.vue";
+import avatar from "../components/avatar.vue";
 import defines from '../defines/define';
 import services from '../services/app.service';
 export default {
@@ -210,6 +208,7 @@ export default {
     components: {
         auth,
         errordial,
+        avatar,
     },
     data() {
         return {

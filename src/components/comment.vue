@@ -13,10 +13,7 @@
             <v-row v-if="item.parentId == pubId" class="pl-5 pr-5 mb-1">
                 <!--avatar-->
                 <v-col v-if="item.parentId == pubId" class="flex-grow-0 d-flex align-center pr-2">
-                    <v-avatar size=40>
-                        <v-img v-if="item.img" :src="item.img" />
-                        <v-icon v-else size=40>mdi-account-circle</v-icon>
-                    </v-avatar>
+                        <avatar :item="item" :size=40></avatar>
                 </v-col>
                 <v-col v-if="item.parentId == pubId">
                     <v-container class="box body-2 pa-3" style="border: solid 1px grey; border-radius: 7px; background-color:#2962FF; box-shadow: 5px 5px 5px #424242; position: relative; z-index: 1;">
@@ -50,8 +47,12 @@
 <script>
 import { mapState, mapActions} from 'vuex';
 import defines from '../defines/define';
+import avatar from '../components/avatar.vue';
 export default {
     name: "comment",
+    components: {
+        avatar,
+    },
     props: {
         pubId: Number,
     },

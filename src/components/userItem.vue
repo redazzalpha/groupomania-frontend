@@ -4,10 +4,7 @@
             <v-container grid-list-xs class="pa-0">
                 <v-row>
                     <v-col class="d-flex flex-grow-0">
-                        <v-avatar size="60" color="primary">
-                            <v-img v-if="item.img" :src="item.img"  />
-                            <v-icon v-else size= 50 color="white">mdi-account</v-icon>
-                        </v-avatar>
+                        <avatar :item="item" :size=60></avatar>
                     </v-col>
                     <v-col class="d-flex align-center justify-center">
                         {{ item.pseudo }}
@@ -19,8 +16,12 @@
 </template>
 
 <script>
+import avatar from '../components/avatar.vue';
 export default {
     name: "usercard",
+    components: {
+        avatar,
+    },
     props: {
         hover: Boolean,
         item: Object,

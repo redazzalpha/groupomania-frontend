@@ -1,5 +1,5 @@
 <template>
-    <v-app-bar app tag="header" color="primary" class="d-flex flex-column" height=114>
+    <v-app-bar app color="primary" class="d-flex flex-column" height=114>
         <v-container fluid>
             <!--logo-row-->
             <v-row no-gutters>
@@ -47,8 +47,7 @@
         >
             <v-list-item>
                 <v-list-item-avatar>
-                    <v-img v-if="getUserImg" :src="getUserImg"></v-img>
-                    <v-icon v-else color="primary">mdi-account-circle</v-icon>
+                        <avatar :item="userData" :size=40></avatar>
                 </v-list-item-avatar>
 
                 <v-list-item-content>
@@ -80,8 +79,12 @@
 <script>
 import { mapState } from "vuex";
 import defines from "../defines/define";
+import avatar from "../components/avatar.vue";
 export default {
-    name: "header",
+    name: "appbar",
+    components: {
+        avatar,
+    },
     data() {
         return {
             defines: defines,

@@ -23,10 +23,7 @@
                         </v-col>
                         <v-col class="d-flex flex-row-reverse flex-grow-0">
                             <v-btn to="/app/profil" title="Accéder au profil" icon class="ma-3">
-                                <v-avatar size=60>
-                                    <v-img v-if="userData.img" :src="userData.img"  />
-                                    <v-icon v-else size=60 color="primary">mdi-account-circle</v-icon>
-                                </v-avatar>
+                                <avatar :item="userData"></avatar>
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -82,6 +79,7 @@ import defines from "../defines/define";
 import errordial from "../components/errordial.vue";
 import pubcard from "../components/pubcard.vue";
 import btnClose from "../components/btnClose.vue";
+import avatar from "../components/avatar.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import '@ckeditor/ckeditor5-build-classic/build/translations/fr';
 export default {
@@ -91,6 +89,7 @@ export default {
         errordial,
         btnClose,
         pubcard,
+        avatar,
     },
     data(){
         return {

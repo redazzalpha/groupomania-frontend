@@ -13,10 +13,7 @@
                 <!--title-row-->
                 <v-row no-gutters>
                     <v-col class="flex-grow-0">
-                        <v-avatar size=60>
-                            <v-img v-if="item.img != 'null'" :src="item.img" width=50% />
-                            <v-icon v-else size=65 >mdi-account-circle</v-icon>
-                        </v-avatar>
+                        <avatar :item="item" :size=65></avatar>
                     </v-col>
                     <v-col>
                         <v-container class="pa-0 pl-1">
@@ -101,10 +98,7 @@
                             >
 
                                 <template v-slot:prepend>
-                                    <v-avatar size=40>
-                                        <v-img v-if="userData.img" :src="userData.img" />
-                                        <v-icon v-else size=40 color="primary">mdi-account-circle</v-icon>
-                                    </v-avatar>
+                                    <avatar :item="userData" :size=45></avatar>
                                 </template>
                                 <template v-slot:append>
                                     <v-btn 
@@ -132,12 +126,14 @@ import { mapState, mapActions } from 'vuex';
 import defines from "../defines/define";
 import services from '../services/app.service';
 import comment from "../components/comment.vue";
+import avatar from "../components/avatar.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default {
     name: "pubcard",
     components: {
         comment,
+        avatar,
     },
     props: {
         item: Object,
