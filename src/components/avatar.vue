@@ -1,7 +1,7 @@
 <template>
     <v-avatar :size="size">
-        <v-img v-if="item.img" :src="item.img"  />
-        <v-img v-else-if="item.rights == 'super'" src="http://localhost:4000/img/super_user.png" />
+        <v-img v-if="item && item.img" :src="item.img"  />
+        <v-img v-else-if="item && item.rights == 'super'" src="http://localhost:4000/img/super_user.png" />
         <v-icon v-else :size="size" color="primary">mdi-account-circle</v-icon>
     </v-avatar>
 </template>

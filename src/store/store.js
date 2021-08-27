@@ -10,7 +10,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        userData: null,
+        userData: {},
         publications: [],
         comments: [],
         notifs: [],
@@ -188,6 +188,7 @@ export default new Vuex.Store({
                 else {
                     context.state.dialogErrText = "Vous ne pouvez pas créer de publication vide";
                     context.state.dialogErr = true;
+                    reject();
                 }  
             });
         },
@@ -400,8 +401,15 @@ export default new Vuex.Store({
             });
         },
         resetStore(context) {
-            context.state.userData = [];
+            context.state.userData = {};
+            context.state.publications = [];
+            context.state.comments = [];
             context.state.notifs = [];
+            context.state.dialogErrText = "";
+            context.state.dialogErr = false;
+            context.state.success = false;
+            context.state.progress = false;
+            context.state.showWelcome = false;
             localStorage.removeItem("vuex");
             localStorage.removeItem("grpm_store");
         },

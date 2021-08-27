@@ -2,7 +2,7 @@
     <v-row class="comments">
         <!--Comment-title-->
         <v-container>
-            <v-row v-if="comments.length >= 1">
+            <v-row v-if="gotCom">
                 <v-col class="text-decoration-underline">
                     Commentaires:
                 </v-col>
@@ -66,6 +66,9 @@ export default {
             "userData", 
             "comments",
         ]),
+        gotCom() {
+            return this.comments.find(item => item.parentId == this.pubId);
+        },
     },
     methods: {
         ...mapActions([
