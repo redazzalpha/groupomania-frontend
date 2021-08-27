@@ -29,8 +29,8 @@
             </v-card>
             <!--user-item-block-->
             <v-container grid-list-xs>
-                <v-row>
-                    <v-col class="d-sm-flex ">
+                <v-row class="d-flex flex-wrap">
+                    <v-col class="d-sm-flex flex-wrap justify-center">
                         <!--dialog-->
                         <v-dialog
                         v-for="item in userList" :key="item.userId"
@@ -39,21 +39,14 @@
                         >
                             <!--dialog-activator-->
                             <template v-slot:activator="{ on, attrs }">
-                                <!--user-item-->
-                                <v-container grid-list-xs v-on="on" v-bind="attrs">
-                                    <v-row class="d-flex justify-center">
-                                        <v-col>
-                                            <!--user-item-->
-                                            <userItem
-                                            :hover="hover"
-                                            :item="item"
-                                            ></userItem>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
+                                <v-col v-on="on" v-bind="attrs"  class="pa-3 col-sm-6">
+                                    <!--user-Item-->
+                                    <userItem
+                                    :hover="hover"
+                                    :item="item"
+                                    ></userItem>
+                                </v-col>
                             </template>
-
-
                             <!--dialog-expanded-->
                             <template v-slot:default="dialog">
                                 <!--user-profil-card-->
