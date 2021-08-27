@@ -25,8 +25,8 @@
                                     color="grey lighten-1"
                                     title="Supprimer la publication"
                                     style="position: absolute; right: 0px; top: 5px"
-                                    :loading="loading4"
-                                    :disabled="loading4"
+                                    :loading="loading3"
+                                    :disabled="loading3"
                                     @click="deletePub(item.pubId)"
                                     >
                                         <v-icon>mdi-close-circle</v-icon>
@@ -66,8 +66,8 @@
                         <v-btn 
                         plain icon
                         title="Je n'aime pas" 
-                        :loading="loading2" 
-                        :disabled="loading2" 
+                        :loading="loading" 
+                        :disabled="loading" 
                         @click="postDislike({pubId: item.pubId, userIdDislike: item.userIdDislike, userIdLike: item.userIdLike})"
                         >
                             <v-icon
@@ -105,8 +105,8 @@
                                     title="Envoyer" 
                                     icon size=40 
                                     color="primary" 
-                                    :loading="loading3"
-                                    :disabled="loading3"
+                                    :loading="loading2"
+                                    :disabled="loading2"
                                     @click="postCom({authorId: item.authorId, parentId: item.pubId, comText})"
                                     >
                                         <v-icon>mdi-send</v-icon>
@@ -154,7 +154,6 @@ export default {
             loading: false,
             loading2: false,
             loading3: false,
-            loading4: false,
             rules: [
                 services.max255,
             ],
@@ -209,7 +208,7 @@ export default {
             setTimeout(() => {this.loading = false}, defines.TIMEOUT);
         },
         postDislike(data) {
-            this.loading2 = true;
+            this.loading = true;
             const userIdLike = data.userIdLike;
             const userIdDislike = data.userIdDislike;
 
@@ -234,12 +233,12 @@ export default {
                 this.undislike(data);
             }
 
-            setTimeout(() => {this.loading2 = false}, defines.TIMEOUT);
+            setTimeout(() => {this.loading = false}, defines.TIMEOUT);
         },
         deletePub(pubId) {
-            this.loading4 = true;
+            this.loading3 = true;
             this.delPub(pubId),
-            setTimeout(() => { this.loading4 = false }, defines.TIMEOUT);
+            setTimeout(() => { this.loading3 = false }, defines.TIMEOUT);
         },
 
     },
