@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import defines from "../defines/define";
 import auth from "../components/auth.vue";
 import userItem from "../components/userItem.vue";
@@ -88,9 +89,10 @@ export default {
             fieldValue: "",
         };
     },
-    computed: {
-    },
     methods: {
+        ...mapActions([
+            "setProgress",
+        ]),
         findUser() {
             if(this.fieldValue != "") {
                 let regex = new RegExp(this.fieldValue, "gi");
@@ -101,17 +103,17 @@ export default {
             else this.userList = this.users;
         },
         getUsers() {
+            this.setProgress(true);
             this.$http.get(`${defines.SERVER_URL}${defines.USERS_URL}`)
             .then(
                 success => {
                     this.users = success.body.results;
                     this.userList = this.users;
+                    setTimeout(() => this.setProgress(false) , defines.TIMEOUT);
                 },
-                (/*failed*/) => {
-
-                }
+                (/*failed*/) => setTimeout(() => this.setProgress(false) , defines.TIMEOUT)
             );
-        },
+        },                          
         refresh() {
             this.getUsers();
         },

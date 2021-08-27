@@ -8,6 +8,7 @@
                 <router-view></router-view>
             </v-container>
         </v-main>
+        <ftr></ftr>
     </v-app>
 </template>
 
@@ -15,10 +16,12 @@
 import { mapState } from 'vuex';
 import appbar from "./components/appbar.vue";
 import progressBar from "./components/progressBar.vue";
+import ftr from "./components/footer.vue";
 export default {
     components: {
         appbar,
         progressBar,
+        ftr,
     },
     computed: {
         ...mapState([

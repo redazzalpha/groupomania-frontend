@@ -198,7 +198,6 @@ export default {
     },
     created() {
         this.refresh();
-        setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10);
     },
 }
 </script>

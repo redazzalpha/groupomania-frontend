@@ -5,7 +5,8 @@
             <!--main-card-container-->
             <v-card elevation=10 class="pb-4 ">
                 <!--main-card-container-title-->
-                <v-card-title class="d-flex justify-center">
+                <v-card-title class="d-flex flex-column justify-center">
+                    <div class="display-1 pa-2 blue--text" style="position: relative; right: 80px; top: 50px">{{ userData.pseudo }}</div>
                     <div style="position: relative">
                         <avatar :item="userData" :size=100></avatar>
                         <v-btn 
