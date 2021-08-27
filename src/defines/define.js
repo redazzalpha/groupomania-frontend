@@ -1,6 +1,7 @@
 const defines = {
     // urls
-    SERVER_URL: "http://localhost:4000",
+    //SERVER_URL: "http://localhost:4000",
+    SERVER_URL: " https://groupomania-webdev.herokuapp.com",
     ROOT_URL: "/",
     LOGIN_URL: "/login",
     SIGNUP_URL: "/signup",
@@ -30,6 +31,7 @@ const defines = {
     IMG_URL: "/app/img",
     TOKEN_URL: "/app/token",
     DEL_ACCOUNT_URL: "/app/account",
+    DEF_SU_IMG_URL: "/img/super_user.png",
     UNKNOWN_URL: "/*",
     // variables
     TIMEOUT: 1000,
