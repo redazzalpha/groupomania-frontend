@@ -46,6 +46,9 @@ export default new Vuex.Store({
     },
     actions: {
         access(context, authUrl) {
+            // access function is used to access resources
+            // this function should be used only by auth component
+            // and register view
             return new Promise((resolve, reject) => {
                 //send request to access resource
                 Vue.http.head(authUrl)
