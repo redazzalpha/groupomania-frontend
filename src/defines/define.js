@@ -1,7 +1,6 @@
 const defines = {
     // urls
-    //SERVER_URL: "http://localhost:4000",
-    SERVER_URL: " https://groupomania-webdev.herokuapp.com",
+    SERVER_URL: "http://localhost:4000",
     ROOT_URL: "/",
     LOGIN_URL: "/login",
     SIGNUP_URL: "/signup",
