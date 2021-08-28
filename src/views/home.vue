@@ -82,6 +82,8 @@ import btnClose from "../components/btnClose.vue";
 import avatar from "../components/avatar.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import '@ckeditor/ckeditor5-build-classic/build/translations/fr';
+//let tab = [];
+
 export default {
     name: "home",
     components: {
