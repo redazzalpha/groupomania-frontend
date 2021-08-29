@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-card-actions>
-            <v-btn @click="eventAtClick">{{ text }}</v-btn>
+            <v-btn tag="button" @click="eventAtClick">{{ text }}</v-btn>
         </v-card-actions>
     </v-row>
 </template>

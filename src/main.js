@@ -5,7 +5,6 @@ import store from './store/store';
 import vuetify from './plugins/vuetify';
 import vueRessource from 'vue-resource';
 import CKEditor from '@ckeditor/ckeditor5-vue2';
-//import CKEditor from 'ckeditor4-vue';
 
 Vue.use(CKEditor);
 Vue.use(vueRessource);
@@ -29,3 +28,4 @@ new Vue({
     vuetify,
     render: h => h(app),
 }).$mount('#app');
+

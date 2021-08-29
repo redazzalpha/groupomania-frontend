@@ -1,7 +1,7 @@
 <template>
-    <auth tab="notification" :authUrl="authUrl"  @onReady="trigger">
+    <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h2 class="pa-5">Notifications</h2>
+            <h1 class="pa-5">Notifications</h1>
             <div v-if="getEmpty" class="text-center title">Vous n'avez pas de notifications !</div>
             <!--notification-item-->
             <v-hover v-for="item in notifs" :key="item.comId" style="overflow: hidden">

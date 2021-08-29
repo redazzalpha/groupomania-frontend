@@ -40,10 +40,8 @@ export default {
     },
     computed: {
         modelFct: { 
-            get() { 
-                return  this.model;
-            }, 
-            set() {} 
+            get() { return  this.model;}, 
+            set(v) { this.model = v;} 
         }
     },
     methods: {

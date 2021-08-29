@@ -42,7 +42,7 @@ export default new Vuex.Store({
         },
         SET_SHOW_WELCOME(state, bool) {
             state.showWelcome = bool;
-        }
+        },
     },
     actions: {
         access(context, authUrl) {
@@ -322,6 +322,30 @@ export default new Vuex.Store({
                         },
                     );
             });
+        },
+        pubScroll(context) {
+            if (context.state.publications) {
+                let size = context.state.publications? context.state.publications.length: 0;
+                let lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
+                let tab = [];
+                window.onscroll = () => {
+                    size = context.state.publications? context.state.publications.length: 0;
+                    lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
+                    tab = [];
+        
+                    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                        Vue.http.get(`${defines.SERVER_URL}${defines.PUBLISH_SCROLL_URL}`, {params: { lpubid }})
+                        .then( 
+                            results => {
+                                tab  = context.state.publications;
+                                for(let item of results.body.results)
+                                tab.push(item);
+                                context.state.publication = tab;
+                            },
+                        );
+                    }
+                };
+            }
         },
         uptImgProf(context, file) {
             return new Promise((resolve, reject) => {

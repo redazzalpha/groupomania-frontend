@@ -19,6 +19,7 @@ const defines = {
     READ_NOTIFICATION_URL: "/app/notification/read",
     LOGOUT_URL: "/app/logout",
     PUBLISH_URL: "/app/publish",
+    PUBLISH_SCROLL_URL: "/app/publish/scroll",
     PUBLISH_LIKE_URL: "/app/publish/like",
     PUBLISH_DISLIKE_URL: "/app/publish/dislike",
     PUBLISH_UNLIKE_URL: "/app/publish/unlike",

@@ -1,7 +1,13 @@
 <template>
     <v-footer color="white" padless class=" mt-5">
         <v-row justify="center" no-gutters>
-            <v-btn v-for="item in icons" :key="item.link" :href="item.link" text plain>
+            <v-btn 
+            v-for="item in icons" 
+            text plain
+            tag="button"
+            :key="item.link" 
+            :href="item.link" 
+            >
                 <v-icon>{{ item.icon }}</v-icon>
             </v-btn>
             <v-col class=" py-4 text-center" cols="12" >

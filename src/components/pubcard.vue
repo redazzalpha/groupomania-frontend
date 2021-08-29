@@ -25,6 +25,7 @@
                                     color="grey lighten-1"
                                     title="Supprimer la publication"
                                     style="position: absolute; right: 0px; top: 5px"
+                                    tag="button"
                                     :loading="loading3"
                                     :disabled="loading3"
                                     @click="deletePub(item.pubId)"
@@ -44,7 +45,7 @@
                 <!--publication-row-->
                 <v-row>
                     <v-col class="test">
-                        <ckeditor :disabled="true" :editor="editor" :value="geditorData(item.text)" :config="editorConfig"></ckeditor> 
+                        <ckeditor tag="textarea" :disabled="true" :editor="editor" :value="geditorData(item.text)" :config="editorConfig"></ckeditor> 
                     </v-col>
                 </v-row>
                 <!--horizontal-line-separation-->
@@ -55,6 +56,7 @@
                         <v-btn 
                         plain icon
                         title="J'aime"
+                        tag="button"
                         :loading="loading" 
                         :disabled="loading" 
                         @click="postLike({pubId: item.pubId, userIdLike: item.userIdLike, userIdDislike: item.userIdDislike})"
@@ -66,6 +68,7 @@
                         <v-btn 
                         plain icon
                         title="Je n'aime pas" 
+                        tag="button"
                         :loading="loading" 
                         :disabled="loading" 
                         @click="postDislike({pubId: item.pubId, userIdDislike: item.userIdDislike, userIdLike: item.userIdLike})"
@@ -84,8 +87,6 @@
                         <v-row>
                             <v-textarea 
                             v-model="comText" 
-                            background-color="white" 
-                            placeholder="Votre commentaire" 
                             solo 
                             rounded 
                             rows="1" 
@@ -94,6 +95,9 @@
                             outlined 
                             no-resize
                             counter
+                            background-color="white" 
+                            placeholder="Votre commentaire"
+                            tag="textarea"
                             :rules="rules"
                             >
 
@@ -105,6 +109,7 @@
                                     title="Envoyer" 
                                     icon size=40 
                                     color="primary" 
+                                    tag="button"
                                     :loading="loading2"
                                     :disabled="loading2"
                                     @click="postCom({authorId: item.authorId, parentId: item.pubId, comText})"

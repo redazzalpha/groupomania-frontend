@@ -2,13 +2,15 @@
     <v-app id="wrapper">
         <!--header-->
         <appbar></appbar>
-        <v-main>
-            <v-container fluid>
-                <progressBar :model="progress"></progressBar>
-                <router-view></router-view>
-            </v-container>
+        <v-main tag="main">
+            <section>
+                <v-container fluid>
+                    <progressBar tag="progress" :model="progress"></progressBar>
+                    <router-view></router-view>
+                </v-container>
+            </section>
         </v-main>
-        <ftr></ftr>
+        <ftr tag="footer"></ftr>
     </v-app>
 </template>
 

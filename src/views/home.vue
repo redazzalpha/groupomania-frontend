@@ -1,7 +1,7 @@
 <template>
-    <auth tab="home" :authUrl="authUrl"  @onReady="trigger">
+    <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h2 class="pa-5">Dernières publiations</h2>
+            <h1 class="pa-5">Dernières publiations</h1>
             <!--welcom-alert-->
             <v-alert
             class="text-center mx-auto"
@@ -11,7 +11,7 @@
             text
             dismissible
             :value="showWelcome"
-            >Bonjour {{ userData.pseudo }} !
+            >Bonjour {{ userData.pseudo }} ! &#x1F44B;
             </v-alert>
             <!--express your-self-card-->
             <v-card elevation="15" color="grey lighten-3" max-width=550 class="mx-auto mb-8 text-center" >
@@ -29,7 +29,7 @@
                     </v-row>
                 </v-container>
                 <v-card-text>
-                    <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"> </ckeditor> 
+                    <ckeditor tag="textarea" :editor="editor" v-model="editorData" :config="editorConfig"> </ckeditor> 
                 </v-card-text>
                 <v-card-actions>
                     <!--buttons-->
@@ -39,6 +39,7 @@
                                 <v-btn 
                                 text
                                 small 
+                                tag="button"
                                 :loading="loading"
                                 :disabled="loading"
                                 @click="item.action(editorData)" 
@@ -82,8 +83,6 @@ import btnClose from "../components/btnClose.vue";
 import avatar from "../components/avatar.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import '@ckeditor/ckeditor5-build-classic/build/translations/fr';
-//let tab = [];
-
 export default {
     name: "home",
     components: {
@@ -124,6 +123,7 @@ export default {
                 {label: "Ajouter une image", class: "flex-grow-0",action: this.onPickFile},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.postPub},
             ],
+
         };
     },
     computed: {
@@ -141,6 +141,7 @@ export default {
             "setDialErr",
             "refresh",
             "setShowWelcome",
+            "pubScroll",
         ]),
         postPub(editorData) {
             this.loading = true
@@ -198,8 +199,10 @@ export default {
             this.setDialErr(false)
         },
     },
-    created() {
+    created() { 
         this.refresh();
+        this.pubScroll();
+        setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10)
     },
 }
 </script>

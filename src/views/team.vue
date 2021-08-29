@@ -1,7 +1,7 @@
 <template>
-    <auth tab="team" :authUrl="authUrl"  @onReady="trigger">
+    <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h2 class="pa-5">&Eacute;quipe</h2>
+            <h1 class="pa-5">&Eacute;quipe</h1>
             <!--search-field-->
             <v-card max-width=550 class="mx-auto elevation-12" color="grey lighten-3">
                 <v-container grid-list-xs>
@@ -10,7 +10,8 @@
                         <v-text-field
                             autofocus
                             outlined
-                            label="Trouver un utilisateur "
+                            label="Trouver un utilisateur"
+                            tag="textarea"
                             v-model="fieldValue"
                             @input="findUser"
                         >
@@ -44,6 +45,7 @@
                                     <userItem
                                     :hover="hover"
                                     :item="item"
+                                    tag="button"
                                     ></userItem>
                                 </v-col>
                             </template>
@@ -92,6 +94,7 @@ export default {
     methods: {
         ...mapActions([
             "setProgress",
+            "pubScroll",
         ]),
         findUser() {
             if(this.fieldValue != "") {

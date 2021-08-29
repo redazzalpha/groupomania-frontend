@@ -1,5 +1,5 @@
 <template>
-    <v-app-bar app color="primary" class="d-flex flex-column" height=114>
+    <v-app-bar app tag="header" color="primary" class="d-flex flex-column" height=114>
         <v-container fluid>
             <!--logo-row-->
             <v-row no-gutters>
@@ -44,6 +44,7 @@
         v-model="drawer"
         absolute
         temporary
+        tag="nav"
         >
             <v-list-item>
                 <v-list-item-avatar>
@@ -63,7 +64,7 @@
                 :key="item.title"
                 :to="item.url"
                 >
-                    <v-list-item-icon>
+                    <v-list-item-icon tag="button">
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-item-icon>
 

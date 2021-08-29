@@ -29,6 +29,7 @@
                                 icon 
                                 color="red darken-3" 
                                 style="position: absolute; top: 36%; right: -2px;" 
+                                tag="button"
                                 :loading="loading"
                                 :disabled="loading"
                                 @click="postDelCom({comId: item.comId, pubId: item.pubId})"
