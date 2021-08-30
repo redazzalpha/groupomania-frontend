@@ -3,8 +3,25 @@
         <slot v-if="showPage">
             <h1 class="pa-5">Notifications</h1>
             <div v-if="getEmpty" class="text-center title">Vous n'avez pas de notifications !</div>
+            <!--delete-read-all-button-->
+            <div v-else class="pa-3 pt-0">
+                <v-btn 
+                small
+                plain
+                text
+                tag="button"
+                @click="readAllNotifs"
+                >Marquer tout comme lu</v-btn>
+                <v-btn 
+                small
+                plain
+                text
+                tag="button"
+                @click="delAllNotifs"
+                >Supprimer tout</v-btn>
+            </div>
             <!--notification-item-->
-            <v-hover v-for="item in notifs" :key="item.comId" style="overflow: hidden">
+            <v-hover v-for="item in notifs" :key="item.notifId" style="overflow: hidden">
                     <template v-slot:default="{ hover }">
                         <v-card shaped color="grey lighten-2" max-width=550 class="mx-auto mb-5 transition-swing" :elevation="hover ? 11 : 4">                            
                             <v-container class="pb-0" >
@@ -114,7 +131,7 @@ export default {
         ...mapState([
             "userData",
             "publications",
-            "notifs"
+            "notifs",
         ]),
         getEmpty() {
             return !this.notifs.length >= 1;
@@ -124,12 +141,20 @@ export default {
         ...mapActions([
             "readNotif",
             "delNotif",
+            "readAll",
+            "deleteAll",
             "refresh",
         ]),
         postDelNotif(notifId) {
             this.loading = true;
             this.delNotif(notifId);
             setTimeout(() => {this.loading = false; }, defines.TIMEOUT);
+        },
+        readAllNotifs() {
+            this.readAll();
+        },
+        delAllNotifs() {
+            this.deleteAll();
         },
         // function used for show or unshow home view
         trigger(ready) {

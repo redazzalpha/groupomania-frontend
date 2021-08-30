@@ -352,6 +352,34 @@ export default new Vuex.Store({
                 };
             }
         },
+        readAll(context) {
+            return new Promise((resolve, reject) => {
+                Vue.http.patch(`${defines.SERVER_URL}${defines.READ_ALL_URL}`, { notifId: context.state.notifs[0].notifId })
+                    .then(
+                        () => {
+                            context.dispatch("refresh");
+                            resolve();
+                        },
+                        () => {
+                            reject();
+                        },
+                    );
+            });
+        },
+        deleteAll(context) {
+            return new Promise((resolve, reject) => {
+                Vue.http.patch(`${defines.SERVER_URL}${defines.DELETE_ALL_URL}`, { notifId: context.state.notifs[0].notifId })
+                    .then(
+                        () => {
+                            context.dispatch("refresh");
+                            resolve();
+                        },
+                        () => {
+                            reject();
+                        },
+                    );
+            });
+        },
         superUser(context, id) {
             return new Promise((resolve, reject) => {
 

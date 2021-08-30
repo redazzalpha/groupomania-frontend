@@ -20,6 +20,8 @@
                     <v-btn
                         v-bind="attrs"
                         v-on="on"
+                        text
+                        plain
                     >
                     <v-icon>mdi-menu</v-icon>
                     </v-btn>

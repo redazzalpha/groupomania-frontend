@@ -34,6 +34,8 @@ const defines = {
     DEF_SU_IMG_URL: "/img/super_user.png",
     SUPER_USER_URL: "/app/authorize/super",
     REVOKE_SUPER_USER_URL: "/app/authorize/revoke",
+    READ_ALL_URL: "/app/notification/readall",
+    DELETE_ALL_URL: "/app/notification/deleteall",
     UNKNOWN_URL: "/*",
     // variables
     TIMEOUT: 1000,
