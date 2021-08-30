@@ -1,7 +1,7 @@
 <template>
     <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h1 class="pa-5">Dernières publiations</h1>
+            <h1 class="pa-5">Dernières publications</h1>
             <!--welcom-alert-->
             <v-alert
             class="text-center mx-auto"
@@ -69,6 +69,21 @@
                     <btnClose text="Ok" :eventAtClick="close"></btnClose>
                 </template >
             </errordial>
+            <!--scroll-top-button-->
+            <v-btn
+            v-scroll="onScroll"
+            v-show="fab"
+            fab
+            dark
+            fixed
+            bottom
+            right
+            color="primary"
+            tab="button"
+            @click="toTop"
+          >
+            <v-icon>mdi-chevron-up</v-icon>
+          </v-btn>
         </slot>
     </auth>
 </template>
@@ -123,7 +138,7 @@ export default {
                 {label: "Ajouter une image", class: "flex-grow-0",action: this.onPickFile},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.postPub},
             ],
-
+            fab: false,
         };
     },
     computed: {
@@ -197,6 +212,14 @@ export default {
         // function used to close error dialog
         close() {
             this.setDialErr(false)
+        },
+        onScroll (e) {
+            if (typeof window === 'undefined') return;
+            const top = window.pageYOffset ||   e.target.scrollTop || 0;
+            this.fab = top > 20;
+        },
+        toTop () {
+            this.$vuetify.goTo(0);
         },
     },
     created() { 

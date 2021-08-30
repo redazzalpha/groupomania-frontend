@@ -1,12 +1,15 @@
 <template>
     <auth tab="profil" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h2 class="pa-5">Profil</h2>
             <!--main-card-container-->
-            <v-card elevation=10 class="pb-4 ">
+            <v-card elevation=10 class="pb-4 mx-auto" max-width="1050px">
+
+                <v-toolbar color="grey " dark class="d-flex justify-center title py-0 ">
+                    Profil de {{ userData.pseudo }}
+                </v-toolbar>
+
                 <!--main-card-container-title-->
                 <v-card-title class="d-flex flex-column justify-center">
-                    <div class="display-1 pa-2 blue--text" style="position: relative; right: 80px; top: 50px">{{ userData.pseudo }}</div>
                     <div style="position: relative">
                         <avatar :item="userData" :size=100></avatar>
                         <v-btn 
@@ -126,6 +129,8 @@
                                 <!--alert-delete-account-activator-->
                                 <template v-slot:activator="{ on }">
                                     <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                                        <v-card-title>Type de compte</v-card-title>
+                                        <v-card-text class="text-center">{{ userData.rights }}</v-card-text>
                                         <v-card-title>Supprimer mon compte</v-card-title>
                                         <v-card-actions>
                                             <v-btn

@@ -1,8 +1,8 @@
 <template>
     <v-row class="comments">
         <!--Comment-title-->
-        <v-container>
-            <v-row v-if="gotCom">
+        <v-container v-if="gotCom">
+            <v-row>
                 <v-col class="text-decoration-underline">
                     Commentaires:
                 </v-col>

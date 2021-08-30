@@ -31,16 +31,17 @@
             <!--user-item-block-->
             <v-container grid-list-xs>
                 <v-row class="d-flex flex-wrap">
-                    <v-col class="d-sm-flex flex-wrap justify-center">
+                    <v-col class="d-sm-flex flex-wrap justify-center px-0">
                         <!--dialog-->
                         <v-dialog
                         v-for="item in userList" :key="item.userId"
                         transition="dialog-top-transition"
-                        max-width="600"
+                        max-width="900px"
+                        :fullscreen="$vuetify.breakpoint.mobile"
                         >
                             <!--dialog-activator-->
                             <template v-slot:activator="{ on, attrs }">
-                                <v-col v-on="on" v-bind="attrs"  class="pa-3 col-sm-6">
+                                <v-col v-on="on" v-bind="attrs"  class="px-0 col-sm-6">
                                     <!--user-Item-->
                                     <userItem
                                     :hover="hover"
@@ -55,10 +56,9 @@
                                 <userProf
                                 :dialog="dialog"
                                 :item="item"
+                                @refresh="refresh"
                                 ></userProf>
                             </template>  
-
-
                         </v-dialog>                        
                     </v-col>
                 </v-row>

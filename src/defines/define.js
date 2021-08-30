@@ -32,6 +32,8 @@ const defines = {
     TOKEN_URL: "/app/token",
     DEL_ACCOUNT_URL: "/app/account",
     DEF_SU_IMG_URL: "/img/super_user.png",
+    SUPER_USER_URL: "/app/authorize/super",
+    REVOKE_SUPER_USER_URL: "/app/authorize/revoke",
     UNKNOWN_URL: "/*",
     // variables
     TIMEOUT: 1000,
