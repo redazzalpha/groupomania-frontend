@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import defines from "../defines/define";
 import auth from "../components/auth.vue";
 import userItem from "../components/userItem.vue";
@@ -84,18 +84,28 @@ export default {
         return {
             authUrl: `${defines.SERVER_URL}${defines.TEAM_URL}`, 
             showPage: false,
-            users: [],
             userList: [],
             input: "",
             hover: "",
             fieldValue: "",
         };
     },
+    computed: {
+        ...mapState([
+            "users",
+        ])
+    },
     methods: {
         ...mapActions([
             "setProgress",
             "pubScroll",
+            "getUsers"
         ]),
+        gusers() {
+            this.getUsers()
+            .then( () => this.userList = this.users )
+            .catch();
+        },
         findUser() {
             if(this.fieldValue != "") {
                 let regex = new RegExp(this.fieldValue, "gi");
@@ -104,21 +114,9 @@ export default {
                 });
             }
             else this.userList = this.users;
-        },
-        getUsers() {
-            this.setProgress(true);
-            this.$http.get(`${defines.SERVER_URL}${defines.USERS_URL}`)
-            .then(
-                success => {
-                    this.users = success.body.results;
-                    this.userList = this.users;
-                    setTimeout(() => this.setProgress(false) , defines.TIMEOUT);
-                },
-                (/*failed*/) => setTimeout(() => this.setProgress(false) , defines.TIMEOUT)
-            );
-        },                          
+        },                         
         refresh() {
-            this.getUsers();
+            this.gusers();
         },
         // function used for show or unshow home view
         trigger(ready) {

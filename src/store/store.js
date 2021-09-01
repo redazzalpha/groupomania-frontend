@@ -3,6 +3,8 @@ import Vuex from 'vuex';
 import createPersistedState from "vuex-persistedstate";
 import services from '../services/app.service';
 import defines from '../defines/define';
+import { Utils  } from '../class';
+
 const jwt = require('jsonwebtoken');
 
 
@@ -11,6 +13,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         userData: {},
+        users: [],
         publications: [],
         comments: [],
         notifs: [],
@@ -27,6 +30,9 @@ export default new Vuex.Store({
         },
         SET_USER_DATA(state, payload) {
             state.userData = payload;
+        },
+        SET_USERS(state, array) {
+            state.users = array;
         },
         SET_PUBLICATIONS(state, payload) {
             state.publications = payload;
@@ -50,68 +56,16 @@ export default new Vuex.Store({
             // this function should be used only by auth component
             // and register view
             return new Promise((resolve, reject) => {
-                //send request to access resource
-                Vue.http.head(authUrl)
-                    .then(
-                        (/*success*/) => {
-                            context.state.progress = false;
-                            resolve();
-                        },
-                        (failed) => {
-                            if (failed.status == 401) {
-                                // if  failed status is 401 
-                                // that means there is an error on token 
-                                // check storage and get refresh token from localStorage 
-                                if (localStorage.grpm_store != null && localStorage.grpm_store != undefined) {
-                                    const grpm_store = JSON.parse(localStorage.grpm_store);
-                                    if (grpm_store.data != null && grpm_store.data != undefined) {
-                                        const tokenRfrsh = JSON.parse(localStorage.grpm_store).data.tokenRfrsh;
-                                        //send request to refresh token
-                                        Vue.http.post(`${defines.SERVER_URL}${defines.TOKEN_URL}`, { tokenRfrsh })
-                                            .then(
-                                                success => {
-                                                    // store new token on success
-                                                    localStorage.grpm_store = JSON.stringify(success.body);
-                                                    // resend request to access resource
-                                                    Vue.http.head(authUrl)
-                                                        .then(
-                                                            () => {
-                                                                // don't need to stop progress bar here
-                                                                // cause refresh atcion already does it 
-                                                                context.dispatch("refresh");
-                                                                resolve();
-                                                            },
-                                                            failed => {
-                                                                context.state.progress = false;
-                                                                reject(failed);
-                                                            }
-                                                        );
-                                                },
-                                                failed => {
-                                                    // on failed means refresh token is either expired or invalid
-                                                    context.state.progress = false;
-                                                    reject(failed);
-                                                }
-                                            );
-                                    }
-                                    else {
-                                        // if there is no data on localStore
-                                        context.state.progress = false;
-                                        reject(failed);
-                                    }
-                                }
-                                else {
-                                    // if there is no store on localStore
-                                    context.state.progress = false;
-                                    reject(failed);
-                                }
-                            }
-                            else {
-                                // if error other than 401 
-                                context.state.progress = false;
-                                reject(failed);
-                            }
-                        });
+                const utils = new Utils();
+                utils.access(authUrl)
+                    .then(success => {
+                        context.state.progress = false;
+                        resolve(success);
+                    })
+                    .catch(failed => {
+                        context.state.progress = false;
+                        reject(failed);
+                    });
             });
         },
         login(context, data) {
@@ -177,41 +131,31 @@ export default new Vuex.Store({
                     );
             });
         },
-        publish(context, editorData) {
-            return new Promise((resolve, reject) => {
-                if (editorData && services.isNotEmpty(editorData)) {
-                    let pub = editorData.replace("\\", "/");
-                    pub = pub.replace("'", "\\'");
-                    Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, { publication: pub })
-                        .then(
-                            (/*success*/) => {
-                                context.dispatch("refresh");
-                                resolve();
-                            },
-                            (/*failed*/) => {
-                                reject();
-                            }
-                        );
-                }
-                else {
-                    context.state.dialogErrText = "Vous ne pouvez pas créer de publication vide";
-                    context.state.dialogErr = true;
-                    reject();
-                }
-            });
+        async publish(context, editorData) {
+            if (editorData && services.isNotEmpty(editorData)) {
+                let pub = editorData.replace("\\", "/");
+                pub = pub.replace("'", "\\'");
+                const utils = new Utils();
+                const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, { publication: pub });
+                context.dispatch("refresh");
+                return result;
+            }
+            else {
+                context.state.dialogErrText = "Vous ne pouvez pas créer de publication vide";
+                context.state.dialogErr = true;
+            }
         },
-        comment(context, data) {
-            // check if publication if empty   
+        async comment(context, data) {
             if (data.comText && services.isNotEmpty(data.comText)) {
-                // create payload
                 const payload = {
                     parentId: data.parentId,
                     comText: data.comText,
                     authorId: data.authorId,
                 };
-                // post request
-                Vue.http.post(`${defines.SERVER_URL}${defines.COMMENT_URL}`, payload)
-                    .then(() => context.dispatch("refresh"));
+                const utils = new Utils();
+                const result = await utils.post(`${defines.SERVER_URL}${defines.COMMENT_URL}`, payload);
+                context.dispatch("refresh");
+                return result;
             }
             // if comment is empty set error dialog
             else {
@@ -219,250 +163,203 @@ export default new Vuex.Store({
                 context.state.dialogErr = true;
             }
         },
-        getPubs(context) {
-            return new Promise((resolve, reject) => {
-                // get request
-                Vue.http.get(`${defines.SERVER_URL}${defines.PUBLISH_URL}`)
-                    .then(
-                        (success) => {
-                            context.dispatch("setPublications", success.body.results);
-                            resolve();
-                        },
-                        (failed) => {
-                            reject(failed);
-                        }
-                    );
-            });
+        async getPubs(context) {
+            const utils = new Utils();
+            const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_URL}`);
+            context.state.publications = result.body.results;
+            return result;
         },
-        getComs(context) {
-            return new Promise((resolve, reject) => {
-                // get request
-                Vue.http.get(`${defines.SERVER_URL}${defines.COMMENT_URL}`)
-                    .then(
-                        (success) => {
-                            context.dispatch("setComments", success.body.results);
-                            resolve();
-                        },
-                        (failed) => { reject(failed); }
-                    );
-            });
+        async getComs(context) {
+            const utils = new Utils();
+            const result = await utils.get(`${defines.SERVER_URL}${defines.COMMENT_URL}`);
+            context.state.comments = result.body.results;
+            return result;
         },
-        getNotifs(context) {
-            return new Promise((resolve, reject) => {
-                Vue.http.get(`${defines.SERVER_URL}${defines.NOTIFICATION_URL}`)
-                    .then(
-                        (success) => {
-                            const notifs = success.body.results.filter(item => item.whereId == context.state.userData.userId);
-                            context.dispatch("setNotifs", notifs);
-                            resolve();
-                        },
-                        (failed) => { reject(failed); }
-                    );
-            });
+        async getNotifs(context) {
+            const utils = new Utils();
+            const result = await utils.get(`${defines.SERVER_URL}${defines.NOTIFICATION_URL}`);
+            const notifs = result.body.results.filter(item => item.whereId == context.state.userData.userId);
+            context.state.notifs =  notifs;
+            return result;
         },
-        readNotif(context, item) {
+        async readNotif(context, item) {
             if (item.state == "unread") {
-                Vue.http.patch(`${defines.SERVER_URL}${defines.READ_NOTIFICATION_URL}`, { notifId: item.notifId })
-                    .then(() => context.dispatch("refresh"));
+                const utils = new Utils();
+                const result = await utils.patch(`${defines.SERVER_URL}${defines.READ_NOTIFICATION_URL}`, { notifId: item.notifId });
+                context.dispatch("refresh");
+                return result;
             }
         },
-        like(context, data) {
+        async like(context, data) {
             if (data.userIdLike)
                 data.userIdLike.push(context.state.userData.userId);
             else data.userIdLike = [context.state.userData.userId];
             const payload = { data };
-            Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_LIKE_URL}`, payload)
-                .then(() => context.dispatch("refresh"));
+
+            const utils = new Utils();
+            const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_LIKE_URL}`, payload);
+            context.dispatch("refresh");
+            return result;
         },
-        unlike(context, data) {
+        async unlike(context, data) {
             data.userIdLike = data.userIdLike.filter(item => { return item != context.state.userData.userId; });
             const payload = { data };
-            Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_UNLIKE_URL}`, payload)
-                .then(() => context.dispatch("refresh"));
+
+            const utils = new Utils();
+            const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_UNLIKE_URL}`, payload);
+            context.dispatch("refresh");
+            return result;
         },
-        dislike(context, data) {
+        async dislike(context, data) {
+
             if (data.userIdDislike)
                 data.userIdDislike.push(context.state.userData.userId);
             else data.userIdDislike = [context.state.userData.userId];
             const payload = { data };
-            Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_DISLIKE_URL}`, payload)
-                .then(() => context.dispatch("refresh"));
+
+            const utils = new Utils();
+            const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_DISLIKE_URL}`, payload);
+            context.dispatch("refresh");
+            return result;
         },
-        undislike(context, data) {
+        async undislike(context, data) {
             data.userIdDislike = data.userIdDislike.filter(item => { return item != context.state.userData.userId; });
             const payload = { data };
-            Vue.http.post(`${defines.SERVER_URL}${defines.PUBLISH_UNDISLIKE_URL}`, payload)
-                .then(() => context.dispatch("refresh"));
+
+            const utils = new Utils();
+            const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_UNDISLIKE_URL}`, payload);
+            context.dispatch("refresh");
+            return result;
         },
-        delPub(context, pubId) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}`, { params: { pubId } })
-                .then(() => context.dispatch("refresh"));
+        async getUsers(context) {
+
+            const utils = new Utils();
+            const result = await utils.get(`${defines.SERVER_URL}${defines.USERS_URL}`);
+            context.state.users = result.body.results;
+            return result;
+
         },
-        delCom(context, data) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}`, { params: { comId: data.comId } })
-                .then(() => context.dispatch("refresh"));
+        async delPub(context, pubId) {
+
+            const utils = new Utils();
+            const result = await utils.delete(`${defines.SERVER_URL}${defines.PUBLISH_DEL_URL}`, { params: { pubId } });
+            context.dispatch("refresh");
+            return result;
         },
-        delNotif(context, notifId) {
-            Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}`, { params: { notifId } })
-                .then(
-                    (/*success*/) => {
-                        context.dispatch("refresh");
-                    },
-                    (/*failed*/) => {
-                    }
-                );
+        async delCom(context, data) {
+
+            const utils = new Utils();
+            const result = await utils.delete(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}`, { params: { comId: data.comId } });
+            context.dispatch("refresh");
+            return result;
+        },
+        async delNotif(context, notifId) {
+
+            const utils = new Utils();
+            const result = await utils.delete(`${defines.SERVER_URL}${defines.DEL_NOTIFICATION_URL}`, { params: { notifId } });
+            context.dispatch("refresh");
+            return result;
         },
         delAccount(context, id) {
             return new Promise((resolve, reject) => {
-                Vue.http.delete(`${defines.SERVER_URL}${defines.DEL_ACCOUNT_URL}`, { params: { id } })
-                    .then(
-                        (/*success*/) => {
-                            context.dispatch("resetStore");
-                            resolve();
-                        },
-                        (/*failed*/) => {
-                            context.state.dialogErrText = "Une erreur est survenue lors de la suppression de votre compte.\nVeuillez réessayer.";
-                            context.state.dialogErr = true;
-                            reject();
-                        },
-                    );
+
+                const utils = new Utils();
+                utils.delete(`${defines.SERVER_URL}${defines.DEL_ACCOUNT_URL}`, { params: { id } })
+                    .then(success => {
+                        context.dispatch("resetStore");
+                        resolve(success);
+                    })
+                    .catch(failed => {
+                        context.state.dialogErrText = "Une erreur inattendue s'est produite lors de la suppression de votre compte.\nVeuillez réessayer.";
+                        context.state.dialogErr = true;
+                        reject(failed);
+                    });
+            });
+        },
+        async readAll(context) {
+
+            const utils = new Utils();
+            const result = await utils.patch(`${defines.SERVER_URL}${defines.READ_ALL_URL}`, { notifId: context.state.notifs[0].notifId });
+            context.dispatch("refresh");
+            return result;
+        },
+        async deleteAll(context) {
+
+            const utils = new Utils();
+            const result = await utils.patch(`${defines.SERVER_URL}${defines.DELETE_ALL_URL}`, { notifId: context.state.notifs[0].notifId });
+            context.dispatch("refresh");
+            return result;
+        },
+        async superUser(context, id) {
+
+            const utils = new Utils();
+            const result = await utils.patch(`${defines.SERVER_URL}${defines.SUPER_USER_URL}`, { id });
+            return result;
+        },
+        async revokeSuperUser(context, id) {
+
+            const utils = new Utils();
+            const result = await utils.patch(`${defines.SERVER_URL}${defines.REVOKE_SUPER_USER_URL}`, { id });
+            return result;            
+        },
+        async uptImgProf(context, file) {
+
+            if (file) {
+                const formData = new FormData();
+                formData.append("image", file, file.name);
+    
+                const utils = new Utils();
+                const result = await utils.post(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, formData);
+                localStorage.grpm_store = JSON.stringify(result.body);
+                return result.body.data.imgUrl;            
+            }
+        },
+        async uptDescProf(context, desc) {
+
+            const utils = new Utils();
+            const result = await utils.patch(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}`, { desc });
+            const token = await result.text();
+            localStorage.grpm_store = token;
+            return result;
+        },
+        uptPasswdProf(context, data) {
+            return new Promise((resolve, reject) => {
+                const utils = new Utils();
+                utils.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}`, { old: data.passwd, new: data.passwdChange })
+                    .then(() => {
+                        context.state.success = true;
+                        setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 2);
+                        resolve();
+                    })
+                    .catch(() => {
+                        context.state.dialogErrText = "Le mot de passe que vous avez saisi est incorrect";
+                        context.state.dialogErr = true;
+                        context.state.success = false;
+                        reject();
+                    }); 
             });
         },
         pubScroll(context) {
-            if (context.state.publications) {
-                let size = context.state.publications ? context.state.publications.length : 0;
-                let lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
-                let tab = [];
-                window.onscroll = () => {
+            window.onscroll = async () => {
+                    if (context.state.publications) {
+                    let size = context.state.publications ? context.state.publications.length : 0;
+                    let lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
+                    let tab = [];
                     size = context.state.publications ? context.state.publications.length : 0;
                     lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
                     tab = [];
         
                     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-                        Vue.http.get(`${defines.SERVER_URL}${defines.PUBLISH_SCROLL_URL}`, { params: { lpubid } })
-                            .then(
-                                results => {
-                                    tab = context.state.publications;
-                                    for (let item of results.body.results)
-                                        tab.push(item);
-                                    context.state.publication = tab;
-                                },
-                            );
+                        const utils = new Utils();
+                        const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_SCROLL_URL}`, { params: { lpubid } });
+                        tab = context.state.publications;
+                        for (let item of result.body.results)
+                            tab.push(item);
+                        context.state.publication = tab;
+                        return result;                        
                     }
-                };
-            }
-        },
-        readAll(context) {
-            return new Promise((resolve, reject) => {
-                Vue.http.patch(`${defines.SERVER_URL}${defines.READ_ALL_URL}`, { notifId: context.state.notifs[0].notifId })
-                    .then(
-                        () => {
-                            context.dispatch("refresh");
-                            resolve();
-                        },
-                        () => {
-                            reject();
-                        },
-                    );
-            });
-        },
-        deleteAll(context) {
-            return new Promise((resolve, reject) => {
-                Vue.http.patch(`${defines.SERVER_URL}${defines.DELETE_ALL_URL}`, { notifId: context.state.notifs[0].notifId })
-                    .then(
-                        () => {
-                            context.dispatch("refresh");
-                            resolve();
-                        },
-                        () => {
-                            reject();
-                        },
-                    );
-            });
-        },
-        superUser(context, id) {
-            return new Promise((resolve, reject) => {
-
-                Vue.http.patch(`${defines.SERVER_URL}${defines.SUPER_USER_URL}`, { id })
-                    .then(
-                        () => {
-                            resolve();
-                        },
-                        () => {
-                            reject();
-                        },
-                    );
-            });
-        },
-        revokeSuperUser(context, id) {
-            return new Promise((resolve, reject) => {
-
-                Vue.http.patch(`${defines.SERVER_URL}${defines.REVOKE_SUPER_USER_URL}`, { id })
-                    .then(
-                        () => {
-                            resolve();
-                        },
-                        () => {
-                            reject();
-                        },
-                    );
-            });
-        },
-        uptImgProf(context, file) {
-            return new Promise((resolve, reject) => {
-
-                if (!file)
-                    return reject();
-                const formData = new FormData();
-                formData.append("image", file, file.name);
-    
-                Vue.http.post(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, formData)
-                .then(
-                    (success) => {
-                        localStorage.grpm_store = JSON.stringify(success.body);
-                        resolve(success.body.data.imgUrl);
-                    },
-                    (/*failed*/) => reject()
-                );
-            });
-
-        },
-        uptDescProf(context, desc) {
-            return new Promise((resolve, reject) => {
-
-                Vue.http.patch(`${defines.SERVER_URL}${defines.PROFIL_DESC_URL}`, { desc })
-                    .then(
-                        (success) => {
-                            success.text()
-                                .then(token => {
-                                    localStorage.grpm_store = token;
-                                    resolve();
-                                });
-                        },
-                        (/*failed*/) => {
-                            reject();
-                        },
-                );
-            });
-        },
-        uptPasswdProf(context, data) {
-            return new Promise((resolve, reject) => {
-                Vue.http.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}`, { old: data.passwd, new: data.passwdChange })
-                .then(
-                    () => {
-                        context.state.success = true;
-                        setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 2);
-                        resolve();
-                    },
-                    () => {
-                        context.state.dialogErrText = "Le mot de passe que vous avez saisi est incorrect";
-                        context.state.dialogErr = true;
-                        context.state.success = false;
-                        reject();
-                    }
-                );  
-                
-            });
+                }
+            };
         },
         refresh(context) {
             return new Promise((resolve, reject) => {
@@ -506,6 +403,9 @@ export default new Vuex.Store({
         },
         setUserData(context, payload) {
             context.commit("SET_USER_DATA", payload);
+        },
+        setUsers(context, array) {
+            context.commit("SET_USERS", array);
         },
         setPublications(context, payload) {
             context.commit("SET_PUBLICATIONS", payload);

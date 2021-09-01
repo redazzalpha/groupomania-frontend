@@ -222,7 +222,7 @@ export default {
             this.$vuetify.goTo(0);
         },
     },
-    created() { 
+    created() {         
         this.refresh();
         this.pubScroll();
         setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10)

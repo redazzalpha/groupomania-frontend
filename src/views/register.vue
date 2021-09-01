@@ -242,12 +242,8 @@ export default {
         // auto logging
         this.access(`${defines.SERVER_URL}${defines.AUTO_LOG_URL}`)
         .then(
-            (/*success*/) => {
-                this.$router.push(defines.HOME_URL);
-            },
-            (/*failed*/) => {
-                this.dialogSign = true;                                                                             
-            }                               
+            (/*success*/) => this.$router.push(defines.HOME_URL),
+            (/*failed*/) => this.dialogSign = true                                                                                                    
         );
     },
 }
