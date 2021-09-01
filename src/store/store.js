@@ -347,18 +347,14 @@ export default new Vuex.Store({
                     }); 
             });
         },
-        pubScroll(context) {
+        async pubScroll(context) {
             window.onscroll = async () => {
-                    if (context.state.publications) {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
                     let size = context.state.publications ? context.state.publications.length : 0;
                     let lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
                     let tab = [];
-                    size = context.state.publications ? context.state.publications.length : 0;
-                    lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
-                    tab = [];
-        
-                    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-                        const utils = new Utils();
+                    const utils = new Utils();
+                    if (context.state.publications && context.state.publications.length > 1 ) {
                         const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_SCROLL_URL}`, { params: { lpubid } });
                         tab = context.state.publications;
                         for (let item of result.body.results)
