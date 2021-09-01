@@ -4,9 +4,7 @@ import createPersistedState from "vuex-persistedstate";
 import services from '../services/app.service';
 import defines from '../defines/define';
 import { Utils  } from '../class';
-
 const jwt = require('jsonwebtoken');
-
 
 Vue.use(Vuex);
 
@@ -301,6 +299,16 @@ export default new Vuex.Store({
             const utils = new Utils();
             const result = await utils.patch(`${defines.SERVER_URL}${defines.REVOKE_SUPER_USER_URL}`, { id });
             return result;            
+        },
+        async lockUser(context, id) {
+            const utils = new Utils();
+            const result = await utils.patch(`${defines.SERVER_URL}${defines.LOCK_USER_URL}`, { id });
+            return result;
+        },
+        async unlockUser(context, id) {
+            const utils = new Utils();
+            const result = await utils.patch(`${defines.SERVER_URL}${defines.UNLOCK_USER_URL}`, { id });
+            return result;
         },
         async uptImgProf(context, file) {
 

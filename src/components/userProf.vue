@@ -33,8 +33,8 @@
                             <v-list-item-title> {{ item.rights == "basic"?"Activer admin":"Activer basique" }}</v-list-item-title>
                         </v-list-item>
                 
-                        <v-list-item v-if="checkMenuSU(item)" @click="onClick">
-                            <v-list-item-title>Bloquer utilisateur</v-list-item-title>
+                        <v-list-item v-if="checkMenuSU(item)" @click="userPass(item)">
+                            <v-list-item-title> {{ item.locked? "Débloquer utilisateur":"Bloquer utilisateur" }}</v-list-item-title>
                         </v-list-item>
                 
                         <v-list-item @click="dialog.value = false">
@@ -63,9 +63,15 @@
                     </v-col>
                 </v-row>
                     <v-row>
-                        <v-col>
+                        <v-col v-if="checkMenuSU(item)">
                             <div class="text-center text-h6">Type de compte</div>
                             <v-card-text class="text-center">{{ item.rights }}</v-card-text>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col v-if="checkMenuSU(item)">
+                            <div class="text-center text-h6">Status</div>
+                            <v-card-text class="text-center">{{ item.locked? 'Bloqué': 'Débloqué' }}</v-card-text>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -127,6 +133,8 @@ export default {
             "refresh",
             "superUser",
             "revokeSuperUser",
+            "lockUser",
+            "unlockUser",
         ]),
         authSuperUser(item) {
             if(item.rights == "basic") {
@@ -136,8 +144,24 @@ export default {
                 })
                 .catch();
             }
-            else if (item.rights == "super") {
+            else {
                 this.revokeSuperUser(item.userId)
+                .then( () => {
+                    this.$emit('refresh');
+                })
+                .catch();
+            }
+        },
+        userPass(item) {
+            if(item.locked) {
+                this.unlockUser(item.userId)
+                .then( () => {
+                    this.$emit('refresh');
+                })
+                .catch();
+            }
+            else {
+                this.lockUser(item.userId)
                 .then( () => {
                     this.$emit('refresh');
                 })

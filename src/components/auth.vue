@@ -7,14 +7,13 @@
         <errordial 
         v-if="useDialErr"
         title="Erreur système"
-        text="Vous n'êtes pas authentifié."
+        :text="text"
         :model="dialogErr"
         >
             <slot>
                 <v-row  class="d-flex flex-column" >
-                    <v-card-text class="red--text pa-0">Veuillez vous connecter.</v-card-text>
                     <v-card-actions>
-                        <v-btn to="/register" class="mb-3" color="primary">Se connecter</v-btn>
+                        <v-btn @click='click' class="mb-3" color="primary">{{ btnLabel }}</v-btn>
                     </v-card-actions>
                 </v-row>
             </slot>
@@ -23,7 +22,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import errordial from "../components/errordial.vue"
 export default {
     name: "auth",
@@ -44,14 +43,30 @@ export default {
     data() {
         return {
             dialogErr: false,
+            title: "",
+            text: "",
+            btnLabel: '',
+            click: null,
         };
     },
     computed: {
+        ...mapState([
+            "userData",
+            "locked",
+        ])
     },
     methods: {
         ...mapActions([
             "access",
+            "resetStore",
         ]),
+        lockGoRgstr() {
+            this.resetStore();
+            this.$router.push('/register');
+        },
+        goRgstr() {
+            this.$router.push('/register');
+        }
     },
     beforeMount() {
         this.access(this.authUrl)
@@ -60,8 +75,23 @@ export default {
             this.$emit("onReady", !this.dialogErr)
         })
         .catch(() => {
-            this.dialogErr = true;
-            this.$emit("onReady", !this.dialogErr);
+
+            if(this.userData.locked) {
+                localStorage.vuex = '';
+                this.click = this.lockGoRgstr;
+                this.text = 'Votre compte est bloqué.';
+                this.btnLabel = 'Ok';
+                this.dialogErr = true;
+                this.$emit("onReady", !this.dialogErr);
+            }
+            else {
+                this.resetStore();
+                this.click = this.goRgstr;
+                this.text = 'Vous n\'êtes pas authentifié.';
+                this.btnLabel = 'Se connecter';
+                this.dialogErr = true;
+                this.$emit("onReady", !this.dialogErr);
+            }
         });
     },
 }

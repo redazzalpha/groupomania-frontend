@@ -104,6 +104,7 @@ export class Utils {
     }
     get(url, params) {
         return new Promise((resolve, reject) => {
+
             this.Vue.http.get(url, params)
                 .then(
                     success => resolve(success),
