@@ -31,7 +31,10 @@
             <!--user-item-block-->
             <v-container grid-list-xs>
                 <v-row class="d-flex flex-wrap">
-                    <v-col class="d-sm-flex flex-wrap justify-center px-0">
+                    <!-- to change the view of the user profile item
+                    set flex to flex-column or flex-wrap
+                    -->
+                    <v-col class="d-flex flex-column justify-center px-0">
                         <!--dialog-->
                         <v-dialog
                         v-for="item in userList" :key="item.userId"
@@ -41,7 +44,7 @@
                         >
                             <!--dialog-activator-->
                             <template v-slot:activator="{ on, attrs }">
-                                <v-col v-on="on" v-bind="attrs"  class="px-0 col-sm-6">
+                                <v-col v-on="on" v-bind="attrs"  class="px-2 col-sm-6 mx-auto">
                                     <!--user-Item-->
                                     <userItem
                                     :hover="hover"
@@ -58,7 +61,7 @@
                                 :item="item"
                                 @refresh="refresh"
                                 ></userProf>
-                            </template>  
+                            </template> 
                         </v-dialog>                        
                     </v-col>
                 </v-row>
@@ -88,6 +91,7 @@ export default {
             input: "",
             hover: "",
             fieldValue: "",
+            fab: false,
         };
     },
     computed: {
@@ -118,7 +122,7 @@ export default {
         refresh() {
             this.gusers();
         },
-        // function used for show or unshow home view
+        // function used for show or unshow view
         trigger(ready) {
             this.showPage = ready;                                                                                                                         
         },

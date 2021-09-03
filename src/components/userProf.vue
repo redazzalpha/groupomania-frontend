@@ -29,16 +29,14 @@
                 <!--menu-list-default-template-->
                 <template>
                     <v-list>
+                        <v-list-item @click="dialog.value = false">
+                            <v-list-item-title>Fermer</v-list-item-title>
+                        </v-list-item>
                         <v-list-item v-if="checkMenuSU(item)" @click="authSuperUser(item)">
                             <v-list-item-title> {{ item.rights == "basic"?"Activer admin":"Activer basique" }}</v-list-item-title>
                         </v-list-item>
-                
                         <v-list-item v-if="checkMenuSU(item)" @click="userPass(item)">
                             <v-list-item-title> {{ item.locked? "Débloquer utilisateur":"Bloquer utilisateur" }}</v-list-item-title>
-                        </v-list-item>
-                
-                        <v-list-item @click="dialog.value = false">
-                            <v-list-item-title>Fermer</v-list-item-title>
                         </v-list-item>
                     </v-list>
                 </template>
@@ -79,21 +77,22 @@
                             <!--profil-publication-card-->
                             <div class="text-center text-h6">Dernières publications</div>
                             <v-card-text v-if="undefined == publications.find(pub => pub.authorId == item.userId)" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
-                            <v-card-text v-for="pub in publications" :key="pub.pubId" style="z-index: 3;">
-                                <pubcard
-                                style="z-index: 3;"
-                                v-if="item.userId == pub.authorId"
-                                :item="pub"
-                                @comment="comment"
-                                @delPub="delPub"
-                                @delCom="delCom"
-                                @like="like"
-                                @dislike="dislike"
-                                @unlike="unlike"
-                                @undislike="undislike"
-                                @refresh="refresh"
-                                ></pubcard>
-                            </v-card-text>
+                            <div v-for="pub in publications" :key="pub.pubId">
+                                <v-card-text v-if="item.userId == pub.authorId" style="z-index: 3;">
+                                    <pubcard
+                                    style="z-index: 3;"
+                                    :item="pub"
+                                    @comment="comment"
+                                    @delPub="delPub"
+                                    @delCom="delCom"
+                                    @like="like"
+                                    @dislike="dislike"
+                                    @unlike="unlike"
+                                    @undislike="undislike"
+                                    @refresh="refresh"
+                                    ></pubcard>
+                                </v-card-text>
+                            </div>
                         </v-col>
                     </v-row>
             </v-container>
@@ -153,6 +152,8 @@ export default {
             }
         },
         userPass(item) {
+            // function is used to set 
+            // locked or unlocked account user
             if(item.locked) {
                 this.unlockUser(item.userId)
                 .then( () => {
@@ -169,13 +170,16 @@ export default {
             }
         },
         checkMenuSU(item) {
+            // this function is used to check user rights 
+            // and show or not show features if user doesn't have super account
             return this.userData.rights == 'super' && this.userData.userId != item.userId;
         },
-
         onClick () {
         // Perform an action
         },
     },
+    created() {
+    }
 }
 </script>
 

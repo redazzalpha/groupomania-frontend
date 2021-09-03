@@ -193,10 +193,13 @@ export default new Vuex.Store({
                 data.userIdLike.push(context.state.userData.userId);
             else data.userIdLike = [context.state.userData.userId];
             const payload = { data };
-
+            
             const utils = new Utils();
             const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_LIKE_URL}`, payload);
-            context.dispatch("refresh");
+
+            const pub = context.state.publications.find(item => item.pubId == data.pubId);
+            pub.postLike = result.body.postLike;
+            pub.userIdLike.push(context.state.userData.userId);
             return result;
         },
         async unlike(context, data) {
@@ -205,7 +208,11 @@ export default new Vuex.Store({
 
             const utils = new Utils();
             const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_UNLIKE_URL}`, payload);
-            context.dispatch("refresh");
+
+            const pub = context.state.publications.find(item => item.pubId == data.pubId);
+            pub.postLike = result.body.postLike;
+            pub.userIdLike = pub.userIdLike.filter(item => item != context.state.userData.userId);
+
             return result;
         },
         async dislike(context, data) {
@@ -217,7 +224,10 @@ export default new Vuex.Store({
 
             const utils = new Utils();
             const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_DISLIKE_URL}`, payload);
-            context.dispatch("refresh");
+
+            const pub = context.state.publications.find(item => item.pubId == data.pubId);
+            pub.postDislike = result.body.postDislike;
+            pub.userIdDislike.push(context.state.userData.userId);
             return result;
         },
         async undislike(context, data) {
@@ -226,7 +236,10 @@ export default new Vuex.Store({
 
             const utils = new Utils();
             const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_UNDISLIKE_URL}`, payload);
-            context.dispatch("refresh");
+
+            const pub = context.state.publications.find(item => item.pubId == data.pubId);
+            pub.postDislike = result.body.postDislike;
+            pub.userIdDislike = pub.userIdDislike.filter(item => item != context.state.userData.userId);
             return result;
         },
         async getUsers(context) {
@@ -347,20 +360,16 @@ export default new Vuex.Store({
                     }); 
             });
         },
-        async pubScroll(context) {
+        pubScroll(context) {
             window.onscroll = async () => {
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
                     let size = context.state.publications ? context.state.publications.length : 0;
                     let lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
-                    let tab = [];
                     const utils = new Utils();
-                    if (context.state.publications && context.state.publications.length > 1 ) {
+                    if (size > 1 ) {
                         const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_SCROLL_URL}`, { params: { lpubid } });
-                        tab = context.state.publications;
                         for (let item of result.body.results)
-                            tab.push(item);
-                        context.state.publication = tab;
-                        return result;                        
+                            context.state.publications.push(item);
                     }
                 }
             };

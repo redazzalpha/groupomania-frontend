@@ -68,16 +68,15 @@ export default {
             this.$router.push('/register');
         }
     },
-    beforeMount() {
+    created() {
         this.access(this.authUrl)
         .then(() => {
             this.dialogErr = false;
             this.$emit("onReady", !this.dialogErr)
         })
-        .catch(() => {
-
+        .catch( () => {
             if(this.userData.locked) {
-                localStorage.vuex = '';
+                //localStorage.vuex = '';
                 this.click = this.lockGoRgstr;
                 this.text = 'Votre compte est bloqué.';
                 this.btnLabel = 'Ok';

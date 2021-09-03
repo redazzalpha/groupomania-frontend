@@ -69,21 +69,6 @@
                     <btnClose text="Ok" :eventAtClick="close"></btnClose>
                 </template >
             </errordial>
-            <!--scroll-top-button-->
-            <v-btn
-            v-scroll="onScroll"
-            v-show="fab"
-            fab
-            dark
-            fixed
-            bottom
-            right
-            color="primary"
-            tab="button"
-            @click="toTop"
-          >
-            <v-icon>mdi-chevron-up</v-icon>
-          </v-btn>
         </slot>
     </auth>
 </template>
@@ -128,7 +113,6 @@ export default {
                     'redo',
                 ],
             },
-
             authUrl: `${defines.SERVER_URL}${defines.HOME_URL}`, 
             showPage: false,
             loading: false,
@@ -138,7 +122,6 @@ export default {
                 {label: "Ajouter une image", class: "flex-grow-0",action: this.onPickFile},
                 {label: "Publiez !", class: "d-flex justify-end col-4", action: this.postPub},
             ],
-            fab: false,
         };
     },
     computed: {
@@ -205,26 +188,18 @@ export default {
                     this.loading = false;
             }, defines.TIMEOUT);
         },
-        // function used for show or unshow home view
-        trigger(ready) {
-            this.showPage = ready;
-        },
         // function used to close error dialog
         close() {
             this.setDialErr(false)
         },
-        onScroll (e) {
-            if (typeof window === 'undefined') return;
-            const top = window.pageYOffset ||   e.target.scrollTop || 0;
-            this.fab = top > 20;
-        },
-        toTop () {
-            this.$vuetify.goTo(0);
+        // function used for show or unshow view
+        trigger(ready) {
+            this.showPage = ready;
         },
     },
     created() {         
-        this.refresh();
-        this.pubScroll();
+        this.refresh()
+        .then( () => this.pubScroll() );
         setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10)
     },
 }

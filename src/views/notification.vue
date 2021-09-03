@@ -10,6 +10,7 @@
                 plain
                 text
                 tag="button"
+                class="text-decoration-underline"
                 @click="readAllNotifs"
                 >Marquer tout comme lu</v-btn>
                 <v-btn 
@@ -17,6 +18,7 @@
                 plain
                 text
                 tag="button"
+                class="text-decoration-underline"
                 @click="delAllNotifs"
                 >Supprimer tout</v-btn>
             </div>
@@ -28,10 +30,7 @@
                                 <!--header-notif-->
                                 <v-row no-gutters>
                                     <v-col class="flex-grow-0">
-                                        <v-avatar size=60>
-                                            <v-img v-if="item.img" :src="item.img"  />
-                                            <v-icon v-else size=60 color="primary">mdi-account-circle</v-icon>
-                                        </v-avatar>
+                                        <avatar :item="item"></avatar>
                                     </v-col>
                                     <v-col>
                                         <v-container class="py-2">
@@ -102,12 +101,14 @@
 import { mapState, mapActions } from 'vuex';
 import auth from "../components/auth.vue";
 import defines from "../defines/define";
+import avatar from '../components/avatar.vue';
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default {
     name: "notification",
     components: {
         auth,
+        avatar,
     },
     data() {
         return {
@@ -156,7 +157,7 @@ export default {
         delAllNotifs() {
             this.deleteAll();
         },
-        // function used for show or unshow home view
+        // function used for show or unshow view
         trigger(ready) {
             this.showPage = ready;                                                                                                                         
         },

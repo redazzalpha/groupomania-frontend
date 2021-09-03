@@ -311,7 +311,7 @@ export default {
         close() {
             this.setDialErr(false);
         },
-        // function used for show or unshow home view
+        // function used for show or unshow view
         trigger(ready) {
             this.showPage = ready;                                                                                                                         
         },

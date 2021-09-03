@@ -1,6 +1,6 @@
 <template>
     <v-footer color="white" padless class=" mt-5">
-        <v-row justify="center" no-gutters>
+        <v-row justify="center" no-gutters>                                                                                     
             <v-btn 
             v-for="item in icons" 
             text plain
