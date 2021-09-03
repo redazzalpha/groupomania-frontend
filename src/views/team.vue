@@ -2,6 +2,28 @@
     <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h1 class="pa-5">&Eacute;quipe</h1>
+
+            <!--bbutton-style-view-->
+            <div>
+                <v-btn 
+                text
+                plain
+                tag='button'
+                title='Vue en line'
+                @click="viewLine"
+                >
+                    <v-icon>mdi-filter-variant</v-icon>
+                </v-btn>
+                <v-btn 
+                text
+                plain
+                tag='button'
+                title='Vue en bloc'
+                @click="viewBlock"
+                >
+                    <v-icon>mdi-border-all</v-icon>
+                </v-btn>
+            </div>
             <!--search-field-->
             <v-card max-width=550 class="mx-auto elevation-12" color="grey lighten-3">
                 <v-container grid-list-xs>
@@ -34,7 +56,7 @@
                     <!-- to change the view of the user profile item
                     set flex to flex-column or flex-wrap
                     -->
-                    <v-col class="d-flex flex-column justify-center px-0">
+                    <v-col class="d-flex flex-column justify-center px-0 items">
                         <!--dialog-->
                         <v-dialog
                         v-for="item in userList" :key="item.userId"
@@ -125,6 +147,16 @@ export default {
         // function used for show or unshow view
         trigger(ready) {
             this.showPage = ready;                                                                                                                         
+        },
+        viewLine() {
+            const col = document.querySelector('.items');
+            col.classList.remove('flex-wrap')
+            col.classList.add('flex-column')
+        },
+        viewBlock() {
+            const col = document.querySelector('.items');
+            col.classList.remove('flex-column')
+            col.classList.add('flex-wrap')
         },
     },
     created() {
