@@ -1,7 +1,7 @@
 <template>
     <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h1 class="pa-5">Dernières publications</h1>
+            <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">Dernières publications</h1>
             <!--welcom-alert-->
             <v-alert
             class="text-center mx-auto"
@@ -14,7 +14,13 @@
             >Bonjour {{ userData.pseudo }} ! &#x1F44B;
             </v-alert>
             <!--express your-self-card-->
-            <v-card elevation="15" color="grey lighten-3" max-width=550 class="mx-auto mb-8 text-center" >
+            <v-card 
+            elevation="15" 
+            :color="darkMode? '': 'grey lighten-3'" 
+            :dark='darkMode'
+            max-width=550 
+            class="mx-auto mb-8 text-center"
+            >
                 <v-container>
                     <v-row>
                         <v-col>
@@ -130,7 +136,8 @@ export default {
             "publications",
             "dialogErrText",
             "dialogErr",
-            "showWelcome"
+            "showWelcome",
+            "darkMode",
         ]),
     },
     methods: {

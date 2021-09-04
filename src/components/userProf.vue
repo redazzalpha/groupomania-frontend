@@ -1,11 +1,14 @@
 <template>
-    <v-card>
+    <v-card
+    :color="darkMode? '': ''" 
+    :dark='darkMode'
+    >
         <!--toolbar-title-->
         <v-toolbar 
-        dark 
         height="65px"
-        color="primary" 
-        style="position: sticky; top:0px; z-index:1; border: solid red 3px;" 
+        :color="darkMode? '': 'primary'" 
+        :dark='darkMode'
+        style="position: sticky; top:0px; z-index:1;" 
         class="d-flex justify-center title px-1"
         >
             <v-toolbar-title>Profil de {{ item.pseudo }}</v-toolbar-title>
@@ -28,7 +31,10 @@
                 </template>
                 <!--menu-list-default-template-->
                 <template>
-                    <v-list>
+                    <v-list 
+                        :color="darkMode? '': 'white'" 
+                        :dark='darkMode'
+                    >
                         <v-list-item @click="dialog.value = false">
                             <v-list-item-title>Fermer</v-list-item-title>
                         </v-list-item>
@@ -118,6 +124,7 @@ export default {
         ...mapState([
             "publications",
             "userData",
+            "darkMode",
         ]),
     },
     methods: {

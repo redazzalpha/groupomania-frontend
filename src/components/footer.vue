@@ -1,5 +1,10 @@
 <template>
-    <v-footer color="white" padless class=" mt-5">
+    <v-footer 
+    padless
+    :color="darkMode? '': 'white'" 
+    :dark='darkMode'
+    class=" mt-5"
+     >
         <v-row justify="center" no-gutters>                                                                                     
             <v-btn 
             v-for="item in icons" 
@@ -18,6 +23,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     name: 'ftr',
     data() {
@@ -30,6 +36,11 @@ export default {
             ],
         };
     },
+    computed: {
+        ...mapState([
+            "darkMode",
+        ])
+    }
 }
 </script>
 

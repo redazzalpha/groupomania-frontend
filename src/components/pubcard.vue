@@ -5,7 +5,8 @@
         max-width=550 
         class="mx-auto mt-8" 
         elevation="15" 
-        color="grey lighten-2" 
+        :color="darkMode? '': 'grey lighten-2'" 
+        :dark='darkMode'
         outlined 
         shaped
         >
@@ -22,7 +23,8 @@
                                 <v-col class="text-right" v-show="item.userId == userData.userId || userData.rights == 'super'">
                                     <v-btn
                                     icon 
-                                    color="grey lighten-1"
+                                    :color="darkMode? '': 'grey lighten-1'" 
+                                    :dark='darkMode'
                                     title="Supprimer la publication"
                                     style="position: absolute; right: 0px; top: 5px"
                                     tag="button"
@@ -89,13 +91,13 @@
                             v-model="comText" 
                             solo 
                             rounded 
-                            rows="1" 
                             auto-grow 
                             full-width 
                             outlined 
                             no-resize
                             counter
-                            background-color="white" 
+                            rows="1" 
+                            :background-color="darkMode?'grey darken-4':'white'" 
                             placeholder="Votre commentaire"
                             tag="textarea"
                             :rules="rules"
@@ -108,7 +110,8 @@
                                     <v-btn 
                                     title="Envoyer" 
                                     icon size=40 
-                                    color="primary" 
+                                    :color="darkMode? '': 'blue'" 
+                                    :dark='darkMode'
                                     tag="button"
                                     :loading="loading2"
                                     :disabled="loading2"
@@ -165,7 +168,11 @@ export default {
         };
     },
     computed: {
-        ...mapState(["userData", "publications"]),
+        ...mapState([
+            "userData",
+            "publications",
+            "darkMode",
+        ]),
         gpubLength() {
             return this.publications.length <= 0;
         }

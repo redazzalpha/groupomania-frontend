@@ -1,7 +1,7 @@
 <template>
     <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h1 class="pa-5">&Eacute;quipe</h1>
+            <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">&Eacute;quipe</h1>
 
             <!--bbutton-style-view-->
             <div>
@@ -10,6 +10,8 @@
                 plain
                 tag='button'
                 title='Vue en line'
+                :color="darkMode? '': 'black'" 
+                :dark='darkMode'
                 @click="viewLine"
                 >
                     <v-icon>mdi-filter-variant</v-icon>
@@ -19,13 +21,20 @@
                 plain
                 tag='button'
                 title='Vue en bloc'
+                :color="darkMode? '': 'black'" 
+                :dark='darkMode'
                 @click="viewBlock"
                 >
                     <v-icon>mdi-border-all</v-icon>
                 </v-btn>
             </div>
             <!--search-field-->
-            <v-card max-width=550 class="mx-auto elevation-12" color="grey lighten-3">
+            <v-card 
+            max-width=550
+            :color="darkMode? '': 'grey lighten-3'" 
+            :dark='darkMode'
+            class="mx-auto elevation-12"
+            >
                 <v-container grid-list-xs>
                 <v-row>
                     <v-col>
@@ -40,7 +49,8 @@
                             <template v-slot:prepend-inner>
                                 <v-avatar
                                     size="30"
-                                    color="primary"
+                        :color="darkMode? 'grey': 'primary'" 
+                        :dark='darkMode'
                                 >
                                 <v-icon color="white">mdi-account</v-icon>
                                 </v-avatar>
@@ -119,6 +129,7 @@ export default {
     computed: {
         ...mapState([
             "users",
+            "darkMode"
         ])
     },
     methods: {

@@ -2,9 +2,11 @@
     <v-app id="wrapper">
         <!--header-->
         <appbar></appbar>
+        <!--main-block-->
         <v-main tag="main">
             <section>
                 <v-container fluid>
+                    <!--progress- loding-bar-->
                     <progressBar tag="progress" :model="progress"></progressBar>
                     <router-view></router-view>
                 </v-container>
@@ -16,11 +18,11 @@
         v-scroll="onScroll"
         v-show="fab"
         fab
-        dark
         fixed
         bottom
         right
-        color="primary"
+        :color='darkMode? "" : "primary"'
+        :dark='darkMode'
         tab="button"
         @click="toTop"
         >
@@ -48,6 +50,7 @@ export default {
     computed: {
         ...mapState([
             "progress",
+            "darkMode"
         ])
     },
     methods: {
@@ -59,13 +62,39 @@ export default {
         toTop () {
             this.$vuetify.goTo(0);
         },
-    }
+        setThemeMode() {
+            const wrapper = document.querySelector('#wrapper');
+            if(this.darkMode) {
+                wrapper.classList.remove('bg-light');
+                wrapper.classList.add('bg-dark');
+            }
+            else{
+                wrapper.classList.remove('bg-dark');
+                wrapper.classList.add('bg-light');
+            }
+        },
+    },
+    watch: {
+        darkMode() {
+            this.setThemeMode();
+        },
+    },
+    mounted() {
+        const wrapper = document.querySelector('.theme--light.v-application');
+        wrapper.classList.remove('theme--light');
+        this.setThemeMode();
+    },
 }
 </script>
 
 <style lang="scss" scoped>
 #wrapper {
-    background: url("./assets/bg.jpg") no-repeat fixed center;
-    background-size: 100vw 100vh;
+    background-size: 100vw 100vh !important;
+}
+.bg-light{
+    background: url("./assets/bg-light.jpg") no-repeat fixed center !important;
+}
+.bg-dark{
+    background: url("./assets/bg-dark.jpg") no-repeat fixed center !important;
 }
 </style>

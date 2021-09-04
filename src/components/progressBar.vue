@@ -1,6 +1,6 @@
 <template>
     <v-dialog :value="model" persistent width="300">
-        <v-card color="primary" dark>
+        <v-card  :color='darkMode? "" : "primary"' :dark='darkMode'>
             <v-card-text>
                 Veuillez patienter...
                 <v-progress-linear
@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     name: "progressBar",
     props: {
@@ -21,6 +22,11 @@ export default {
             type: Boolean,
             default: false,
         },
+    },
+    computed: {
+        ...mapState([
+            "darkMode",
+        ]),
     },
 }
 </script>

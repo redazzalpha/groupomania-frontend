@@ -2,19 +2,43 @@
     <auth tab="profil" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <!--main-card-container-->
-            <v-card elevation=10 class="pb-4 mx-auto" max-width="1050px">
+            <v-card 
+            elevation=10 
+            class="pb-4 mx-auto" 
+            max-width="1050px"
+            :color="darkMode? '': ''" 
+            :dark='darkMode' 
+            >
 
-                <v-toolbar color="grey " dark class="d-flex justify-center title py-0 ">
+
+                <v-toolbar
+                class="d-flex justify-center title py-0 " 
+                :color="darkMode? '': 'grey'" 
+                :dark='darkMode'
+                >
                     Profil de {{ userData.pseudo }}
                 </v-toolbar>
-
+                <!--dark-mode-switch-->
+                <v-container >
+                    <v-row>
+                        <v-col class="d-flex px-5 pt-2">
+                            Claire
+                            <v-switch
+                            @change='setDarkMode(!darkMode)'
+                            :input-value='darkMode'
+                            :value='darkMode'
+                            ></v-switch>
+                            Sombre
+                        </v-col>
+                    </v-row>
+                </v-container>  
                 <!--main-card-container-title-->
                 <v-card-title class="d-flex flex-column justify-center">
                     <div style="position: relative">
                         <avatar :item="userData" :size=100></avatar>
                         <v-btn 
                             icon 
-                            color="primary" 
+                            :color="darkMode? 'white': 'primary'" 
                             style="position: absolute; top: 80px; left: 72px;"
                             title="Changer ma photo de profil"
                             @click="onPickImg"
@@ -23,25 +47,48 @@
                         </v-btn> 
                         <input v-show="0" type="file" accept="image/*" ref="fileInput" @change="uptImg" />
                     </div>
-                </v-card-title>
-                <v-card-text class="text-center">
-                </v-card-text>
+                </v-card-title >
                 <!--main-block-tabs-->
                 <v-tabs-items>
                     <!--container-tabs-->
-                    <v-tabs center-active centered>
+                    <v-tabs 
+                    center-active 
+                    centered
+                    :color="darkMode? '': 'blue'" 
+                    :dark='darkMode'
+                    >
                         <!--Email-tab-->
                         <v-tab>E-mail</v-tab>
-                        <v-tab-item class="pa-4">
-                            <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                        <v-tab-item 
+                        :style="darkMode? 'background-color: #444444' : ''"
+                        class="pa-4"
+                        >
+                            <v-card 
+                            no-gutters elevation="5" 
+                            max-width=1000 
+                            min-height=350
+                            :color="darkMode? '': 'grey lighten-3'" 
+                            :dark='darkMode'
+                            class="d-flex flex-column align-center justify-center mx-auto py-4" 
+                            >
                                 <v-card-title>E-mail</v-card-title>
                                 <v-card-text class="d-flex justify-center">{{ userData.email }}</v-card-text>
                             </v-card>
                         </v-tab-item>
                         <!--description-tab-->
                         <v-tab>Description</v-tab>
-                        <v-tab-item class="pa-4">
-                            <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                        <v-tab-item 
+                        :style="darkMode? 'background-color: #444444' : ''"
+                        class="pa-4"
+                        >
+                            <v-card 
+                            no-gutters elevation="5" 
+                            max-width=1000 
+                            min-height=350 
+                            :color="darkMode? '': 'grey lighten-3'" 
+                            :dark='darkMode'
+                            class="d-flex flex-column align-center justify-center mx-auto py-4"
+                            >
                                 <v-card-title>Description</v-card-title>
                                 <v-card-text class="d-flex justify-center">
                                     <div v-if="userData.description" class="text-center">{{ userData.description }}</div>
@@ -52,7 +99,8 @@
                                 outlined  
                                 no-resize auto-grow
                                 rows=1
-                                background-color="white" 
+                                :background-color="darkMode?'grey darken-4':'white'" 
+                                :dark='darkMode' 
                                 placeholder="Ajouter un texte"
                                 counter
                                 :rules="descRules"
@@ -67,8 +115,18 @@
                         </v-tab-item>
                         <!--password-tab--->
                         <v-tab>Mot de passe</v-tab>
-                        <v-tab-item class="pa-4">
-                            <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                        <v-tab-item 
+                        :style="darkMode? 'background-color: #444444' : ''"
+                        class="pa-4"
+                        >
+                            <v-card 
+                            no-gutters elevation="5" 
+                            max-width=1000 
+                            min-height=350 
+                            :color="darkMode? '': 'grey lighten-3'" 
+                            :dark='darkMode'
+                            class="d-flex flex-column align-center justify-center mx-auto py-4" 
+                            >
                                 <!--success-dialog-->
                                 <v-alert v-if="success" outlined type="success" text dismissible>
                                     Votre mot de passe a été modifié avec succès
@@ -118,7 +176,10 @@
                         </v-tab-item>
                         <!--account-delete-tab-->
                         <v-tab>Compte</v-tab>
-                        <v-tab-item class="pa-4">
+                        <v-tab-item 
+                        :style="darkMode? 'background-color: #444444' : ''"
+                        class="pa-4"
+                        >
                             <!--alert-delete-account-dialog-->
                             <v-dialog
                                 v-model="dialog"
@@ -128,7 +189,14 @@
                             >
                                 <!--alert-delete-account-activator-->
                                 <template v-slot:activator="{ on }">
-                                    <v-card class="d-flex flex-column align-center justify-center mx-auto py-4" no-gutters elevation="5" color="grey lighten-3" max-width=1000 min-height=350>
+                                    <v-card 
+                                    no-gutters elevation="5" 
+                                    max-width=1000 
+                                    min-height=350 
+                                    :color="darkMode? '': 'grey lighten-3'" 
+                                    :dark='darkMode'
+                                    class="d-flex flex-column align-center justify-center mx-auto py-4" 
+                                    >
                                         <v-card-title>Type de compte</v-card-title>
                                         <v-card-text class="text-center">{{ userData.rights }}</v-card-text>
                                         <v-card-title>Supprimer mon compte</v-card-title>
@@ -234,6 +302,7 @@ export default {
             descRules: [
                 services.max255,
             ],
+            darkModeModel: true,
         };
     },
     computed: {
@@ -241,7 +310,8 @@ export default {
             "userData",
             "dialogErr",
             "dialogErrText", 
-            "success"
+            "success",
+            "darkMode",
         ]),
     },
     methods: {
@@ -251,7 +321,8 @@ export default {
             "uptImgProf",
             "uptDescProf",
             "delAccount", 
-            "setDialErr"
+            "setDialErr",
+            "setDarkMode"
         ]),
         modifyPasswd() {
             if(this.$refs.passwdForm.validate()) {
@@ -308,6 +379,9 @@ export default {
         onPickImg () {
             this.$refs.fileInput.click();
         }, 
+        darkFct(bool) {
+            alert(bool);
+        },
         close() {
             this.setDialErr(false);
         },

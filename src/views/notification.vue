@@ -1,7 +1,7 @@
 <template>
     <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h1 class="pa-5">Notifications</h1>
+            <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">Notifications</h1>
             <div v-if="getEmpty" class="text-center title">Vous n'avez pas de notifications !</div>
             <!--delete-read-all-button-->
             <div v-else class="pa-3 pt-0">
@@ -10,6 +10,8 @@
                 plain
                 text
                 tag="button"
+                :color='darkMode?"":"black"'
+                :dark='darkMode'
                 class="text-decoration-underline"
                 @click="readAllNotifs"
                 >Marquer tout comme lu</v-btn>
@@ -18,6 +20,8 @@
                 plain
                 text
                 tag="button"
+                :color='darkMode?"":"black"'
+                :dark='darkMode'
                 class="text-decoration-underline"
                 @click="delAllNotifs"
                 >Supprimer tout</v-btn>
@@ -25,7 +29,14 @@
             <!--notification-item-->
             <v-hover v-for="item in notifs" :key="item.notifId" style="overflow: hidden">
                     <template v-slot:default="{ hover }">
-                        <v-card shaped color="grey lighten-2" max-width=550 class="mx-auto mb-5 transition-swing" :elevation="hover ? 11 : 4">                            
+                        <v-card 
+                        shaped 
+                        max-width=550 
+                        :color="darkMode? '': 'grey lighten-2'" 
+                        :dark='darkMode'
+                        :elevation="hover ? 11 : 4"
+                        class="mx-auto mb-5 transition-swing" 
+                        >                            
                             <v-container class="pb-0" >
                                 <!--header-notif-->
                                 <v-row no-gutters>
@@ -49,7 +60,8 @@
                                     <v-col class="d-flex flex-grow-0 align-center">
                                         <v-btn
                                         icon 
-                                        color="grey lighten-1"
+                                        :color="darkMode? '': 'grey lighten-1'" 
+                                        :dark='darkMode'
                                         title="Supprimer la notification"
                                         class="pr-3"
                                         :loading="loading"
@@ -64,14 +76,19 @@
                             <!--expanded-notif-->
                             <v-expansion-panels>
                                 <v-expansion-panel>
-                                    <v-expansion-panel-header class="py-0" color="grey lighten-2" @click="readNotif(item)">
-                                        <v-icon color="primary">mdi-comment-processing</v-icon>
+                                    <v-expansion-panel-header 
+                                    class="py-0" 
+                                    :color="darkMode? '': 'grey lighten-2'" 
+                                    :dark='darkMode'
+                                    @click="readNotif(item)"
+                                    >
+                                        <v-icon :color="darkMode? '': 'primary'" :dark='darkMode'>mdi-comment-processing</v-icon>
                                         <v-badge :dot="!hover" :value="item.state == 'unread'" content="Nouveau" color="warning" style="position: absolute; left: 50%; top: 20px;"></v-badge>
                                     </v-expansion-panel-header>
                                     <!--expanded-message-->
-                                    <v-expansion-panel-content color="grey lighten-2">
+                                    <v-expansion-panel-content :color="darkMode? '': 'grey lighten-2'" :dark='darkMode'>
                                         <v-container>
-                                            <v-row>                                        
+                                            <v-row>
                                                 <v-col class="body-2">
                                                         &#x27a1;&#xfe0f; Publication du <span class="font-italic">{{ item.time.substring(0,20) }}</span>
                                                 </v-col>
@@ -133,6 +150,7 @@ export default {
             "userData",
             "publications",
             "notifs",
+            "darkMode"
         ]),
         getEmpty() {
             return !this.notifs.length >= 1;

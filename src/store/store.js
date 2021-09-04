@@ -20,6 +20,7 @@ export default new Vuex.Store({
         success: false,
         progress: false,
         showWelcome: true,
+        darkMode: false,
     },
     mutations: {
 
@@ -47,6 +48,9 @@ export default new Vuex.Store({
         SET_SHOW_WELCOME(state, bool) {
             state.showWelcome = bool;
         },
+        SET_DARK_MODE(state, bool) {
+            state.darkMode = bool;
+        }
     },
     actions: {
         access(context, authUrl) {
@@ -408,6 +412,7 @@ export default new Vuex.Store({
             context.state.success = false;
             context.state.progress = false;
             context.state.showWelcome = false;
+            context.state.darkMode = false;
             localStorage.removeItem("vuex");
             localStorage.removeItem("grpm_store");
         },
@@ -435,6 +440,11 @@ export default new Vuex.Store({
         setShowWelcome(context, bool) {
             context.commit("SET_SHOW_WELCOME", bool);
         },
+        setDarkMode(context, bool) {
+            context.commit("SET_DARK_MODE", bool);
+            return bool;
+
+        }
     },
     modules: {
     },

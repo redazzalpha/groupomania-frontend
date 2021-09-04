@@ -1,10 +1,11 @@
 <template>
     <v-hover v-slot="{ hover }">
         <v-card 
-        color="grey lighten-3" 
         max-width=550 
-        class="user-item mx-auto  pa-5 transition-swing" 
+        :color="darkMode? '': 'grey lighten-3'" 
+        :dark='darkMode'
         :elevation="hover ? 11 : 4" :ripple="false"
+        class="user-item mx-auto  pa-5 transition-swing" 
         >
             <v-container grid-list-xs class="pa-0">
                 <v-row class="d-flex flex-column align-center justify-center text-center">
@@ -21,6 +22,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import avatar from '../components/avatar.vue';
 export default {
     name: "usercard",
@@ -31,6 +33,11 @@ export default {
         hover: Boolean,
         item: Object,
     },
+    computed: {
+        ...mapState([
+            "darkMode",
+        ]),
+    }
 }
 </script>
 <style lang="scss" scoped>

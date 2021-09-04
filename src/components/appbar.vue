@@ -1,14 +1,25 @@
 <template>
-    <v-app-bar app tag="header" color="primary" class="d-flex flex-column" height=114>
+    <v-app-bar 
+    app 
+    height=114
+    tag="header"
+    :color="darkMode? '#212121': 'primary'" 
+    :dark='darkMode'
+    class="d-flex flex-column" 
+    >
         <v-container fluid>
             <!--logo-row-->
             <v-row no-gutters>
-                <v-col>
-                    <img class="header-logo" src="../assets/header_logo.svg" alt="header logo" width="70%" style="max-width: 300px;" />
+                <v-col id='imgCtr'>
+                    <img class="header-logo" alt="header logo" width="70%" style="max-width: 300px;" />
                 </v-col>
             </v-row>
             <!--toolbar-row-->
-            <v-row justify="center" no-gutters style="background-color: #3F51B5;">
+            <v-row 
+            justify="center" 
+            no-gutters 
+            :style="darkMode? 'background-color:#444444 ;' : 'background-color: #3F51B5;'"
+            >
                 <!--navbar-toggler-button-->
                 <v-col cols="2" class="d-flex justify-center">
                     <v-app-bar-nav-icon @click.stop="drawer = !drawer" title="Menu"></v-app-bar-nav-icon>
@@ -102,6 +113,7 @@ export default {
         ...mapState([
             "userData",
             "notifs",
+            "darkMode",
         ]),
         getUserImg() {
             if(this.userData)
@@ -114,6 +126,22 @@ export default {
             return 0;
         }
     },
+    methods: {
+        setThemeMode() {
+            const img = document.querySelector('img');
+            if(this.darkMode)
+                img.setAttribute('src', require("../assets/header_logo-dark.svg"));
+            else
+                img.setAttribute('src', require("../assets/header_logo-light.svg"));
+        },
+    },
+    watch: {
+        darkMode() {
+            this.setThemeMode();
+        },
+    },
+    mounted() {
+        this.setThemeMode();
+    },
 }
 </script>
-
