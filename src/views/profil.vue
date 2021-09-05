@@ -9,8 +9,6 @@
             :color="darkMode? '': ''" 
             :dark='darkMode' 
             >
-
-
                 <v-toolbar
                 class="d-flex justify-center title py-0 " 
                 :color="darkMode? '': 'grey'" 
@@ -379,9 +377,6 @@ export default {
         onPickImg () {
             this.$refs.fileInput.click();
         }, 
-        darkFct(bool) {
-            alert(bool);
-        },
         close() {
             this.setDialErr(false);
         },

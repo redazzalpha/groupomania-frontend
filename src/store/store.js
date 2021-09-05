@@ -403,7 +403,9 @@ export default new Vuex.Store({
             });
         },
         resetStore(context) {
+
             context.state.userData = {};
+            context.state.users = [];
             context.state.publications = [];
             context.state.comments = [];
             context.state.notifs = [];
@@ -440,11 +442,51 @@ export default new Vuex.Store({
         setShowWelcome(context, bool) {
             context.commit("SET_SHOW_WELCOME", bool);
         },
-        setDarkMode(context, bool) {
-            context.commit("SET_DARK_MODE", bool);
-            return bool;
+        setAppMode(context) {
+            // this function is used to 
+            // set header logo and app background
+            // according dark or light 
 
-        }
+            // remove base theme cause blocks
+            // modifications
+            const baseTheme = document.querySelector('.theme--light.v-application');
+            if(baseTheme)
+                baseTheme.classList.remove('theme--light');
+            // create html element img
+            // to replace header logo 
+            // according dark or light mode
+            const img = document.querySelector('img');
+            if(context.state.darkMode)
+                img.setAttribute('src', require("../assets/header_logo-dark.svg"));
+            else
+                img.setAttribute('src', require("../assets/header_logo-light.svg"));
+            // add/remove class to wrapper
+            // to set app background image 
+            // accotding dark or light mode
+            const wrapper = document.querySelector('#wrapper');
+            if (wrapper) {
+                if(context.state.darkMode) {
+                    wrapper.classList.remove('bg-light');
+                    wrapper.classList.add('bg-dark');
+                }
+                else{
+                    wrapper.classList.remove('bg-dark');
+                    wrapper.classList.add('bg-light');
+                }
+            }
+        },
+        async setDarkMode(context, bool) {
+            try {
+                const utils = new Utils();
+                await utils.post(`${defines.SERVER_URL}${defines.PROFIL_MODE_URL}`, { dark: bool? 1 : 0 });
+                return bool;
+            }
+            finally {
+                context.state.userData.dark = bool? 1 : 0;
+                context.dispatch('setAppMode');
+                context.state.darkMode = bool;
+            }
+        },
     },
     modules: {
     },

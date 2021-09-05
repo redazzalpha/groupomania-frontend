@@ -11,7 +11,7 @@
             <!--logo-row-->
             <v-row no-gutters>
                 <v-col id='imgCtr'>
-                    <img class="header-logo" alt="header logo" width="70%" style="max-width: 300px;" />
+                    <img class="header-logo" src='../assets/header_logo-light.svg' alt="header logo" width="70%" style="max-width: 300px;" />
                 </v-col>
             </v-row>
             <!--toolbar-row-->
@@ -125,23 +125,6 @@ export default {
                 return this.notifs.filter(item => item.state === "unread").length;
             return 0;
         }
-    },
-    methods: {
-        setThemeMode() {
-            const img = document.querySelector('img');
-            if(this.darkMode)
-                img.setAttribute('src', require("../assets/header_logo-dark.svg"));
-            else
-                img.setAttribute('src', require("../assets/header_logo-light.svg"));
-        },
-    },
-    watch: {
-        darkMode() {
-            this.setThemeMode();
-        },
-    },
-    mounted() {
-        this.setThemeMode();
     },
 }
 </script>

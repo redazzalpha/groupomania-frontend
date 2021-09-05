@@ -147,6 +147,7 @@ export default {
             "refresh",
             "setShowWelcome",
             "pubScroll",
+            "setDarkMode",
         ]),
         postPub(editorData) {
             this.loading = true
@@ -209,11 +210,8 @@ export default {
         .then( () => this.pubScroll() );
         setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10)
     },
+    mounted() {
+        this.setDarkMode(this.userData.dark? true:false);
+    }
 }
 </script>
-
-<style lang="scss">
-.ck.ck-editor__main>.ck-editor__editable {
-    min-height: 150px;
-}
-</style>

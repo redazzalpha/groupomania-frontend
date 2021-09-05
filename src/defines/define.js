@@ -11,6 +11,7 @@ const defines = {
     PROFIL_DESC_URL: "/app/profil/description",
     PROFIL_PASSWD_URL: "/app/profil/password",
     PROFIL_ACC_URL: "/app/profil/account",
+    PROFIL_MODE_URL: "/app/profil/mode",
     LOCK_USER_URL: "/app/profil/lock",
     UNLOCK_USER_URL: "/app/profil/unlock",
     PASSWORD_URL: "/app/password",

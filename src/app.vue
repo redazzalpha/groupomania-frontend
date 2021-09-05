@@ -20,7 +20,7 @@
         fab
         fixed
         bottom
-        right
+        right                                                                                                                                                                                                                                                                                                                                                       
         :color='darkMode? "" : "primary"'
         :dark='darkMode'
         tab="button"
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import appbar from "./components/appbar.vue";
 import progressBar from "./components/progressBar.vue";
 import ftr from "./components/footer.vue";
@@ -49,11 +49,16 @@ export default {
     },
     computed: {
         ...mapState([
+            "userData",
             "progress",
             "darkMode"
-        ])
+        ]),
     },
     methods: {
+        ...mapActions([
+            "setDarkMode",
+            "setAppMode",
+        ]),
         onScroll (e) {
             if (typeof window === 'undefined') return;
             const top = window.pageYOffset ||   e.target.scrollTop || 0;
@@ -62,34 +67,21 @@ export default {
         toTop () {
             this.$vuetify.goTo(0);
         },
-        setThemeMode() {
-            const wrapper = document.querySelector('#wrapper');
-            if(this.darkMode) {
-                wrapper.classList.remove('bg-light');
-                wrapper.classList.add('bg-dark');
-            }
-            else{
-                wrapper.classList.remove('bg-dark');
-                wrapper.classList.add('bg-light');
-            }
-        },
     },
     watch: {
-        darkMode() {
-            this.setThemeMode();
+        darkMode(bool) {
+            this.setDarkMode(bool);
         },
-    },
-    mounted() {
-        const wrapper = document.querySelector('.theme--light.v-application');
-        wrapper.classList.remove('theme--light');
-        this.setThemeMode();
     },
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #wrapper {
     background-size: 100vw 100vh !important;
+}
+.ck.ck-editor__main>.ck-editor__editable {
+    min-height: 150px;
 }
 .bg-light{
     background: url("./assets/bg-light.jpg") no-repeat fixed center !important;
