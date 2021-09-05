@@ -134,9 +134,11 @@ export default {
     },
     methods: {
         ...mapActions([
+            "userData",
             "setProgress",
             "pubScroll",
-            "getUsers"
+            "getUsers",
+            "setDarkMode",
         ]),
         gusers() {
             this.getUsers()

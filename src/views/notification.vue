@@ -2,7 +2,7 @@
     <auth :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">Notifications</h1>
-            <div v-if="getEmpty" class="text-center title">Vous n'avez pas de notifications !</div>
+            <div v-if="getEmpty" :class="darkMode?'pa-5 white--text text-center title':'pa-5 black--text text-center title'">Vous n'avez pas de notifications !</div>
             <!--delete-read-all-button-->
             <div v-else class="pa-3 pt-0">
                 <v-btn 

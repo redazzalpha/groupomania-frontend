@@ -5,7 +5,8 @@
             <!--welcom-alert-->
             <v-alert
             class="text-center mx-auto"
-            color="deep-purple accent-4"
+            :color="darkMode? '':'deep-purple accent-4'"
+            :dark='darkMode'
             max-width="550px"
             outlined
             text
@@ -59,11 +60,15 @@
                 </v-card-actions>
             </v-card>
             <!--publication-card-->
-            <div v-if="publications.length <= 0" class="title text-center">Il n'y a pas encore de publication soyez le premier à en créer une !</div>
+            <div 
+            v-if="publications.length <= 0" 
+            :class="darkMode?'pa-5 white--text title text-center':'pa-5 black--text title text-center'" 
+            >Il n'y a pas encore de publication soyez le premier à en créer une !</div>
             <pubcard
                 v-for="item in publications"
                 :key="item.pubId"
                 :item="item"
+                :usedArray="publications"
             ></pubcard>
             <!--error-dial-->
             <errordial
@@ -205,13 +210,11 @@ export default {
             this.showPage = ready;
         },
     },
-    created() {         
+    created() {
         this.refresh()
         .then( () => this.pubScroll() );
         setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10)
     },
-    mounted() {
-        this.setDarkMode(this.userData.dark? true:false);
-    }
 }
 </script>
+

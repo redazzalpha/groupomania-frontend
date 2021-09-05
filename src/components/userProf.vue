@@ -82,20 +82,13 @@
                         <v-col class="px-0">
                             <!--profil-publication-card-->
                             <div class="text-center text-h6">Dernières publications</div>
-                            <v-card-text v-if="undefined == publications.find(pub => pub.authorId == item.userId)" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
-                            <div v-for="pub in publications" :key="pub.pubId">
+                            <v-card-text v-if="undefined == pubs.find(pub => pub.authorId == item.userId)" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
+                            <div v-for="pub in pubs" :key="pub.pubId">
                                 <v-card-text v-if="item.userId == pub.authorId" style="z-index: 3;">
                                     <pubcard
                                     style="z-index: 3;"
                                     :item="pub"
-                                    @comment="comment"
-                                    @delPub="delPub"
-                                    @delCom="delCom"
-                                    @like="like"
-                                    @dislike="dislike"
-                                    @unlike="unlike"
-                                    @undislike="undislike"
-                                    @refresh="refresh"
+                                    :usedArray="pubs"
                                     ></pubcard>
                                 </v-card-text>
                             </div>
@@ -120,9 +113,13 @@ export default {
         dialog: Object,
         item: Object,
     },
+    data() {
+        return {
+            pubs: [],
+        };
+    },
     computed: {
         ...mapState([
-            "publications",
             "userData",
             "darkMode",
         ]),
@@ -141,6 +138,7 @@ export default {
             "revokeSuperUser",
             "lockUser",
             "unlockUser",
+            "getUserPubs",
         ]),
         authSuperUser(item) {
             if(item.rights == "basic") {
@@ -181,11 +179,13 @@ export default {
             // and show or not show features if user doesn't have super account
             return this.userData.rights == 'super' && this.userData.userId != item.userId;
         },
-        onClick () {
-        // Perform an action
+        async getPubs () {
+            this.pubs = await this.getUserPubs(this.item.userId);
+            this.pubs = this.pubs.body.results;
         },
     },
     created() {
+        this.getPubs();
     }
 }
 </script>

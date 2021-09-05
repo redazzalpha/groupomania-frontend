@@ -1,7 +1,7 @@
 <template>
     <v-dialog :value="model" persistent width="300">
         <v-card  :color='darkMode? "" : "primary"' :dark='darkMode'>
-            <v-card-text>
+            <v-card-text class="white--text">
                 Veuillez patienter...
                 <v-progress-linear
                 indeterminate

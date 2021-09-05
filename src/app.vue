@@ -72,6 +72,9 @@ export default {
         darkMode(bool) {
             this.setDarkMode(bool);
         },
+    },                                                          
+    beforeMount() {
+        this.setDarkMode(this.userData.dark? true : false);
     },
 }
 </script>

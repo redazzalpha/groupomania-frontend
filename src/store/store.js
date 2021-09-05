@@ -79,6 +79,7 @@ export default new Vuex.Store({
                                 .then(token => {
                                     localStorage.grpm_store = token;
                                     context.state.userData = jwt.decode(success.body.data.token);
+                                    context.state.darkMode = !!context.state.userData.dark;
                                     context.state.showWelcome = true;
                                     resolve();
                                 });
@@ -192,7 +193,9 @@ export default new Vuex.Store({
                 return result;
             }
         },
-        async like(context, data) {
+        async like(context, obj) {
+            const data = obj.item;
+            const array = obj.usedArray;
             if (data.userIdLike)
                 data.userIdLike.push(context.state.userData.userId);
             else data.userIdLike = [context.state.userData.userId];
@@ -201,25 +204,32 @@ export default new Vuex.Store({
             const utils = new Utils();
             const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_LIKE_URL}`, payload);
 
-            const pub = context.state.publications.find(item => item.pubId == data.pubId);
+            const pub = array.find(item => item.pubId == data.pubId);
+
             pub.postLike = result.body.postLike;
             pub.userIdLike.push(context.state.userData.userId);
             return result;
         },
-        async unlike(context, data) {
+        async unlike(context, obj) {
+            const data = obj.item;
+            const array = obj.usedArray;
+
             data.userIdLike = data.userIdLike.filter(item => { return item != context.state.userData.userId; });
             const payload = { data };
 
             const utils = new Utils();
             const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_UNLIKE_URL}`, payload);
 
-            const pub = context.state.publications.find(item => item.pubId == data.pubId);
+            const pub = array.find(item => item.pubId == data.pubId);
+
             pub.postLike = result.body.postLike;
             pub.userIdLike = pub.userIdLike.filter(item => item != context.state.userData.userId);
 
             return result;
         },
-        async dislike(context, data) {
+        async dislike(context, obj) {
+            const data = obj.item;
+            const array = obj.usedArray;
 
             if (data.userIdDislike)
                 data.userIdDislike.push(context.state.userData.userId);
@@ -229,19 +239,22 @@ export default new Vuex.Store({
             const utils = new Utils();
             const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_DISLIKE_URL}`, payload);
 
-            const pub = context.state.publications.find(item => item.pubId == data.pubId);
+            const pub = array.find(item => item.pubId == data.pubId);
             pub.postDislike = result.body.postDislike;
             pub.userIdDislike.push(context.state.userData.userId);
             return result;
         },
-        async undislike(context, data) {
+        async undislike(context, obj) {
+            const data = obj.item;
+            const array = obj.usedArray;
+
             data.userIdDislike = data.userIdDislike.filter(item => { return item != context.state.userData.userId; });
             const payload = { data };
 
             const utils = new Utils();
             const result = await utils.post(`${defines.SERVER_URL}${defines.PUBLISH_UNDISLIKE_URL}`, payload);
 
-            const pub = context.state.publications.find(item => item.pubId == data.pubId);
+            const pub = array.find(item => item.pubId == data.pubId);
             pub.postDislike = result.body.postDislike;
             pub.userIdDislike = pub.userIdDislike.filter(item => item != context.state.userData.userId);
             return result;
@@ -252,7 +265,13 @@ export default new Vuex.Store({
             const result = await utils.get(`${defines.SERVER_URL}${defines.USERS_URL}`);
             context.state.users = result.body.results;
             return result;
-
+        },
+        async getUserPubs(context, id) {
+            context.state.progress = true;
+            const utils = new Utils();
+            const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_URL}`, { params: { id } });
+            setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
+            return result;
         },
         async delPub(context, pubId) {
 

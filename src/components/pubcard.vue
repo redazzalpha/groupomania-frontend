@@ -61,7 +61,7 @@
                         tag="button"
                         :loading="loading" 
                         :disabled="loading" 
-                        @click="postLike({pubId: item.pubId, userIdLike: item.userIdLike, userIdDislike: item.userIdDislike})"
+                        @click="postLike( { usedArray, item } )"
                         >
                             <v-icon :color='item.userIdLike && item.userIdLike.find(item => item == userData.userId) ? "green": ""'>mdi-thumb-up</v-icon> {{ item.postLike }}
                         </v-btn>
@@ -73,7 +73,7 @@
                         tag="button"
                         :loading="loading" 
                         :disabled="loading" 
-                        @click="postDislike({pubId: item.pubId, userIdDislike: item.userIdDislike, userIdLike: item.userIdLike})"
+                        @click="postDislike({ usedArray, item })"
                         >
                             <v-icon
                             :color='item.userIdDislike && item.userIdDislike.find(item => item == userData.userId) ? "red": ""'>mdi-thumb-down</v-icon> {{ item.postDislike }}
@@ -145,6 +145,7 @@ export default {
     },
     props: {
         item: Object,
+        usedArray: Array,
     },
     data() {
         return {
@@ -191,11 +192,10 @@ export default {
             this.comText = "";
         },
         postLike(data) {
-
             this.loading = true;
-            const userIdLike = data.userIdLike;
-            const userIdDislike = data.userIdDislike;
-            
+            const userIdLike = data.item.userIdLike;
+            const userIdDislike = data.item.userIdDislike;
+
             if(userIdLike == null && userIdDislike == null) {
                 this.like(data);
             }
@@ -207,7 +207,7 @@ export default {
             }
             else if(userIdLike == null && userIdDislike) {
                 (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)) ?
-                this.$emit("like", data) : "";
+                this.like(data) : "";
             }
             else if(userIdLike && userIdDislike) {
                 if((userIdLike && !userIdLike.find(item => item == this.userData.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)))
@@ -216,13 +216,12 @@ export default {
                 else if((userIdLike && userIdLike.find(item => item == this.userData.userId)) && (userIdDislike && !userIdDislike.find(item => item == this.userData.userId)))
                 this.unlike(data);
             }
-
             setTimeout(() => {this.loading = false}, defines.TIMEOUT);
         },
         postDislike(data) {
             this.loading = true;
-            const userIdLike = data.userIdLike;
-            const userIdDislike = data.userIdDislike;
+            const userIdLike = data.item.userIdLike;
+            const userIdDislike = data.item.userIdDislike;
 
             if(userIdDislike == null && userIdLike == null) {
                 this.dislike(data);
@@ -244,7 +243,6 @@ export default {
                 else if((userIdDislike && userIdDislike.find(item => item == this.userData.userId)) && (userIdLike && !userIdLike.find(item => item == this.userData.userId)))
                 this.undislike(data);
             }
-
             setTimeout(() => {this.loading = false}, defines.TIMEOUT);
         },
         deletePub(pubId) {
