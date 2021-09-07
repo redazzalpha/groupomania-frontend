@@ -21,6 +21,8 @@ export default new Vuex.Store({
         progress: false,
         showWelcome: true,
         darkMode: false,
+        pubCount: 0,
+        limit: 2,
     },
     mutations: {
 
@@ -85,6 +87,7 @@ export default new Vuex.Store({
                                 });
                         },
                         failed => {
+
                             if (failed.body.error) {
                                 switch (failed.body.error.code) {
                                     case "ER_UNK_USER":
@@ -99,6 +102,10 @@ export default new Vuex.Store({
                                         throw new Error("Unknown error");
                                 }
                             }
+                            else if (failed.status == 0) {
+                                context.state.dialogErrText = `Le serveur est indisponible.`;
+                                context.state.dialogErr = true;
+                            }
                             reject(failed);
                         }
                     );
@@ -106,7 +113,6 @@ export default new Vuex.Store({
         },
         register(context, data) {
             return new Promise((resolve, reject) => {
-
                 Vue.http.post(`${defines.SERVER_URL}${defines.SIGNUP_URL}`, data)
                     .then(
                         (/*success*/) => {
@@ -116,20 +122,26 @@ export default new Vuex.Store({
                                 });
                         },
                         failed => {
-                            switch (failed.body.error.code) {
-                                case "ER_DUP_ENTRY":
-                                    if (/.*pseudo.*/gi.test(failed.body.error.sqlMessage))
-                                    context.state.dialogErrText = "Le pseudo que vous essayez de créer existe déjà.";
-                                    else if (/.*email.*/gi.test(failed.body.error.sqlMessage))
-                                        context.state.dialogErrText = "L'utilisateur que vous essayez de créer existe déjà.";
-                                    else context.state.dialogErrText = "Erreur inconnue.";
-
-                                    context.state.dialogErr = true;
-                                    break;
-                                default:
-                                    throw new Error("Unknown error");
+                            if (failed.body.error) {
+                                switch (failed.body.error.code) {
+                                    case "ER_DUP_ENTRY":
+                                        if (/.*pseudo.*/gi.test(failed.body.error.sqlMessage))
+                                        context.state.dialogErrText = "Le pseudo que vous essayez de créer existe déjà.";
+                                        else if (/.*email.*/gi.test(failed.body.error.sqlMessage))
+                                            context.state.dialogErrText = "L'utilisateur que vous essayez de créer existe déjà.";
+                                        else context.state.dialogErrText = "Erreur inconnue.";
+    
+                                        context.state.dialogErr = true;
+                                        break;
+                                    default:
+                                        throw new Error("Unknown error");
+                                }
                             }
-                            reject();
+                            else if (failed.status == 0) {
+                                context.state.dialogErrText = `Le serveur est indisponible.`;
+                                context.state.dialogErr = true;
+                            }
+                            reject(failed);
                         }
                     );
             });
@@ -157,7 +169,7 @@ export default new Vuex.Store({
                 };
                 const utils = new Utils();
                 const result = await utils.post(`${defines.SERVER_URL}${defines.COMMENT_URL}`, payload);
-                context.dispatch("refresh");
+                context.dispatch("refresh", context.state.publications.length);
                 return result;
             }
             // if comment is empty set error dialog
@@ -166,10 +178,11 @@ export default new Vuex.Store({
                 context.state.dialogErr = true;
             }
         },
-        async getPubs(context) {
+        async getPubs(context, limit) {
             const utils = new Utils();
-            const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_URL}`);
+            const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, { params: { limit: limit ? limit : 2 } });
             context.state.publications = result.body.results;
+            context.dispatch("pubsCount");
             return result;
         },
         async getComs(context) {
@@ -281,10 +294,9 @@ export default new Vuex.Store({
             return result;
         },
         async delCom(context, data) {
-
             const utils = new Utils();
             const result = await utils.delete(`${defines.SERVER_URL}${defines.COMMENT_DEL_URL}`, { params: { comId: data.comId } });
-            context.dispatch("refresh");
+            context.dispatch("refresh", context.state.publications.length);
             return result;
         },
         async delNotif(context, notifId) {
@@ -372,7 +384,7 @@ export default new Vuex.Store({
                 utils.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}`, { old: data.passwd, new: data.passwdChange })
                     .then(() => {
                         context.state.success = true;
-                        setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 2);
+                        setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 10);
                         resolve();
                     })
                     .catch(() => {
@@ -383,24 +395,30 @@ export default new Vuex.Store({
                     }); 
             });
         },
-        pubScroll(context) {
+        async pubScroll(context) {
             window.onscroll = async () => {
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
                     let size = context.state.publications ? context.state.publications.length : 0;
                     let lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
                     const utils = new Utils();
-                    if (size > 1 ) {
+                    if (size > 1 && size < context.state.pubCount) {
                         const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_SCROLL_URL}`, { params: { lpubid } });
                         for (let item of result.body.results)
-                            context.state.publications.push(item);
+                        context.state.publications.push(item);
                     }
                 }
             };
         },
-        refresh(context) {
+        async pubsCount(context) {
+            const utils = new Utils();
+            const success = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_COUNT_URL}`);
+            context.state.pubCount = success.body.results[0]["count(*)"];
+
+        },
+        refresh(context, limit) {
             return new Promise((resolve, reject) => {
                 context.state.progress = true;
-                context.dispatch("getPubs")
+                context.dispatch("getPubs", limit)
                     .then( () => {
                         context.dispatch("getComs")
                             .then( () => {
@@ -422,7 +440,6 @@ export default new Vuex.Store({
             });
         },
         resetStore(context) {
-
             context.state.userData = {};
             context.state.users = [];
             context.state.publications = [];

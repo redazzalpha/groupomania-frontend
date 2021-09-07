@@ -1,5 +1,5 @@
 <template>
-    <auth :authUrl="authUrl"  @onReady="trigger">
+    <auth tag="team" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">&Eacute;quipe</h1>
 

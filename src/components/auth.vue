@@ -1,5 +1,5 @@
 <template>
-    <div :class=tag>
+    <div :class="tag">
         <div>
             <slot></slot>
         </div>
@@ -74,7 +74,8 @@ export default {
             this.dialogErr = false;
             this.$emit("onReady", !this.dialogErr)
         })
-        .catch( () => {
+        .catch( error => {
+            // error locked account
             if(this.userData.locked) {
                 //localStorage.vuex = '';
                 this.click = this.lockGoRgstr;
@@ -83,6 +84,16 @@ export default {
                 this.dialogErr = true;
                 this.$emit("onReady", !this.dialogErr);
             }
+            // error on unavailable server
+            else if(error.status == 0) {
+
+                this.click = this.goRgstr;
+                this.text = `Le serveur est indisponible.`;
+                this.btnLabel = 'Ok';
+                this.dialogErr = true;
+                this.$emit("onReady", !this.dialogErr);
+            }
+            // error on authentification
             else {
                 this.resetStore();
                 this.click = this.goRgstr;

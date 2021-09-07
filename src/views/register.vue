@@ -197,6 +197,7 @@ export default {
         ]),
         validateLogin() {
             if (this.$refs.loginForm.validate()) {
+
                 this.loading = true;
                 const payload = {
                     email: this.emailLogin,
@@ -217,7 +218,6 @@ export default {
         validateRegister() {
             if (this.$refs.registerForm.validate()) {
                 this.loading = true;
-
                 const payload = {
                     pseudo: this.pseudoRgstr,
                     email: this.emailRgstr,

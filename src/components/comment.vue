@@ -18,12 +18,12 @@
                 <v-col v-if="item.parentId == pubId">
                     <v-container class="box body-2 pa-3" style="border: solid 1px grey; border-radius: 7px; background-color:#2962FF; box-shadow: 5px 5px 5px #424242; position: relative; z-index: 1;">
                         <div class="arrow" style="">&#9664;</div>
-                        <v-row class="pl-2 pt-1 white--text"> 
-                            <v-col class="text-decoration-underline flex-grow-0 pa-0">{{ item.pseudo}}</v-col>
-                            <v-col class="font-italic pa-0 pl-2 flex-grow-1">le {{ item.comTime.substring(0,20)}}</v-col>
+                        <v-row class="d-flex flex-column flex-sm-row pl-2 pt-1 white--text" >
+                            <v-col class="text-decoration-underline flex-grow-0  text-no-wrap pa-0 pr-2 ">{{ item.pseudo}}</v-col>
+                            <v-col class="font-italic pa-0 ">le {{ item.comTime.substring(0,20)}}</v-col>
                         </v-row>
                         <v-row class="align-center pl-2">
-                            <v-col cols=10 class="pa-0 pt-1 white--text" style="word-break: break-all;">{{ item.comText}}</v-col>
+                            <v-col cols=10 class="pa-0 pt-2 white--text" style="word-break: break-all;">{{ item.comText}}</v-col>
                             <v-col v-show="item.writerId == userData.userId || userData.rights == 'super'">
                                 <v-btn 
                                 icon 

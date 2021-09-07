@@ -1,5 +1,5 @@
 <template>
-    <auth tab="profil" :authUrl="authUrl"  @onReady="trigger">
+    <auth tag="profil" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <!--main-card-container-->
             <v-card 
@@ -125,10 +125,6 @@
                             :dark='darkMode'
                             class="d-flex flex-column align-center justify-center mx-auto py-4" 
                             >
-                                <!--success-dialog-->
-                                <v-alert v-if="success" outlined type="success" text dismissible>
-                                    Votre mot de passe a été modifié avec succès
-                                </v-alert>
                                 <!--password-card-->
                                 <v-card-title>Changer le mot de passe</v-card-title>
                                 <v-form ref="passwdForm" v-model="passwdValid">
@@ -249,6 +245,13 @@
                     </v-tabs>
                 </v-tabs-items>
             </v-card>
+            <!--alert-modification-message-->
+            <alert
+            :text='alertText'
+            type='success'
+            :watcher='alertWatcher'
+            @clickOut='closeAlert'
+            ></alert>
             <!--error-dialog-->
             <errordial
             title="Erreur Système"
@@ -275,12 +278,14 @@ import errordial from "../components/errordial.vue";
 import avatar from "../components/avatar.vue";
 import defines from '../defines/define';
 import services from '../services/app.service';
+import alert from '../components/alert.vue';
 export default {
     name: "profil",
     components: {
         auth,
         errordial,
         avatar,
+        alert,
     },
     data() {
         return {
@@ -293,6 +298,8 @@ export default {
             showPasswd: false,
             loading: false,
             dialog:false,
+            alertWatcher: false,
+            alertText: "", 
             passwdRules:[
                 services.requiredPasswd,
                 services.passwdValidator,
@@ -322,21 +329,19 @@ export default {
             "setDialErr",
             "setDarkMode"
         ]),
-        modifyPasswd() {
-            if(this.$refs.passwdForm.validate()) {
-                this.loading = true;
-                this.uptPasswdProf({passwd: this.passwd, passwdChange: this.passwdChange})
-                .then(() => {
-                    this.$refs.passwdForm.reset();
-                    setTimeout(() => {
-                        this.loading = false;
-                    }, defines.TIMEOUT);
-                })
-                .catch(() => {
-                    setTimeout(() => {
-                        this.loading = false;
-                    }, defines.TIMEOUT);
-                });
+        async modifyPasswd() {
+            try {
+                if(this.$refs.passwdForm.validate()) {
+                    this.loading = true;
+                    await this.uptPasswdProf({passwd: this.passwd, passwdChange: this.passwdChange});
+                    this.alertText = "Votre mot de passe a été modifié avec succès";
+                    this.alertWatcher = true;
+                }
+            }
+            finally {
+                setTimeout(() => {
+                    this.loading = false;
+                }, defines.TIMEOUT);
             }
         },
         uptImg (event) { 
@@ -347,25 +352,21 @@ export default {
             })
             .catch();
         },
-        uptDesc() {
+        async uptDesc() {
             // Empty string is authorized 
             // to delete previous description
-            if(this.description.length <= 255) {
-                this.loading = true;
-
-                this.uptDescProf(this.description)
-                .then( () => {
+            try {
+                if(this.description.length <= 255) {
+                    this.loading = true;
+                    await this.uptDescProf(this.description)
                     this.userData.description = this.description;
                     this.description = "";
-                    setTimeout(() => { 
-                        this.loading = false;
-                    }, defines.TIMEOUT);
-                })
-                .catch( () => {
-                    setTimeout(() => { 
-                        this.loading = false;
-                    }, defines.TIMEOUT);
-                });
+                    this.alertText = "Votre descrption  a été modifié avec succès";
+                    this.alertWatcher = true;
+                }
+            }
+            finally {
+                setTimeout(() => this.loading = false, defines.TIMEOUT);
             }
         },
         delAcc() {
@@ -378,7 +379,12 @@ export default {
             this.$refs.fileInput.click();
         }, 
         close() {
+            // this function is used
+            // to close error dialog
             this.setDialErr(false);
+        },
+        closeAlert() {
+            this.alertWatcher = false;
         },
         // function used for show or unshow view
         trigger(ready) {

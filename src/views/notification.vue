@@ -1,5 +1,5 @@
 <template>
-    <auth :authUrl="authUrl"  @onReady="trigger">
+    <auth tag="notificattion" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">Notifications</h1>
             <div v-if="getEmpty" :class="darkMode?'pa-5 white--text text-center title':'pa-5 black--text text-center title'">Vous n'avez pas de notifications !</div>
@@ -36,7 +36,7 @@
                         :dark='darkMode'
                         :elevation="hover ? 11 : 4"
                         class="mx-auto mb-5 transition-swing" 
-                        >                            
+                        >
                             <v-container class="pb-0" >
                                 <!--header-notif-->
                                 <v-row no-gutters>
@@ -137,7 +137,6 @@ export default {
             geditorData(text) {
                 return  this.editorData = text;
             },
-
             authUrl: `${defines.SERVER_URL}${defines.NOTIFICATION_URL}`, 
             showPage: false,
             hover: false,
@@ -181,6 +180,7 @@ export default {
         },
     },
     created() {
+        
         this.refresh();
     },
 }

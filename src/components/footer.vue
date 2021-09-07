@@ -1,7 +1,7 @@
 <template>
     <v-footer 
     padless
-    :color="darkMode? '': 'white'" 
+    color='transparent' 
     :dark='darkMode'
     class=" mt-5"
      >

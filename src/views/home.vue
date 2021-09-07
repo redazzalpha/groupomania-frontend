@@ -1,5 +1,5 @@
 <template>
-    <auth :authUrl="authUrl"  @onReady="trigger">
+    <auth tag="home" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">Dernières publications</h1>
             <!--welcom-alert-->
@@ -61,7 +61,7 @@
             </v-card>
             <!--publication-card-->
             <div 
-            v-if="publications.length <= 0" 
+            v-if="!pubCount" 
             :class="darkMode?'pa-5 white--text title text-center':'pa-5 black--text title text-center'" 
             >Il n'y a pas encore de publication soyez le premier à en créer une !</div>
             <pubcard
@@ -70,6 +70,17 @@
                 :item="item"
                 :usedArray="publications"
             ></pubcard>
+            <!--end-pub-scroll-message-->  
+            <v-alert 
+            v-if='publications.length >= pubCount' 
+            class="text-center mt-8 mx-auto elevation-12"
+            max-width=550 
+            outlined
+            text
+            :color="darkMode? '' : 'primary'"
+            :dark='darkMode'
+            >Vous avez atteint la publication la plus ancienne
+            </v-alert>
             <!--error-dial-->
             <errordial
             title="Erreur système"
@@ -143,6 +154,7 @@ export default {
             "dialogErr",
             "showWelcome",
             "darkMode",
+            "pubCount",
         ]),
     },
     methods: {
@@ -212,7 +224,7 @@ export default {
     },
     created() {
         this.refresh()
-        .then( () => this.pubScroll() );
+        this.pubScroll()
         setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10)
     },
 }

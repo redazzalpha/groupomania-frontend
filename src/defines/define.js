@@ -29,6 +29,7 @@ const defines = {
     PUBLISH_UNDISLIKE_URL: "/app/publish/undislike",
     PUBLISH_DEL_URL: "/app/publish/delete",
     PUBLISH_USER_URL: "/app/publish/user",    
+    PUBLISH_COUNT_URL: "/app/publish/count",    
     COMMENT_URL: "/app/publish/comment",
     COMMENT_DEL_URL: "/app/publish/comment/delete",
     AUTO_LOG_URL: "/app/autolog",

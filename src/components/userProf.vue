@@ -48,7 +48,6 @@
                 </template>
             </v-menu>
         </div>
-        
         <!--card-content-->
         <v-card-text class="px-0">
             <v-container grid-list-xs>
@@ -96,6 +95,13 @@
                     </v-row>
             </v-container>
         </v-card-text>
+        <!--alert-modification-message-->
+        <alert
+        :text='alertText'
+        :watcher='alertWatcher'
+        :type='alertType'
+        @clickOut='closeAlert'
+        ></alert>
     </v-card>
 </template>
 
@@ -103,11 +109,13 @@
 import { mapState, mapActions } from 'vuex';
 import pubcard from "../components/pubcard.vue"
 import avatar from "../components/avatar.vue"
+import alert from "../components/alert.vue"
 export default {
     name: "userProf",
     components: {
         pubcard,
         avatar,
+        alert,
     },
     props: {
         dialog: Object,
@@ -115,6 +123,9 @@ export default {
     },
     data() {
         return {
+            alertWatcher: false,
+            alertText: '',
+            alertType: '',
             pubs: [],
         };
     },
@@ -140,38 +151,55 @@ export default {
             "unlockUser",
             "getUserPubs",
         ]),
-        authSuperUser(item) {
-            if(item.rights == "basic") {
-                this.superUser(item.userId)
-                .then( () => {
+        async authSuperUser(item) {
+            // this function is used 
+            // to set grant access or revoke 
+            //  to user
+            try {
+                if(item.rights == "basic") {
+                    await this.superUser(item.userId)
+                    this.alertText = `${item.pseudo} est désormais administrateur`;
+                    this.alertType = 'success';
                     this.$emit('refresh');
-                })
-                .catch();
+                }
+                else {
+                    await this.revokeSuperUser(item.userId)
+                    this.alertText = `${item.pseudo} n'est plus  administrateur`;
+                    this.alertType = 'success';
+                    this.$emit('refresh');
+                }
             }
-            else {
-                this.revokeSuperUser(item.userId)
-                .then( () => {
-                    this.$emit('refresh');
-                })
-                .catch();
+            catch(e) {
+                this.alertText = 'Une erreur s\'est produite veuillez réessayer ultérieurement';
+                this.alertType = 'error';
+            }
+            finally {
+                this.alertWatcher = true;
             }
         },
-        userPass(item) {
+        async userPass(item) {
             // function is used to set 
             // locked or unlocked account user
-            if(item.locked) {
-                this.unlockUser(item.userId)
-                .then( () => {
+            try {
+                if(item.locked) {
+                    await this.unlockUser(item.userId)
+                    this.alertText = `Le compte de ${item.pseudo} a été débloqué avec succès`;
+                    this.alertType = 'success';
                     this.$emit('refresh');
-                })
-                .catch();
+                }
+                else {
+                    await this.lockUser(item.userId)
+                    this.alertText = `Le compte de ${item.pseudo} a été bloqué avec succès`;
+                    this.alertType = 'success';
+                    this.$emit('refresh');
+                }
             }
-            else {
-                this.lockUser(item.userId)
-                .then( () => {
-                    this.$emit('refresh');
-                })
-                .catch();
+            catch(e) {
+                this.alertText = 'Une erreur s\'est produite veuillez réessayer ultérieurement';
+                this.alertType = 'error';
+            }
+            finally {
+                this.alertWatcher = true;
             }
         },
         checkMenuSU(item) {
@@ -182,6 +210,9 @@ export default {
         async getPubs () {
             this.pubs = await this.getUserPubs(this.item.userId);
             this.pubs = this.pubs.body.results;
+        },
+        closeAlert() {
+            this.alertWatcher = false;
         },
     },
     created() {
