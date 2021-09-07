@@ -1,8 +1,7 @@
 <template>
     <auth tag="team" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">&Eacute;quipe</h1>
-
+            <h1 :class="'pa-5 ' + (darkMode?'white':'black') + '--text'">&Eacute;quipe</h1>
             <!--bbutton-style-view-->
             <div>
                 <v-btn 

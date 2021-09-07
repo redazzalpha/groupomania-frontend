@@ -1,5 +1,7 @@
 <template>
-    <v-app id="wrapper">
+    <v-app id="wrapper"
+    :style='"background: url(" + (darkMode? require("./assets/bg-dark.jpg") : require("./assets/bg-light.jpg")) + ") no-repeat fixed center;"'
+    >
         <!--header-->
         <appbar></appbar>
         <!--main-block-->
@@ -85,11 +87,5 @@ export default {
 }
 .ck.ck-editor__main>.ck-editor__editable {
     min-height: 150px;
-}
-.bg-light{
-    background: url("./assets/bg-light.jpg") no-repeat fixed center !important;
-}
-.bg-dark{
-    background: url("./assets/bg-dark.jpg") no-repeat fixed center !important;
 }
 </style>

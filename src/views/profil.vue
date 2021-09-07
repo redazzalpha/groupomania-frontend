@@ -6,7 +6,6 @@
             elevation=10 
             class="pb-4 mx-auto" 
             max-width="1050px"
-            :color="darkMode? '': ''" 
             :dark='darkMode' 
             >
                 <v-toolbar
@@ -20,13 +19,20 @@
                 <v-container >
                     <v-row>
                         <v-col class="d-flex px-5 pt-2">
-                            Claire
                             <v-switch
-                            @change='setDarkMode(!darkMode)'
+                            :hint="darkMode?'Sombre':'Claire'"
+                            color='primary'
+                            persistent-hint
                             :input-value='darkMode'
-                            :value='darkMode'
-                            ></v-switch>
-                            Sombre
+                            @change='setDarkMode(!darkMode)'
+                            >
+                            <template v-slot:prepend>
+                                <v-icon>mdi-brightness-5</v-icon>
+                            </template>
+                            <template v-slot:append>
+                                <v-icon>mdi-brightness-2</v-icon>
+                            </template>
+                            </v-switch>
                         </v-col>
                     </v-row>
                 </v-container>  
@@ -58,7 +64,7 @@
                         <!--Email-tab-->
                         <v-tab>E-mail</v-tab>
                         <v-tab-item 
-                        :style="darkMode? 'background-color: #444444' : ''"
+                            :style="darkMode? 'background-color: #444444' : ''"
                         class="pa-4"
                         >
                             <v-card 
@@ -339,9 +345,7 @@ export default {
                 }
             }
             finally {
-                setTimeout(() => {
-                    this.loading = false;
-                }, defines.TIMEOUT);
+                setTimeout(() => this.loading = false, defines.TIMEOUT);
             }
         },
         uptImg (event) { 

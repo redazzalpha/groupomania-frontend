@@ -11,14 +11,19 @@
             <!--logo-row-->
             <v-row no-gutters>
                 <v-col id='imgCtr'>
-                    <img class="header-logo" src='../assets/header_logo-light.svg' alt="header logo" width="70%" style="max-width: 300px;" />
+                    <img 
+                    class="header-logo" 
+                    width="70%" 
+                    alt="header logo" 
+                    :src='darkMode?require("../assets/header_logo-dark.svg"):require("../assets/header_logo-light.svg")' 
+                    style="max-width: 300px;" />
                 </v-col>
             </v-row>
             <!--toolbar-row-->
             <v-row 
             justify="center" 
             no-gutters 
-            :style="darkMode? 'background-color:#444444 ;' : 'background-color: #3F51B5;'"
+            :style="'background-color:' + (darkMode?'#444444':'#3F51B5')"
             >
                 <!--navbar-toggler-button-->
                 <v-col cols="2" class="d-flex justify-center">

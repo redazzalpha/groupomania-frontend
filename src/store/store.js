@@ -378,22 +378,19 @@ export default new Vuex.Store({
             localStorage.grpm_store = token;
             return result;
         },
-        uptPasswdProf(context, data) {
-            return new Promise((resolve, reject) => {
+        async uptPasswdProf(context, data) {
+            try {
                 const utils = new Utils();
-                utils.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}`, { old: data.passwd, new: data.passwdChange })
-                    .then(() => {
-                        context.state.success = true;
-                        setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 10);
-                        resolve();
-                    })
-                    .catch(() => {
-                        context.state.dialogErrText = "Le mot de passe que vous avez saisi est incorrect";
-                        context.state.dialogErr = true;
-                        context.state.success = false;
-                        reject();
-                    }); 
-            });
+                await utils.patch(`${defines.SERVER_URL}${defines.PASSWORD_URL}`, { old: data.passwd, new: data.passwdChange });
+                context.state.success = true;
+                setTimeout(() => { context.state.success = false; }, defines.TIMEOUT * 10);
+            }
+            catch (e) {
+                context.state.dialogErrText = "Le mot de passe que vous avez saisi est incorrect";
+                context.state.dialogErr = true;
+                context.state.success = false;
+                
+            }
         },
         async pubScroll(context) {
             window.onscroll = async () => {
@@ -413,31 +410,18 @@ export default new Vuex.Store({
             const utils = new Utils();
             const success = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_COUNT_URL}`);
             context.state.pubCount = success.body.results[0]["count(*)"];
-
         },
-        refresh(context, limit) {
-            return new Promise((resolve, reject) => {
+        async refresh(context, limit) {
+            try {
+
                 context.state.progress = true;
-                context.dispatch("getPubs", limit)
-                    .then( () => {
-                        context.dispatch("getComs")
-                            .then( () => {
-                                context.dispatch("getNotifs")
-                                    .then(() => {
-                                        setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
-                                        //context.state.progress = false;
-                                        resolve();
-                                    })
-                                    .catch(() => {
-                                        setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
-                                        //context.state.progress = false;
-                                        reject();
-                                    });
-                            })
-                            .catch(() => setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT) );
-                    })
-                    .catch(setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT) );
-            });
+                await context.dispatch("getPubs", limit);
+                await context.dispatch("getComs");
+                await context.dispatch("getNotifs");
+            }
+            finally {
+                setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
+            }
         },
         resetStore(context) {
             context.state.userData = {};
@@ -478,39 +462,6 @@ export default new Vuex.Store({
         setShowWelcome(context, bool) {
             context.commit("SET_SHOW_WELCOME", bool);
         },
-        setAppMode(context) {
-            // this function is used to 
-            // set header logo and app background
-            // according dark or light 
-
-            // remove base theme cause blocks
-            // modifications
-            const baseTheme = document.querySelector('.theme--light.v-application');
-            if(baseTheme)
-                baseTheme.classList.remove('theme--light');
-            // create html element img
-            // to replace header logo 
-            // according dark or light mode
-            const img = document.querySelector('img');
-            if(context.state.darkMode)
-                img.setAttribute('src', require("../assets/header_logo-dark.svg"));
-            else
-                img.setAttribute('src', require("../assets/header_logo-light.svg"));
-            // add/remove class to wrapper
-            // to set app background image 
-            // accotding dark or light mode
-            const wrapper = document.querySelector('#wrapper');
-            if (wrapper) {
-                if(context.state.darkMode) {
-                    wrapper.classList.remove('bg-light');
-                    wrapper.classList.add('bg-dark');
-                }
-                else{
-                    wrapper.classList.remove('bg-dark');
-                    wrapper.classList.add('bg-light');
-                }
-            }
-        },
         async setDarkMode(context, bool) {
             try {
                 const utils = new Utils();
@@ -519,8 +470,7 @@ export default new Vuex.Store({
             }
             finally {
                 context.state.userData.dark = bool? 1 : 0;
-                context.dispatch('setAppMode');
-                context.state.darkMode = bool;
+                context.commit('SET_DARK_MODE', bool);
             }
         },
     },

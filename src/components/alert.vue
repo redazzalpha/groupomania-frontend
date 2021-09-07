@@ -1,21 +1,27 @@
 <template>
     <v-dialog
-    hide-overlay
     v-model='alert' 
+    hide-overlay
+    :dark='darkMode'
     :max-width='maxWidth'
-    :transition='transition'
+    :transition='transition'                                                                                
     @click:outside='clickOut'
     >
-        <v-alert 
-        :type='type' 
+        <v-alert
         :max-width='maxWidth'
-        class="mx-auto ma-0"
+        class="mx-auto ma-0 white-text"
         style="text-align: center;"
-        >{{ text }}</v-alert>
+        >
+            <template v-slot:prepend>
+                <v-icon>mdi-check-circle</v-icon>
+            </template>        
+            {{ text }}
+        </v-alert>
     </v-dialog>
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     name: 'alert',
     props: {
@@ -35,6 +41,11 @@ export default {
         return {
             alert: false,
         };
+    },
+    computed: {
+        ...mapState([
+            "darkMode",
+        ]),
     },
     methods: {
         clickOut() {

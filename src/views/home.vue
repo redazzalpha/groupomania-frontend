@@ -1,7 +1,7 @@
 <template>
     <auth tag="home" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
-            <h1 :class="darkMode?'pa-5 white--text':'pa-5 black--text'">Dernières publications</h1>
+            <h1 :class="'pa-5 ' + (darkMode?'white':'black') + '--text'">Dernières publications</h1>
             <!--welcom-alert-->
             <v-alert
             class="text-center mx-auto"
@@ -62,7 +62,7 @@
             <!--publication-card-->
             <div 
             v-if="!pubCount" 
-            :class="darkMode?'pa-5 white--text title text-center':'pa-5 black--text title text-center'" 
+            :class="'title text-center pa-5 ' + (darkMode?'white':'black') +'--text'" 
             >Il n'y a pas encore de publication soyez le premier à en créer une !</div>
             <pubcard
                 v-for="item in publications"
