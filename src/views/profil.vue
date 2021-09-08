@@ -254,7 +254,6 @@
             <!--alert-modification-message-->
             <alert
             :text='alertText'
-            type='success'
             :watcher='alertWatcher'
             @clickOut='closeAlert'
             ></alert>
@@ -335,6 +334,23 @@ export default {
             "setDialErr",
             "setDarkMode"
         ]),
+        async uptDesc() {
+            // Empty string is authorized 
+            // to delete previous description
+            try {
+                if(this.description.length <= 255) {
+                    this.loading = true;
+                    await this.uptDescProf(this.description)
+                    this.userData.description = this.description;
+                    this.description = "";
+                    this.alertText = "Votre descrption  a été modifié avec succès";
+                    this.alertWatcher = true;
+                }
+            }
+            finally {
+                setTimeout(() => this.loading = false, defines.TIMEOUT);
+            }
+        },
         async modifyPasswd() {
             try {
                 if(this.$refs.passwdForm.validate()) {
@@ -355,23 +371,6 @@ export default {
                 this.userData.img = imgUrl;
             })
             .catch();
-        },
-        async uptDesc() {
-            // Empty string is authorized 
-            // to delete previous description
-            try {
-                if(this.description.length <= 255) {
-                    this.loading = true;
-                    await this.uptDescProf(this.description)
-                    this.userData.description = this.description;
-                    this.description = "";
-                    this.alertText = "Votre descrption  a été modifié avec succès";
-                    this.alertWatcher = true;
-                }
-            }
-            finally {
-                setTimeout(() => this.loading = false, defines.TIMEOUT);
-            }
         },
         delAcc() {
             this.delAccount(this.userData.userId)

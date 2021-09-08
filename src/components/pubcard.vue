@@ -36,7 +36,7 @@
                                     </v-btn>
                                 </v-col>
                             </v-row>
-                            <v-row no-gutters class="body-2 font-italic">
+                            <v-row no-gutters class="body-2 font-italic pt-5" >
                                 <v-col>publié le {{ item.time.substring(0,20) }}</v-col>
                             </v-row>
                         </v-container>

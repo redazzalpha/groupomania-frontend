@@ -1,22 +1,24 @@
 <template>
     <v-card
+    ref='card'
     :color="darkMode? '': ''" 
     :dark='darkMode'
+    v-scroll.self='onScroll'
+    style='max-height: 685px;'
+    class="overflow-y-auto"
     >
         <!--toolbar-title-->
         <v-toolbar 
         height="65px"
         :color="darkMode? '': 'primary'" 
         :dark='darkMode'
-        style="position: sticky; top:0px; z-index:1;" 
+        style="position: sticky; top:0px; z-index: 2;" 
         class="d-flex justify-center title px-1"
         >
             <v-toolbar-title>Profil de {{ item.pseudo }}</v-toolbar-title>
         </v-toolbar>
-        <div
-        style="position: sticky; top: 65px; z-index: 1;"
-        >
-            <!--menu-->
+        <!--menu-block-->
+        <div style="position: sticky; top: 65px; z-index: 1;">
             <v-menu>
                 <!--menu-activator-template-->
                 <template v-slot:activator="{ on, attrs }">
@@ -49,7 +51,7 @@
             </v-menu>
         </div>
         <!--card-content-->
-        <v-card-text class="px-0">
+        <v-card-text class="px-0" >
             <v-container grid-list-xs>
                 <!--user-img-row-->
                 <v-row class="justify-center">
@@ -65,43 +67,72 @@
                         <v-card-text v-else class="text-center">{{ item.pseudo }} n'a pas encore de description</v-card-text>
                     </v-col>
                 </v-row>
-                    <v-row>
-                        <v-col v-if="checkMenuSU(item)">
-                            <div class="text-center text-h6">Type de compte</div>
-                            <v-card-text class="text-center">{{ item.rights }}</v-card-text>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col v-if="checkMenuSU(item)">
-                            <div class="text-center text-h6">Status</div>
-                            <v-card-text class="text-center">{{ item.locked? 'Bloqué': 'Débloqué' }}</v-card-text>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col class="px-0">
-                            <!--profil-publication-card-->
-                            <div class="text-center text-h6">Dernières publications</div>
-                            <v-card-text v-if="undefined == pubs.find(pub => pub.authorId == item.userId)" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
-                            <div v-for="pub in pubs" :key="pub.pubId">
-                                <v-card-text v-if="item.userId == pub.authorId" style="z-index: 3;">
-                                    <pubcard
-                                    style="z-index: 3;"
-                                    :item="pub"
-                                    :usedArray="pubs"
-                                    ></pubcard>
-                                </v-card-text>
-                            </div>
-                        </v-col>
-                    </v-row>
+                <!--account-type-row-->
+                <v-row>
+                    <v-col v-if="checkMenuSU(item)">
+                        <div class="text-center text-h6">Type de compte</div>
+                        <v-card-text class="text-center">{{ item.rights }}</v-card-text>
+                    </v-col>
+                </v-row>
+                <!--account-status-row-->
+                <v-row>
+                    <v-col v-if="checkMenuSU(item)">
+                        <div class="text-center text-h6">Status</div>
+                        <v-card-text class="text-center">{{ item.locked? 'Bloqué': 'Débloqué' }}</v-card-text>
+                    </v-col>
+                </v-row>
+                <!--publication-card -row-->
+                <v-row>
+                    <v-col class="px-0">
+                        <div class="text-center text-h6">Dernières publications</div>
+                        <v-card-text v-if="undefined == userPubs.find(pub => pub.authorId == item.userId)" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
+                        <div v-for="pub in userPubs" :key="pub.pubId">
+                            <v-card-text v-if="item.userId == pub.authorId" style="z-index: 3;">
+                                <pubcard
+                                style="z-index: 3;"
+                                :item="pub"
+                                :usedArray="userPubs"
+                                ></pubcard>
+                            </v-card-text>
+                        </div>
+                    </v-col>
+                </v-row>
             </v-container>
+            <!--end-pub-scroll-message-->  
+            <v-alert 
+            v-if='userPubs.length >= userPubCount && !(undefined == userPubs.find(pub => pub.authorId == item.userId))'
+            class="text-center mt-8 mx-auto elevation-12"
+            max-width=550 
+            outlined
+            text
+            :color="darkMode? '' : 'primary'"
+            :dark='darkMode'
+            >Vous avez atteint la publication la plus ancienne
+            </v-alert>
+            <!--error-dial-->
         </v-card-text>
         <!--alert-modification-message-->
         <alert
         :text='alertText'
+        :icon='alertIcon'
         :watcher='alertWatcher'
-        :type='alertType'
         @clickOut='closeAlert'
         ></alert>
+        <!--scroll-top-button-->
+        <v-btn
+        v-show="fab"
+        fab
+        fixed
+        bottom
+        right                                                                                                                                                                                                                                                                                                                                                       
+        :color='darkMode? "" : "primary"'
+        :dark='darkMode'
+        tab="button"
+        @click="toTop"
+        >
+            <v-icon>mdi-chevron-up</v-icon>
+        </v-btn>
+
     </v-card>
 </template>
 
@@ -123,15 +154,18 @@ export default {
     },
     data() {
         return {
-            alertWatcher: false,
             alertText: '',
-            alertType: '',
+            alertIcon: '',
+            alertWatcher: false,
+            fab: false,
             pubs: [],
         };
     },
     computed: {
         ...mapState([
             "userData",
+            "userPubs",
+            "userPubCount",
             "darkMode",
         ]),
     },
@@ -150,6 +184,7 @@ export default {
             "lockUser",
             "unlockUser",
             "getUserPubs",
+            "userPubScroll",
         ]),
         async authSuperUser(item) {
             // this function is used 
@@ -159,13 +194,13 @@ export default {
                 if(item.rights == "basic") {
                     await this.superUser(item.userId)
                     this.alertText = `${item.pseudo} est désormais administrateur`;
-                    this.alertType = 'success';
+                    this.alertIcon = 'mdi-check-circle';
                     this.$emit('refresh');
                 }
                 else {
                     await this.revokeSuperUser(item.userId)
                     this.alertText = `${item.pseudo} n'est plus  administrateur`;
-                    this.alertType = 'success';
+                    this.alertIcon = 'mdi-check-circle';
                     this.$emit('refresh');
                 }
             }
@@ -184,13 +219,13 @@ export default {
                 if(item.locked) {
                     await this.unlockUser(item.userId)
                     this.alertText = `Le compte de ${item.pseudo} a été débloqué avec succès`;
-                    this.alertType = 'success';
+                    this.alertIcon = 'mdi-lock-open'
                     this.$emit('refresh');
                 }
                 else {
                     await this.lockUser(item.userId)
                     this.alertText = `Le compte de ${item.pseudo} a été bloqué avec succès`;
-                    this.alertType = 'success';
+                    this.alertIcon = 'mdi-lock'
                     this.$emit('refresh');
                 }
             }
@@ -208,11 +243,25 @@ export default {
             return this.userData.rights == 'super' && this.userData.userId != item.userId;
         },
         async getPubs () {
-            this.pubs = await this.getUserPubs(this.item.userId);
-            this.pubs = this.pubs.body.results;
+            await this.getUserPubs(this.item.userId);
         },
         closeAlert() {
             this.alertWatcher = false;
+        },
+        onScroll(e) {
+            // show button scroll top
+            const onBottom  = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+            if(e.target.scrollTop >= 160)
+                this.fab = true;
+            else
+                this.fab = false;
+            // intinite scroll user publications
+            if(onBottom) {
+                this.userPubScroll();
+            }
+        },
+        toTop () {
+            this.$el.scrollTop = 0;
         },
     },
     created() {

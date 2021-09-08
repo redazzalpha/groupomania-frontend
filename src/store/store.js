@@ -13,6 +13,7 @@ export default new Vuex.Store({
         userData: {},
         users: [],
         publications: [],
+        userPubs: [],
         comments: [],
         notifs: [],
         dialogErrText: "",
@@ -22,7 +23,7 @@ export default new Vuex.Store({
         showWelcome: true,
         darkMode: false,
         pubCount: 0,
-        limit: 2,
+        userPubCount: 0,
     },
     mutations: {
 
@@ -37,6 +38,9 @@ export default new Vuex.Store({
         },
         SET_PUBLICATIONS(state, payload) {
             state.publications = payload;
+        },
+        SET_USER_PUBS(state, pubs) {
+            state.userPubs = pubs;
         },
         SET_COMMENTS(state, payload) {
             state.comments = payload;
@@ -185,6 +189,15 @@ export default new Vuex.Store({
             context.dispatch("pubsCount");
             return result;
         },
+        async getUserPubs(context, id) {
+            context.state.progress = true;
+            const utils = new Utils();
+            const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_URL}`, { params: { id, limit: 2 } });
+            context.state.userPubs = result.body.results;
+            context.dispatch("userPubsCount", id);
+            setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
+            return result;
+        },
         async getComs(context) {
             const utils = new Utils();
             const result = await utils.get(`${defines.SERVER_URL}${defines.COMMENT_URL}`);
@@ -277,13 +290,6 @@ export default new Vuex.Store({
             const utils = new Utils();
             const result = await utils.get(`${defines.SERVER_URL}${defines.USERS_URL}`);
             context.state.users = result.body.results;
-            return result;
-        },
-        async getUserPubs(context, id) {
-            context.state.progress = true;
-            const utils = new Utils();
-            const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_URL}`, { params: { id } });
-            setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
             return result;
         },
         async delPub(context, pubId) {
@@ -393,8 +399,13 @@ export default new Vuex.Store({
             }
         },
         async pubScroll(context) {
-            window.onscroll = async () => {
-                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            // this function is used to 
+            // infinite scroll all pubs
+            // from home page
+            window.onscroll = async (e) => {
+                const bottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight;
+                const homePage = e.target.location.pathname == '/app/home';
+                if (bottom && homePage) {
                     let size = context.state.publications ? context.state.publications.length : 0;
                     let lpubid = { id: size ? context.state.publications[size - 1].pubId : 0 };
                     const utils = new Utils();
@@ -406,10 +417,28 @@ export default new Vuex.Store({
                 }
             };
         },
+        async userPubScroll(context) {
+            // this function is used to 
+            // infinite scroll user pubs
+            // from team user profile page
+            let size = context.state.userPubs ? context.state.userPubs.length : 0;
+            let lpubid = { id: size ? context.state.userPubs[size - 1].pubId : 0 };
+            const utils = new Utils();
+            if (size > 1 && size < context.state.userPubCount) {
+                const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_SCROLL_URL}`, { params: { lpubid } });
+                for (let item of result.body.results)
+                    context.state.userPubs.push(item);
+            }
+        },
         async pubsCount(context) {
             const utils = new Utils();
             const success = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_COUNT_URL}`);
             context.state.pubCount = success.body.results[0]["count(*)"];
+        },
+        async userPubsCount(context, id) {
+            const utils = new Utils();
+            const success = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_COUNT_URL}`, { params: { id }});
+            context.state.userPubCount = success.body.results[0]["count(*)"];
         },
         async refresh(context, limit) {
             try {
@@ -435,6 +464,8 @@ export default new Vuex.Store({
             context.state.progress = false;
             context.state.showWelcome = false;
             context.state.darkMode = false;
+            context.state.pubCount = 0;
+            context.state.userPubCount = 0;
             localStorage.removeItem("vuex");
             localStorage.removeItem("grpm_store");
         },
@@ -449,6 +480,9 @@ export default new Vuex.Store({
         },
         setPublications(context, payload) {
             context.commit("SET_PUBLICATIONS", payload);
+        },
+        setUserPubs(context, pubs) {
+            context.commit("SET_USER_PUBS", pubs);
         },
         setComments(context, payload) {
             context.commit("SET_COMMENTS", payload);

@@ -15,6 +15,7 @@
                 <v-col v-if="item.parentId == pubId" class="flex-grow-0 d-flex align-center pr-2">
                         <avatar :item="item" :size=40></avatar>
                 </v-col>
+                <!--comment-message-->
                 <v-col v-if="item.parentId == pubId">
                     <v-container class="box body-2 pa-3" style="border: solid 1px grey; border-radius: 7px; background-color:#2962FF; box-shadow: 5px 5px 5px #424242; position: relative; z-index: 1;">
                         <div class="arrow" style="">&#9664;</div>
@@ -23,7 +24,7 @@
                             <v-col class="font-italic pa-0 ">le {{ item.comTime.substring(0,20)}}</v-col>
                         </v-row>
                         <v-row class="align-center pl-2">
-                            <v-col cols=10 class="pa-0 pt-2 white--text" style="word-break: break-all;">{{ item.comText}}</v-col>
+                            <v-col cols=10 class="pa-0 pt-2 white--text text-break" >{{ item.comText}}</v-col>
                             <v-col v-show="item.writerId == userData.userId || userData.rights == 'super'">
                                 <v-btn 
                                 icon 

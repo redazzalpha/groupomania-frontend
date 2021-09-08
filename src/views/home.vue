@@ -223,9 +223,9 @@ export default {
         },
     },
     created() {
-        this.refresh()
-        this.pubScroll()
-        setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10)
+        this.refresh();
+        this.pubScroll();
+        setTimeout(() => {this.setShowWelcome(false)}, defines.TIMEOUT * 10);
     },
 }
 </script>

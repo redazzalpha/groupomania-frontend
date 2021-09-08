@@ -69,9 +69,9 @@
                         <!--dialog-->
                         <v-dialog
                         v-for="item in userList" :key="item.userId"
+                        :fullscreen="$vuetify.breakpoint.mobile"
                         transition="dialog-top-transition"
                         max-width="900px"
-                        :fullscreen="$vuetify.breakpoint.mobile"
                         >
                             <!--dialog-activator-->
                             <template v-slot:activator="{ on, attrs }">
@@ -90,7 +90,7 @@
                                 <userProf
                                 :dialog="dialog"
                                 :item="item"
-                                @refresh="refresh"
+                                @refresh="gusers"
                                 ></userProf>
                             </template> 
                         </v-dialog>                        
@@ -117,11 +117,11 @@ export default {
     data() {
         return {
             authUrl: `${defines.SERVER_URL}${defines.TEAM_URL}`, 
-            showPage: false,
             userList: [],
             input: "",
             hover: "",
             fieldValue: "",
+            showPage: false,
             fab: false,
         };
     },
@@ -141,21 +141,17 @@ export default {
         ]),
         gusers() {
             this.getUsers()
-            .then( () => this.userList = this.users )
-            .catch();
+            .then( () => this.userList = this.users );
         },
         findUser() {
             if(this.fieldValue != "") {
                 let regex = new RegExp(this.fieldValue, "gi");
                 this.userList = this.users.filter(item => {
-                    return regex.test(item.pseudo);
+                    return item.pseudo.match(regex);
                 });
             }
             else this.userList = this.users;
         },                         
-        refresh() {
-            this.gusers();
-        },
         // function used for show or unshow view
         trigger(ready) {
             this.showPage = ready;                                                                                                                         
@@ -172,7 +168,7 @@ export default {
         },
     },
     created() {
-        this.refresh();
+        this.gusers();
     },
 }
 </script>
