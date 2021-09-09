@@ -63,7 +63,7 @@
             <v-container grid-list-xs>
                 <v-row class="d-flex flex-wrap">
                     <v-col :class="'d-flex justify-center px-0 ' + (viewColumn?'flex-column':'flex-row flex-wrap')">
-                        <!--dialog-->
+                        <!--profil-dialog-->
                         <v-dialog
                         v-for="item in userList" :key="item.userId"
                         :fullscreen="$vuetify.breakpoint.mobile"
@@ -132,7 +132,6 @@ export default {
     methods: {
         ...mapActions([
             "userData",
-            "setProgress",
             "pubScroll",
             "getUsers",
             "setDarkMode",
@@ -155,7 +154,7 @@ export default {
             this.showPage = ready;                                                                                                                         
         },
     },
-    created() {
+    mounted() {
         this.gusers();
     },
 }

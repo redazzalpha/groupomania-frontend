@@ -20,11 +20,13 @@
                     <v-row>
                         <v-col class="d-flex px-5 pt-2">
                             <v-switch
-                            :hint="darkMode?'Sombre':'Claire'"
-                            color='primary'
                             persistent-hint
+                            color='primary'
+                            :loading='switchLoad'
+                            :disabled='switchLoad'
+                            :hint="darkMode?'Sombre':'Claire'"
                             :input-value='darkMode'
-                            @change='setDarkMode(!darkMode)'
+                            @change='onChange'
                             >
                             <template v-slot:prepend>
                                 <v-icon>mdi-brightness-5</v-icon>
@@ -302,6 +304,7 @@ export default {
             passwdValid: false,
             showPasswd: false,
             loading: false,
+            switchLoad: false,
             dialog:false,
             alertWatcher: false,
             alertText: "", 
@@ -332,7 +335,7 @@ export default {
             "uptDescProf",
             "delAccount", 
             "setDialErr",
-            "setDarkMode"
+            "setDarkMode",
         ]),
         async uptDesc() {
             // Empty string is authorized 
@@ -370,7 +373,6 @@ export default {
             .then( imgUrl => {
                 this.userData.img = imgUrl;
             })
-            .catch();
         },
         delAcc() {
             this.delAccount(this.userData.userId)
@@ -388,6 +390,11 @@ export default {
         },
         closeAlert() {
             this.alertWatcher = false;
+        },
+        onChange() {
+            this.switchLoad = true;
+            this.setDarkMode(!this.darkMode);
+            setTimeout(() => {this.switchLoad = false;}, 1000);
         },
         // function used for show or unshow view
         trigger(ready) {

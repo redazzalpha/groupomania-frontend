@@ -68,30 +68,25 @@ export default {
             this.$router.push('/register');
         }
     },
-    created() {
-        this.access(this.authUrl)
-        .then(() => {
+    async created() {
+        try {
+            await this.access(this.authUrl);
             this.dialogErr = false;
-            this.$emit("onReady", !this.dialogErr)
-        })
-        .catch( error => {
+        }
+        catch(error) {
+            this.dialogErr = true;
             // error locked account
             if(this.userData.locked) {
                 //localStorage.vuex = '';
                 this.click = this.lockGoRgstr;
                 this.text = 'Votre compte est bloqué.';
                 this.btnLabel = 'Ok';
-                this.dialogErr = true;
-                this.$emit("onReady", !this.dialogErr);
             }
             // error on unavailable server
             else if(error.status == 0) {
-
                 this.click = this.goRgstr;
                 this.text = `Le serveur est indisponible.`;
                 this.btnLabel = 'Ok';
-                this.dialogErr = true;
-                this.$emit("onReady", !this.dialogErr);
             }
             // error on authentification
             else {
@@ -99,10 +94,11 @@ export default {
                 this.click = this.goRgstr;
                 this.text = 'Vous n\'êtes pas authentifié.';
                 this.btnLabel = 'Se connecter';
-                this.dialogErr = true;
-                this.$emit("onReady", !this.dialogErr);
             }
-        });
+        }
+        finally {
+            this.$emit("onReady", !this.dialogErr)
+        }
     },
 }
 </script>

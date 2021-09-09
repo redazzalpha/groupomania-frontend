@@ -59,22 +59,15 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        access(context, authUrl) {
+        async access(context, authUrl) {
+            context.state.progress = true;
             // access function is used to access resources
             // this function should be used only by auth component
             // and register view
-            return new Promise((resolve, reject) => {
-                const utils = new Utils();
-                utils.access(authUrl)
-                    .then(success => {
-                        context.state.progress = false;
-                        resolve(success);
-                    })
-                    .catch(failed => {
-                        context.state.progress = false;
-                        reject(failed);
-                    });
-            });
+            const utils = new Utils();
+            const result = await utils.access(authUrl);
+            context.state.progress = false;
+            return result;
         },
         login(context, data) {
             return new Promise((resolve, reject) => {
@@ -152,6 +145,7 @@ export default new Vuex.Store({
         },
         async publish(context, editorData) {
             if (editorData && services.isNotEmpty(editorData)) {
+                context.state.progress = true; // don't need to stop progress cause refresh already does it 
                 let pub = editorData.replace("\\", "/");
                 pub = pub.replace("'", "\\'");
                 const utils = new Utils();
@@ -166,6 +160,7 @@ export default new Vuex.Store({
         },
         async comment(context, data) {
             if (data.comText && services.isNotEmpty(data.comText)) {
+                context.state.progress = true; // don't need to stop progress cause refresh already does it 
                 const payload = {
                     parentId: data.parentId,
                     comText: data.comText,
@@ -190,12 +185,10 @@ export default new Vuex.Store({
             return result;
         },
         async getUserPubs(context, id) {
-            context.state.progress = true;
             const utils = new Utils();
             const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_URL}`, { params: { id, limit: 2 } });
             context.state.userPubs = result.body.results;
             context.dispatch("userPubsCount", id);
-            setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
             return result;
         },
         async getComs(context) {
@@ -286,10 +279,11 @@ export default new Vuex.Store({
             return result;
         },
         async getUsers(context) {
-
+            context.state.progress = true;
             const utils = new Utils();
             const result = await utils.get(`${defines.SERVER_URL}${defines.USERS_URL}`);
             context.state.users = result.body.results;
+            context.state.progress = false;
             return result;
         },
         async delPub(context, pubId) {
@@ -367,12 +361,13 @@ export default new Vuex.Store({
         async uptImgProf(context, file) {
 
             if (file) {
+                context.state.progress = true;
                 const formData = new FormData();
                 formData.append("image", file, file.name);
-    
                 const utils = new Utils();
                 const result = await utils.post(`${defines.SERVER_URL}${defines.PROFIL_IMG_URL}`, formData);
                 localStorage.grpm_store = JSON.stringify(result.body);
+                context.state.progress = false;
                 return result.body.data.imgUrl;            
             }
         },
@@ -442,14 +437,13 @@ export default new Vuex.Store({
         },
         async refresh(context, limit) {
             try {
-
                 context.state.progress = true;
                 await context.dispatch("getPubs", limit);
                 await context.dispatch("getComs");
                 await context.dispatch("getNotifs");
             }
             finally {
-                setTimeout(() => { context.state.progress = false; }, defines.TIMEOUT);
+                context.state.progress = false;
             }
         },
         resetStore(context) {

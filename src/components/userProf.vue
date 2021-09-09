@@ -184,7 +184,6 @@ export default {
             "dislike",
             "unlike",
             "undislike",
-            "refresh",
             "superUser",
             "revokeSuperUser",
             "lockUser",
