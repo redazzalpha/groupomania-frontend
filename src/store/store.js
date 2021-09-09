@@ -417,7 +417,7 @@ export default new Vuex.Store({
                 }
             };
         },
-        async userPubScroll(context) {
+        async userPubScroll(context, id) {
             // this function is used to 
             // infinite scroll user pubs
             // from team user profile page
@@ -425,7 +425,7 @@ export default new Vuex.Store({
             let lpubid = { id: size ? context.state.userPubs[size - 1].pubId : 0 };
             const utils = new Utils();
             if (size > 1 && size < context.state.userPubCount) {
-                const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_SCROLL_URL}`, { params: { lpubid } });
+                const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_SCROLL_URL}`, { params: { lpubid, id } });
                 for (let item of result.body.results)
                     context.state.userPubs.push(item);
             }

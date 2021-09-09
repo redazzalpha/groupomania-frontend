@@ -1,5 +1,10 @@
 <template>
-    <div class="pubCard">
+    <v-lazy
+    v-model="isActive"
+    :options="{ threshold: .9}"
+    transition="fade-transition"
+    class="pubCard"
+    >
         <!--Publications-cards-->
         <v-card
         max-width=550 
@@ -102,7 +107,6 @@
                             tag="textarea"
                             :rules="rules"
                             >
-
                                 <template v-slot:prepend>
                                     <avatar :item="userData" :size=45></avatar>
                                 </template>
@@ -126,7 +130,7 @@
                 </v-row>
             </v-container>
         </v-card>
-    </div>
+    </v-lazy>
 </template>
 
 <script>
@@ -166,6 +170,7 @@ export default {
             rules: [
                 services.max255,
             ],
+            isActive: false,
         };
     },
     computed: {

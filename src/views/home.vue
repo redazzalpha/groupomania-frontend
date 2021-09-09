@@ -36,7 +36,13 @@
                     </v-row>
                 </v-container>
                 <v-card-text>
-                    <ckeditor tag="textarea" :editor="editor" v-model="editorData" :config="editorConfig"> </ckeditor> 
+                    <ckeditor 
+                    tag="textarea" 
+                    :editor="editor" 
+                    v-model="editorData" 
+                    :config="editorConfig"
+                    style="background-color: red !important;"
+                    ></ckeditor> 
                 </v-card-text>
                 <v-card-actions>
                     <!--buttons-->
@@ -71,16 +77,22 @@
                 :usedArray="publications"
             ></pubcard>
             <!--end-pub-scroll-message-->  
-            <v-alert 
-            v-if='publications.length >= pubCount' 
-            class="text-center mt-8 mx-auto elevation-12"
-            max-width=550 
-            outlined
-            text
-            :color="darkMode? '' : 'primary'"
-            :dark='darkMode'
-            >Vous avez atteint la publication la plus ancienne
-            </v-alert>
+            <v-lazy
+            v-model="isActive"
+            :options="{ threshold: .9}"
+            transition="fade-transition"
+            >
+                <v-alert 
+                v-if='publications.length >= pubCount' 
+                class="text-center mt-8 mx-auto elevation-12"
+                max-width=550 
+                outlined
+                text
+                :color="darkMode? '' : 'primary'"
+                :dark='darkMode'
+                >Vous avez atteint la publication la plus ancienne
+                </v-alert>
+            </v-lazy>
             <!--error-dial-->
             <errordial
             title="Erreur système"
@@ -136,6 +148,7 @@ export default {
                 ],
             },
             authUrl: `${defines.SERVER_URL}${defines.HOME_URL}`, 
+            isActive: false,
             showPage: false,
             loading: false,
             loader: null,

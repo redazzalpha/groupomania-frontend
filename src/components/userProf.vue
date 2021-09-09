@@ -112,12 +112,18 @@
             <!--error-dial-->
         </v-card-text>
         <!--alert-modification-message-->
-        <alert
-        :text='alertText'
-        :icon='alertIcon'
-        :watcher='alertWatcher'
-        @clickOut='closeAlert'
-        ></alert>
+        <v-lazy
+        v-model="isActive"
+        :options="{ threshold: .9}"
+        transition="fade-transition"
+        >
+            <alert
+            :text='alertText'
+            :icon='alertIcon'
+            :watcher='alertWatcher'
+            @clickOut='closeAlert'
+            ></alert>
+        </v-lazy>
         <!--scroll-top-button-->
         <v-btn
         v-show="fab"
@@ -132,7 +138,6 @@
         >
             <v-icon>mdi-chevron-up</v-icon>
         </v-btn>
-
     </v-card>
 </template>
 
@@ -158,6 +163,7 @@ export default {
             alertIcon: '',
             alertWatcher: false,
             fab: false,
+            isActive: false,
             pubs: [],
         };
     },
@@ -257,7 +263,7 @@ export default {
                 this.fab = false;
             // intinite scroll user publications
             if(onBottom) {
-                this.userPubScroll();
+                this.userPubScroll(this.item.userId);
             }
         },
         toTop () {
@@ -270,3 +276,8 @@ export default {
 }
 </script>
 
+<style lang="scss" scoped>
+.v-sheet.v-card:not(.v-sheet--outlined) {
+    scroll-behavior: smooth;
+}
+</style>

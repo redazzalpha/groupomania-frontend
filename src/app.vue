@@ -83,9 +83,11 @@ export default {
 
 <style lang="scss">
 #wrapper {
+    scroll-behavior: smooth;
     background-size: 100vw 100vh !important;
 }
 .ck.ck-editor__main>.ck-editor__editable {
     min-height: 150px;
+    background: unset !important;
 }
 </style>
