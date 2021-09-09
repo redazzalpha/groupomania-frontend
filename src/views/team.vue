@@ -8,10 +8,10 @@
                 text
                 plain
                 tag='button'
-                title='Vue en line'
+                title='Vue en colonne'
                 :color="darkMode? '': 'black'" 
                 :dark='darkMode'
-                @click="viewLine"
+                @click="viewColumn=true"
                 >
                     <v-icon>mdi-filter-variant</v-icon>
                 </v-btn>
@@ -22,7 +22,7 @@
                 title='Vue en bloc'
                 :color="darkMode? '': 'black'" 
                 :dark='darkMode'
-                @click="viewBlock"
+                @click="viewColumn=false"
                 >
                     <v-icon>mdi-border-all</v-icon>
                 </v-btn>
@@ -62,10 +62,7 @@
             <!--user-item-block-->
             <v-container grid-list-xs>
                 <v-row class="d-flex flex-wrap">
-                    <!-- to change the view of the user profile item
-                    set flex to flex-column or flex-wrap
-                    -->
-                    <v-col class="d-flex flex-column justify-center px-0 items">
+                    <v-col :class="'d-flex justify-center px-0 ' + (viewColumn?'flex-column':'flex-row flex-wrap')">
                         <!--dialog-->
                         <v-dialog
                         v-for="item in userList" :key="item.userId"
@@ -75,7 +72,7 @@
                         >
                             <!--dialog-activator-->
                             <template v-slot:activator="{ on, attrs }">
-                                <v-col v-on="on" v-bind="attrs"  class="px-2 col-sm-6 mx-auto">
+                                <v-col v-on="on" v-bind="attrs"  :class="'mx-auto ' + (!viewColumn?'col-6':'')">
                                     <!--user-Item-->
                                     <userItem
                                     :hover="hover"
@@ -121,6 +118,7 @@ export default {
             input: "",
             hover: "",
             fieldValue: "",
+            viewColumn: true,
             showPage: false,
             fab: false,
         };
@@ -155,16 +153,6 @@ export default {
         // function used for show or unshow view
         trigger(ready) {
             this.showPage = ready;                                                                                                                         
-        },
-        viewLine() {
-            const col = document.querySelector('.items');
-            col.classList.remove('flex-wrap')
-            col.classList.add('flex-column')
-        },
-        viewBlock() {
-            const col = document.querySelector('.items');
-            col.classList.remove('flex-column')
-            col.classList.add('flex-wrap')
         },
     },
     created() {
