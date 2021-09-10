@@ -52,7 +52,7 @@
                                             </v-row>
                                             <v-row no-gutters>
                                                 <v-col>
-                                                    <v-card-text class="pa-0 font-italic">le {{ item.comTime.substring(0,20) }}</v-card-text>
+                                                    <v-card-text class="pa-0 font-italic">le {{ item.comTime }}</v-card-text>
                                                 </v-col>
                                             </v-row>
                                         </v-container>
@@ -90,7 +90,7 @@
                                         <v-container>
                                             <v-row>
                                                 <v-col class="body-2">
-                                                        &#x27a1;&#xfe0f; Publication du <span class="font-italic">{{ item.time.substring(0,20) }}</span>
+                                                        &#x27a1;&#xfe0f; Publication du <span class="font-italic">{{ item.time }}</span>
                                                 </v-col>
                                             </v-row>
                                             <v-row>

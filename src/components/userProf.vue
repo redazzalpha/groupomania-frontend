@@ -87,7 +87,7 @@
                 <v-row>
                     <v-col class="px-0">
                         <div class="text-center text-h6">Dernières publications</div>
-                        <v-card-text v-if="undefined == userPubs.find(pub => pub.authorId == item.userId)" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
+                        <v-card-text v-if="!userPubCount" class="text-center">{{ item.pseudo }} n'a pas encore de publication</v-card-text>
                         <div v-for="pub in userPubs" :key="pub.pubId">
                             <v-card-text v-if="item.userId == pub.authorId" style="z-index: 3;">
                                 <pubcard
@@ -102,7 +102,7 @@
             </v-container>
             <!--end-pub-scroll-message-->  
             <v-alert 
-            v-if='userPubs.length >= userPubCount && !(undefined == userPubs.find(pub => pub.authorId == item.userId))'
+            v-if='userPubCount && userPubs.length >= userPubCount'
             class="text-center mt-8 mx-auto elevation-12"
             max-width=550 
             outlined

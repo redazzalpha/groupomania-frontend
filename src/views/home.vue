@@ -82,7 +82,7 @@
             transition="fade-transition"
             >
                 <v-alert 
-                v-if='publications.length >= pubCount' 
+                v-if='pubCount && publications.length >= pubCount ' 
                 class="text-center mt-8 mx-auto elevation-12"
                 max-width=550 
                 outlined

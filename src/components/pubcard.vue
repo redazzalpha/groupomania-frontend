@@ -42,7 +42,7 @@
                                 </v-col>
                             </v-row>
                             <v-row no-gutters class="body-2 font-italic" >
-                                <v-col>publié le {{ item.time.substring(0,20) }}</v-col>
+                                <v-col>publié le {{ item.time }}</v-col>
                             </v-row>
                         </v-container>
                     </v-col>
