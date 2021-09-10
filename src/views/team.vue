@@ -2,7 +2,7 @@
     <auth tag="team" :authUrl="authUrl"  @onReady="trigger">
         <slot v-if="showPage">
             <h1 :class="'pa-5 ' + (darkMode?'white':'black') + '--text'">&Eacute;quipe</h1>
-            <!--bbutton-style-view-->
+            <!--button-style-view-->
             <div>
                 <v-btn 
                 text
@@ -75,9 +75,9 @@
                                 <v-col v-on="on" v-bind="attrs"  :class="'mx-auto ' + (!viewColumn?'col-6':'')">
                                     <!--user-Item-->
                                     <userItem
-                                    :hover="hover"
-                                    :item="item"
                                     tag="button"
+                                    :item="item"
+                                    :viewColumn='viewColumn'
                                     ></userItem>
                                 </v-col>
                             </template>
@@ -116,7 +116,6 @@ export default {
             authUrl: `${defines.SERVER_URL}${defines.TEAM_URL}`, 
             userList: [],
             input: "",
-            hover: "",
             fieldValue: "",
             viewColumn: true,
             showPage: false,
@@ -127,7 +126,7 @@ export default {
         ...mapState([
             "users",
             "darkMode"
-        ])
+        ]),
     },
     methods: {
         ...mapActions([

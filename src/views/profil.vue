@@ -6,7 +6,8 @@
             elevation=10 
             class="pb-4 mx-auto" 
             max-width="1050px"
-            :dark='darkMode' 
+            :dark='darkMode'
+            :style='"background: url(" + (darkMode? require("../assets/bg-dark.jpg") : require("../assets/bg-light.jpg")) + ") no-repeat fixed center; background-size: 100vw 100vh !important"'
             >
                 <v-toolbar
                 class="d-flex justify-center title py-0 " 

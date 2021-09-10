@@ -5,9 +5,12 @@ import store from './store/store';
 import vuetify from './plugins/vuetify';
 import vueRessource from 'vue-resource';
 import CKEditor from '@ckeditor/ckeditor5-vue2';
+import VueObserveVisibility from 'vue-observe-visibility';
 
+Vue.use(VueObserveVisibility);
 Vue.use(CKEditor);
 Vue.use(vueRessource);
+
 Vue.http.interceptors.push(function (req) {
     //set interceptor headers
     req.headers.set("Accept", "application/json");

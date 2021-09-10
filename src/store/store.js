@@ -178,17 +178,21 @@ export default new Vuex.Store({
             }
         },
         async getPubs(context, limit) {
+            context.state.progress = true;
             const utils = new Utils();
             const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_URL}`, { params: { limit: limit ? limit : 2 } });
             context.state.publications = result.body.results;
             context.dispatch("pubsCount");
+            context.state.progress = false;
             return result;
         },
         async getUserPubs(context, id) {
+            context.state.progress = true;
             const utils = new Utils();
             const result = await utils.get(`${defines.SERVER_URL}${defines.PUBLISH_USER_URL}`, { params: { id, limit: 2 } });
             context.state.userPubs = result.body.results;
             context.dispatch("userPubsCount", id);
+            context.state.progress = false;
             return result;
         },
         async getComs(context) {

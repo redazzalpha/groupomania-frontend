@@ -6,6 +6,7 @@
         :dark='darkMode'
         :elevation="hover ? 11 : 4" :ripple="false"
         class="user-item mx-auto  pa-5 transition-swing" 
+        :height='height'
         >
             <v-container grid-list-xs class="pa-0">
                 <v-row class="d-flex flex-column align-center justify-center text-center">
@@ -30,10 +31,16 @@ export default {
         avatar,
     },
     props: {
-        hover: Boolean,
         item: Object,
+        viewColumn: Boolean,
     },
     computed: {
+        height() {
+            if(this.$vuetify.breakpoint.xs && !this.viewColumn)
+                return 185;
+            else return '';
+        },
+
         ...mapState([
             "darkMode",
         ]),

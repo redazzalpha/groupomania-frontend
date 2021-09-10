@@ -41,7 +41,6 @@
                     :editor="editor" 
                     v-model="editorData" 
                     :config="editorConfig"
-                    style="background-color: red !important;"
                     ></ckeditor> 
                 </v-card-text>
                 <v-card-actions>

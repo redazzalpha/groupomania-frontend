@@ -88,6 +88,6 @@ export default {
 }
 .ck.ck-editor__main>.ck-editor__editable {
     min-height: 150px;
-    background: unset !important;
+    background-color: unset !important;
 }
 </style>

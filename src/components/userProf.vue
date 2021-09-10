@@ -6,6 +6,8 @@
     v-scroll.self='onScroll'
     style='max-height: 685px;'
     class="overflow-y-auto"
+    v-observe-visibility="observer"
+    :style='"background: url(" + (darkMode? require("../assets/bg-dark.jpg") : require("../assets/bg-light.jpg")) + ") no-repeat fixed center; background-size: 100vw 100vh !important"'
     >
         <!--toolbar-title-->
         <v-toolbar 
@@ -40,7 +42,7 @@
                         <v-list-item @click="dialog.value = false">
                             <v-list-item-title>Fermer</v-list-item-title>
                         </v-list-item>
-                        <v-list-item v-if="checkMenuSU(item)" @click="authSuperUser(item)">
+                        <v-list-item v-if="checkMenuSU(item)" @click="authSuper(item)">
                             <v-list-item-title> {{ item.rights == "basic"?"Activer admin":"Activer basique" }}</v-list-item-title>
                         </v-list-item>
                         <v-list-item v-if="checkMenuSU(item)" @click="userPass(item)">
@@ -191,7 +193,7 @@ export default {
             "getUserPubs",
             "userPubScroll",
         ]),
-        async authSuperUser(item) {
+        async authSuper(item) {
             // this function is used 
             // to set grant access or revoke 
             //  to user
@@ -250,6 +252,10 @@ export default {
         async getPubs () {
             await this.getUserPubs(this.item.userId);
         },
+        observer(isVisible) {
+            if(isVisible) 
+                this.getUserPubs(this.item.userId);
+        },
         closeAlert() {
             this.alertWatcher = false;
         },
@@ -269,9 +275,6 @@ export default {
             this.$el.scrollTop = 0;
         },
     },
-    created() {
-        this.getPubs();
-    }
 }
 </script>
 
