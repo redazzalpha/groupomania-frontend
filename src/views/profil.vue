@@ -201,7 +201,10 @@
                                     class="d-flex flex-column align-center justify-center mx-auto py-4" 
                                     >
                                         <v-card-title>Type de compte</v-card-title>
-                                        <v-card-text class="text-center">{{ userData.rights }}</v-card-text>
+                                        <v-card-text class="text-center">
+                                            {{ userData.rights == 'basic'? 'Utilisateur': 'Administrateur' }}
+                                            <v-icon>{{ userData.rights == 'basic'?'mdi-account':'mdi-shield-account'}}</v-icon>
+                                        </v-card-text>
                                         <v-card-title>Supprimer mon compte</v-card-title>
                                         <v-card-actions>
                                             <v-btn
@@ -257,6 +260,8 @@
             <!--alert-modification-message-->
             <alert
             :text='alertText'
+            :icon='alertIcon'
+            :color='alertColor'
             :watcher='alertWatcher'
             @clickOut='closeAlert'
             ></alert>
@@ -307,8 +312,10 @@ export default {
             loading: false,
             switchLoad: false,
             dialog:false,
+            alertText: '',
+            alertIcon: '',
+            alertColor: '',
             alertWatcher: false,
-            alertText: "", 
             passwdRules:[
                 services.requiredPasswd,
                 services.passwdValidator,
@@ -348,10 +355,17 @@ export default {
                     this.userData.description = this.description;
                     this.description = "";
                     this.alertText = "Votre descrption  a été modifié avec succès";
-                    this.alertWatcher = true;
+                    this.alertIcon = 'mdi-check-circle';
+                    this.alertColor = "green";
                 }
             }
+            catch(e) {
+                this.alertText = 'Une erreur s\'est produite veuillez réessayer ultérieurement';
+                this.alertIcon = 'mdi-alert-circle';
+                this.alertColor = "red";
+            }
             finally {
+                this.alertWatcher = true;
                 setTimeout(() => this.loading = false, defines.TIMEOUT);
             }
         },
@@ -361,10 +375,17 @@ export default {
                     this.loading = true;
                     await this.uptPasswdProf({passwd: this.passwd, passwdChange: this.passwdChange});
                     this.alertText = "Votre mot de passe a été modifié avec succès";
-                    this.alertWatcher = true;
+                    this.alertIcon = 'mdi-check-circle';
+                    this.alertColor = "green";
                 }
             }
+            catch(e) {
+                this.alertText = 'Une erreur s\'est produite veuillez réessayer ultérieurement';
+                this.alertIcon = 'mdi-alert-circle';
+                this.alertColor = "red";
+            }
             finally {
+                this.alertWatcher = true;
                 setTimeout(() => this.loading = false, defines.TIMEOUT);
             }
         },

@@ -73,14 +73,21 @@
                 <v-row>
                     <v-col v-if="checkMenuSU(item)">
                         <div class="text-center text-h6">Type de compte</div>
-                        <v-card-text class="text-center">{{ item.rights }}</v-card-text>
+                        <v-card-text class="text-center">
+                            {{ item.rights == 'basic'? 'Utilisateur': 'Administrateur' }}
+                            <v-icon>{{item.rights == 'basic'? 'mdi-account': 'mdi-shield-account'}}</v-icon>
+                        </v-card-text>
                     </v-col>
                 </v-row>
                 <!--account-status-row-->
                 <v-row>
                     <v-col v-if="checkMenuSU(item)">
                         <div class="text-center text-h6">Status</div>
-                        <v-card-text class="text-center">{{ item.locked? 'Bloqué': 'Débloqué' }}</v-card-text>
+                        <v-card-text class="text-center">
+                            {{ item.locked? 'Bloqué': 'Débloqué' }}
+                            <v-icon>{{item.locked?'mdi-lock':'mdi-lock-open-variant'}}</v-icon>
+                        </v-card-text>
+
                     </v-col>
                 </v-row>
                 <!--publication-card -row-->
@@ -114,18 +121,13 @@
             <!--error-dial-->
         </v-card-text>
         <!--alert-modification-message-->
-        <v-lazy
-        v-model="isActive"
-        :options="{ threshold: .9}"
-        transition="fade-transition"
-        >
-            <alert
-            :text='alertText'
-            :icon='alertIcon'
-            :watcher='alertWatcher'
-            @clickOut='closeAlert'
-            ></alert>
-        </v-lazy>
+        <alert
+        :text='alertText'
+        :icon='alertIcon'
+        :color='alertColor'
+        :watcher='alertWatcher'
+        @clickOut='closeAlert'
+        ></alert>
         <!--scroll-top-button-->
         <v-btn
         v-show="fab"
@@ -163,9 +165,9 @@ export default {
         return {
             alertText: '',
             alertIcon: '',
+            alertColor: '',
             alertWatcher: false,
             fab: false,
-            isActive: false,
             pubs: [],
         };
     },
@@ -202,21 +204,23 @@ export default {
                     await this.superUser(item.userId)
                     this.alertText = `${item.pseudo} est désormais administrateur`;
                     this.alertIcon = 'mdi-check-circle';
-                    this.$emit('refresh');
+                    this.alertColor = "primary";
                 }
                 else {
                     await this.revokeSuperUser(item.userId)
                     this.alertText = `${item.pseudo} n'est plus  administrateur`;
                     this.alertIcon = 'mdi-check-circle';
-                    this.$emit('refresh');
+                    this.alertColor = "green";
                 }
             }
             catch(e) {
                 this.alertText = 'Une erreur s\'est produite veuillez réessayer ultérieurement';
-                this.alertType = 'error';
+                this.alertIcon = 'mdi-alert-circle';
+                this.alertColor = "red";
             }
             finally {
-                this.alertWatcher = true;
+                this.alertWatcher = true;   
+                this.$emit('refresh');
             }
         },
         async userPass(item) {
@@ -226,22 +230,24 @@ export default {
                 if(item.locked) {
                     await this.unlockUser(item.userId)
                     this.alertText = `Le compte de ${item.pseudo} a été débloqué avec succès`;
-                    this.alertIcon = 'mdi-lock-open'
-                    this.$emit('refresh');
+                    this.alertIcon = 'mdi-lock-open-variant'
+                    this.alertColor = "green";
                 }
                 else {
                     await this.lockUser(item.userId)
                     this.alertText = `Le compte de ${item.pseudo} a été bloqué avec succès`;
                     this.alertIcon = 'mdi-lock'
-                    this.$emit('refresh');
+                    this.alertColor = 'red';
                 }
             }
             catch(e) {
                 this.alertText = 'Une erreur s\'est produite veuillez réessayer ultérieurement';
-                this.alertType = 'error';
+                this.alertIcon = 'mdi-alert-circle';
+                this.alertColor = "red";
             }
             finally {
                 this.alertWatcher = true;
+                this.$emit('refresh');
             }
         },
         checkMenuSU(item) {

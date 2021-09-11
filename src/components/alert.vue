@@ -1,6 +1,6 @@
 <template>
     <v-dialog
-    v-model='alert' 
+    :value='watcher' 
     hide-overlay
     :dark='darkMode'
     :max-width='maxWidth'
@@ -48,7 +48,7 @@ export default {
     },
     data() {
         return {
-            alert: false,
+            isActive: true,
         };
     },
     computed: {
@@ -61,10 +61,5 @@ export default {
             this.$emit('clickOut');
         },
     },
-    watch: {
-        watcher(v) {
-            this.alert = v;
-        },
-    }
 }
 </script>

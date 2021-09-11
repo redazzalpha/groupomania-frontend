@@ -38,6 +38,7 @@
                 <v-row>
                     <v-col>
                         <v-text-field
+                        ref='field'
                             autofocus
                             outlined
                             label="Trouver un utilisateur"
@@ -47,11 +48,11 @@
                         >
                             <template v-slot:prepend-inner>
                                 <v-avatar
-                                    size="30"
-                        :color="darkMode? 'grey': 'primary'" 
-                        :dark='darkMode'
+                                size="30"
+                                :color="darkMode? 'grey': 'primary'" 
+                                :dark='darkMode'
                                 >
-                                <v-icon color="white">mdi-account</v-icon>
+                                    <v-icon color="white">mdi-account</v-icon>
                                 </v-avatar>
                             </template>
                         </v-text-field>
@@ -88,6 +89,7 @@
                                 :dialog="dialog"
                                 :item="item"
                                 @refresh="gusers"
+                                v-observe-visibility="observer"
                                 ></userProf>
                             </template> 
                         </v-dialog>                        
@@ -147,13 +149,19 @@ export default {
                 });
             }
             else this.userList = this.users;
-        },                         
+        }, 
+        observer(isVisible) {
+            if(isVisible) {
+                this.fieldValue = "";
+                this.gusers();
+            }
+        },                     
         // function used for show or unshow view
         trigger(ready) {
             this.showPage = ready;                                                                                                                         
         },
     },
-    mounted() {
+    created() {
         this.gusers();
     },
 }

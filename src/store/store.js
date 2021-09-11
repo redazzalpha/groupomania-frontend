@@ -454,16 +454,18 @@ export default new Vuex.Store({
             context.state.userData = {};
             context.state.users = [];
             context.state.publications = [];
+            context.state.userPubs = [];
             context.state.comments = [];
             context.state.notifs = [];
             context.state.dialogErrText = "";
             context.state.dialogErr = false;
             context.state.success = false;
             context.state.progress = false;
-            context.state.showWelcome = false;
+            context.state.showWelcome = true;
             context.state.darkMode = false;
             context.state.pubCount = 0;
             context.state.userPubCount = 0;
+    
             localStorage.removeItem("vuex");
             localStorage.removeItem("grpm_store");
         },

@@ -13,7 +13,7 @@
             <slot>
                 <v-row  class="d-flex flex-column" >
                     <v-card-actions>
-                        <v-btn @click='click' class="mb-3" color="primary">{{ btnLabel }}</v-btn>
+                        <v-btn to='/register' class="mb-3" color="primary">{{ btnLabel }}</v-btn>
                     </v-card-actions>
                 </v-row>
             </slot>
@@ -76,8 +76,8 @@ export default {
         catch(error) {
             this.dialogErr = true;
             // error locked account
-            if(this.userData.locked) {
-                //localStorage.vuex = '';
+            if(error.status == 403) {
+                localStorage.removeItem("vuex");
                 this.click = this.lockGoRgstr;
                 this.text = 'Votre compte est bloqué.';
                 this.btnLabel = 'Ok';
